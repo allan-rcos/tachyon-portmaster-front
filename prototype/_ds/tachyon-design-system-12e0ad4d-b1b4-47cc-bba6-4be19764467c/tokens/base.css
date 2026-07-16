@@ -1,0 +1,68 @@
+/* ============================================================
+   Tachyon — Base layer
+   The signature backdrop + reusable glass utilities.
+   The whole system is designed to sit on the brand "deep water"
+   background: a dark teal-ink base lit by brand-colored glows,
+   with frosted glass surfaces floating on top.
+   ============================================================ */
+
+/* ---- The brand backdrop ---------------------------------- */
+.tachyon-bg,
+body.tachyon-bg {
+  background-color: var(--ink-900);
+  background-image:
+    radial-gradient(60% 55% at 12% 8%,  rgba(42,115,132,0.55) 0%, transparent 60%),
+    radial-gradient(50% 50% at 92% 14%, rgba(236,186,40,0.20) 0%, transparent 55%),
+    radial-gradient(55% 60% at 85% 92%, rgba(142,163,123,0.28) 0%, transparent 60%),
+    radial-gradient(45% 50% at 30% 100%, rgba(217,124,32,0.18) 0%, transparent 55%),
+    linear-gradient(160deg, var(--ink-850) 0%, var(--ink-950) 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+/* ---- Glass surface utilities ----------------------------- */
+/* Base frosted panel — translucent fill, blur, hairline border,
+   crisp top highlight, soft drop shadow. */
+.glass {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    var(--shadow-lg),
+    inset 0 1px 0 var(--glass-highlight);
+  border-radius: var(--radius-lg);
+}
+.glass-strong {
+  background: var(--glass-fill-strong);
+  -webkit-backdrop-filter: blur(var(--glass-blur-lg)) saturate(150%);
+  backdrop-filter: blur(var(--glass-blur-lg)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-xl), inset 0 1px 0 var(--glass-highlight);
+  border-radius: var(--radius-lg);
+}
+.glass-weak {
+  background: var(--glass-fill-weak);
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+  backdrop-filter: blur(var(--glass-blur-sm));
+  border: 1px solid var(--glass-border-soft);
+  border-radius: var(--radius-md);
+}
+
+/* Tinted glass — brand-washed frosted panels */
+.glass-gold   { background: var(--glass-gold);   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%); backdrop-filter: blur(var(--glass-blur)) saturate(150%); border:1px solid rgba(236,186,40,0.32); border-radius: var(--radius-lg); box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.4); }
+.glass-teal   { background: var(--glass-teal);   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%); backdrop-filter: blur(var(--glass-blur)) saturate(150%); border:1px solid rgba(86,155,166,0.34); border-radius: var(--radius-lg); box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.32); }
+.glass-sage   { background: var(--glass-sage);   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%); backdrop-filter: blur(var(--glass-blur)) saturate(150%); border:1px solid rgba(166,186,137,0.34); border-radius: var(--radius-lg); box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.32); }
+.glass-orange { background: var(--glass-orange); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%); backdrop-filter: blur(var(--glass-blur)) saturate(150%); border:1px solid rgba(217,124,32,0.34); border-radius: var(--radius-lg); box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.32); }
+
+/* Text helpers */
+.text-script { font-family: var(--font-script); font-weight: 400; }
+.text-mono   { font-family: var(--font-mono); }
+.eyebrow {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+}

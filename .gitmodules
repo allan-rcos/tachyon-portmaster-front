@@ -1,0 +1,4 @@
+[submodule "swagger"]
+	path = swagger
+	url = git@github.com:allan-rcos/tachyon-swagger.git
+	branch = flatbuffers-openapi

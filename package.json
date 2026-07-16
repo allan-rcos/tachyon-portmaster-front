@@ -1,0 +1,26 @@
+{
+  "name": "portmaster",
+  "type": "module",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "devDependencies": {
+    "@types/bun": "latest",
+    "sass": "^1.101.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.14",
+    "vike": "^0.4.260",
+    "vike-solid": "^0.8.3",
+    "vike-txiki-adapter": "workspace:*",
+    "vite": "^8.1.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build:adapter": "bun run --filter vike-txiki-adapter build",
+    "build": "bun run build:adapter && bunx --bun vite build",
+    "start": "vike-txiki-adapter start"
+  }
+}

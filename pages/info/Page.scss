@@ -1,0 +1,113 @@
+// Estilos da tela de Info. Compilados em build-time pelo Vite (dep `sass`).
+// Como as classes só são usadas nesta página, um SCSS global tem efeito
+// equivalente ao <style> escopado do Svelte.
+.info-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: sans-serif;
+
+  .info-header {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      margin: 0 0 0.5rem 0;
+      color: #222;
+    }
+
+    p {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    @media (min-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .info-card {
+    border: 1px solid #ddd;
+    padding: 1.5rem;
+    background: #fff;
+
+    &.frontend-card {
+      border-top: 4px solid #6b8e23; // Identidade Verde Musgo do FLOW
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+
+      h2 {
+        font-size: 1.25rem;
+        margin: 0;
+      }
+
+      .runtime-badge {
+        background: #f0f0f0;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.85rem;
+        font-family: monospace;
+        border-radius: 3px;
+      }
+    }
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      font-weight: bold;
+      color: #555;
+    }
+
+    code {
+      font-family: monospace;
+    }
+
+    .highlight-metric {
+      font-weight: bold;
+      color: #6b8e23;
+    }
+  }
+
+  .backend-placeholder {
+    border: 2px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+
+    .placeholder-content {
+      text-align: center;
+      color: #888;
+
+      h3 {
+        font-family: monospace;
+        margin: 0 0 0.5rem 0;
+      }
+
+      p {
+        font-size: 0.85rem;
+        margin: 0;
+      }
+    }
+  }
+}

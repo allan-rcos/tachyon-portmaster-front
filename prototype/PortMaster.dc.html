@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/tachyon-design-system-12e0ad4d-b1b4-47cc-bba6-4be19764467c/styles.css">
+  <script src="_ds/tachyon-design-system-12e0ad4d-b1b4-47cc-bba6-4be19764467c/_ds_bundle.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <style>
+    *{box-sizing:border-box;}
+    ::-webkit-scrollbar{width:10px;height:10px;}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px;border:3px solid transparent;background-clip:content-box;}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.22);background-clip:content-box;}
+    .pm-nav:hover{color:var(--text-primary)!important;background:var(--glass-fill)!important;}
+    .pm-cardlift{transition:transform .22s cubic-bezier(.22,1,.36,1),box-shadow .22s,border-color .22s;}
+    .pm-cardlift:hover{transform:translateY(-3px);border-color:var(--glass-border)!important;box-shadow:var(--shadow-xl),inset 0 1px 0 var(--glass-highlight)!important;}
+    .pm-row:hover{background:var(--glass-fill)!important;}
+    .pm-opt:hover{background:var(--glass-fill)!important;}
+    .pm-selbtn:hover{border-color:rgba(255,255,255,.26)!important;}
+    .pm-chip:hover{border-color:rgba(255,255,255,.3)!important;}
+    @keyframes pm-fade{from{opacity:0;}}
+    @keyframes pm-pop{from{opacity:0;transform:translateY(14px) scale(.97);}}
+    .pm-scrim{animation:pm-fade .2s ease;}
+    .pm-dialog{animation:pm-pop .32s cubic-bezier(.34,1.56,.64,1);}
+    .pm-burger,.pm-drawer-close{display:none;}
+    /* ---------- Responsive ---------- */
+    @media (max-width:1180px){
+      .pm-stats{grid-template-columns:repeat(2,1fr)!important;}
+      .pm-cols-2,.pm-resumo,.pm-mani{grid-template-columns:1fr!important;}
+      .pm-search{width:200px!important;}
+    }
+    @media (max-width:860px){
+      /* shell → single column, whole page scrolls */
+      .pm-root{height:auto!important;min-height:100dvh;overflow:visible!important;}
+      .pm-shell{grid-template-columns:1fr!important;width:100%!important;height:auto!important;min-height:100dvh;}
+      .pm-main{height:auto!important;min-height:100dvh;padding:0 0 28px!important;gap:0!important;}
+      .pm-scroll{overflow:visible!important;flex:0 1 auto!important;padding:14px!important;display:flex;flex-direction:column;gap:14px;}
+
+      /* navigation becomes an off-canvas drawer */
+      .pm-sidebar{position:fixed!important;top:0;left:0;bottom:0;height:100dvh!important;width:84vw;max-width:300px;margin:0!important;border-radius:0 20px 20px 0!important;flex-direction:column!important;padding:20px 16px!important;z-index:200;transform:translateX(-100%);transition:transform .32s cubic-bezier(.4,0,.2,1);overflow-y:auto;background:rgba(13,39,46,.94)!important;-webkit-backdrop-filter:blur(28px) saturate(150%);backdrop-filter:blur(28px) saturate(150%);box-shadow:0 24px 70px rgba(0,0,0,.55);}
+      .pm-sidebar.pm-drawer-open{transform:translateX(0);}
+      .pm-sidebar nav{flex-direction:column!important;gap:3px;}
+      .pm-nav{width:100%!important;}
+      .pm-drawer-close{display:inline-flex!important;}
+
+      /* compact sticky top bar with hamburger */
+      .pm-header{position:sticky;top:0;z-index:90;flex-wrap:wrap;border-radius:0!important;padding:12px 16px!important;background:rgba(11,40,46,.8)!important;-webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);box-shadow:0 1px 0 var(--glass-border-soft);}
+      .pm-burger{display:inline-flex!important;flex:0 0 auto;}
+      .pm-header h1{white-space:normal!important;font-size:var(--text-lg)!important;}
+      .pm-header>div:last-child{order:3;width:100%;}
+      .pm-search{width:100%!important;flex:1 1 auto!important;}
+
+      /* flatter surfaces, fuller width */
+      .pm-scroll .cir-card,.pm-scroll .glass,.pm-scroll .glass-weak,.pm-scroll .glass-teal{border-radius:16px!important;}
+
+      /* container & profile cards stack to one column */
+      .pm-cont-grid,.pm-cards{grid-template-columns:1fr!important;}
+
+      /* tables reflow into stacked cards */
+      .pm-prod-head,.pm-user-head{display:none!important;}
+      .pm-prod-row{grid-template-columns:1fr auto!important;grid-template-areas:"name action" "risk risk" "meta meta"!important;gap:7px 12px!important;padding:15px 16px!important;align-items:center!important;}
+      .pm-prod-row>*:nth-child(1){display:none!important;}
+      .pm-prod-row>*:nth-child(2){grid-area:name;font-size:var(--text-base)!important;}
+      .pm-prod-row>*:nth-child(3){grid-area:meta;}
+      .pm-prod-row>*:nth-child(4){grid-area:risk;}
+      .pm-prod-row>*:nth-child(5){grid-area:action;justify-self:end;text-align:right!important;}
+      .pm-user-row{grid-template-columns:1fr auto!important;grid-template-areas:"user action" "email email" "roles roles"!important;gap:10px 12px!important;padding:15px 16px!important;align-items:center!important;}
+      .pm-user-row>*:nth-child(1){grid-area:user;}
+      .pm-user-row>*:nth-child(2){grid-area:email;}
+      .pm-user-row>*:nth-child(3){grid-area:roles;}
+      .pm-user-row>*:nth-child(4){grid-area:action;justify-self:end;}
+
+      /* login → single column, trimmed marketing */
+      .pm-login{grid-template-columns:1fr!important;height:auto!important;min-height:100dvh;}
+      .pm-login-promo{padding:34px 24px 8px!important;gap:14px!important;justify-content:flex-start!important;overflow:visible!important;}
+      .pm-login-promo h1{font-size:28px!important;margin-bottom:0!important;}
+      .pm-login-desc,.pm-login-script,.pm-login-stats{display:none!important;}
+      .pm-login-form{padding:20px 18px 40px!important;align-items:flex-start!important;}
+
+      /* page toolbars → stack, action goes full-width below the context line */
+      .pm-toolbar{flex-direction:column!important;align-items:stretch!important;gap:12px!important;}
+      .pm-toolbar>p{order:-1;}
+      .pm-toolbar>.cir-btn{width:100%!important;justify-content:center!important;min-height:46px;}
+      .pm-toolbar--resumo{flex-direction:column!important;}
+      .pm-toolbar--resumo>div:first-child{width:100%;}
+      .pm-toolbar-actions{width:100%;}
+      .pm-toolbar-actions>.cir-btn{flex:1 1 0;justify-content:center!important;min-height:46px;}
+
+      /* segmented tabs scroll horizontally instead of overflowing */
+      .pm-tabs{width:100%;}
+      .pm-tabs .cir-tabs__list{overflow-x:auto;flex-wrap:nowrap!important;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+      .pm-tabs .cir-tabs__list::-webkit-scrollbar{display:none;}
+      .pm-tabs .cir-tab{flex:0 0 auto;white-space:nowrap;}
+
+      /* honour the 44px hit-target floor — promote sm controls */
+      .pm-scroll .cir-btn--sm{min-height:44px;}
+      .pm-scroll .cir-iconbtn--sm{width:38px;height:38px;}
+
+      /* modal → bottom sheet with grab handle; actions stack full-width, primary on top */
+      .pm-scrim{align-items:flex-end!important;padding:0!important;}
+      .pm-dialog{max-width:none!important;width:100%!important;border-radius:22px 22px 0 0!important;max-height:92vh!important;overflow-y:auto!important;padding:10px 18px calc(26px + env(safe-area-inset-bottom))!important;}
+      .pm-dialog::before{content:"";display:block;width:38px;height:4px;border-radius:99px;background:var(--glass-border);margin:6px auto 14px;}
+      .pm-dialog-actions{flex-direction:column-reverse!important;gap:10px!important;}
+      .pm-dialog-actions>.cir-btn{width:100%!important;justify-content:center!important;min-height:48px;}
+    }
+    @media (max-width:430px){
+      .pm-stats{gap:10px!important;}
+      .pm-scroll{padding:12px!important;}
+      .pm-login-promo h1{font-size:25px!important;}
+      .pm-resumo-meta{flex-wrap:wrap;}
+    }
+  </style>
+</helmet>
+
+<div class="tachyon-bg pm-root" style="height:100vh;width:100%;overflow:hidden;font-family:var(--font-sans);color:var(--text-primary);">
+
+  <!-- ============ LOGIN ============ -->
+  <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+    <div class="pm-login" style="height:100vh;display:grid;grid-template-columns:1.05fr .95fr;">
+      <div class="pm-login-promo" style="position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:54px 56px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:13px;">
+          <img src="assets/emblem-primary.png" alt="" style="width:46px;height:46px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));">
+          <span style="font-size:23px;font-weight:500;letter-spacing:-.02em;">Port<span style="color:var(--gold-400);">Master</span></span>
+        </div>
+        <div style="max-width:430px;">
+          <p class="eyebrow" style="margin:0 0 16px;">Terminal portuário</p>
+          <h1 style="font-size:var(--text-3xl);font-weight:500;line-height:1.08;letter-spacing:-.02em;margin:0 0 18px;">Controle total do pátio, do registro ao despacho.</h1>
+          <p class="pm-login-desc" style="font-size:var(--text-md);color:var(--text-secondary);line-height:1.55;margin:0;">Registre contêineres, monte manifestos de carga com checagem de classe de risco IMDG e acompanhe a telemetria de cada movimentação em tempo real.</p>
+          <p class="text-script pm-login-script" style="font-size:34px;color:var(--gold-300);margin:26px 0 0;">bare metal, à beira d'água</p>
+        </div>
+        <div class="pm-login-stats" style="display:flex;gap:28px;font-size:var(--text-xs);color:var(--text-muted);">
+          <span><b style="color:var(--text-secondary);font-weight:500;">10</b> contêineres no pátio</span>
+          <span><b style="color:var(--text-secondary);font-weight:500;">124,3 t</b> em movimentação</span>
+          <span><b style="color:var(--text-secondary);font-weight:500;">99,98%</b> uptime</span>
+        </div>
+      </div>
+      <div class="pm-login-form" style="display:flex;align-items:center;justify-content:center;padding:40px;">
+        <div class="glass-strong" style="width:100%;max-width:392px;padding:38px 36px;border-radius:var(--radius-xl);">
+          <h2 style="font-size:var(--text-xl);font-weight:500;margin:0 0 6px;">Entrar no console</h2>
+          <p style="font-size:var(--text-sm);color:var(--text-muted);margin:0 0 26px;">Use suas credenciais corporativas.</p>
+          <div class="cir-field" style="margin-bottom:16px;">
+            <label class="cir-field__label">E-mail</label>
+            <div class="cir-input-wrap">
+              <span class="cir-input__icon"><i data-lucide="mail" style="width:16px;height:16px;"></i></span>
+              <input class="cir-input cir-input--has-icon" type="email" value="ana.ferreira@portmaster.com.br" readonly>
+            </div>
+          </div>
+          <div class="cir-field" style="margin-bottom:22px;">
+            <label class="cir-field__label">Senha</label>
+            <div class="cir-input-wrap">
+              <span class="cir-input__icon"><i data-lucide="lock" style="width:16px;height:16px;"></i></span>
+              <input class="cir-input cir-input--has-icon" type="password" value="senha-corporativa" readonly>
+            </div>
+          </div>
+          <button class="cir-btn cir-btn--primary cir-btn--block" onClick="{{ enter }}"><span class="cir-btn__icon"><i data-lucide="log-in" style="width:16px;height:16px;"></i></span><span>Entrar</span></button>
+          <p style="font-size:var(--text-xs);color:var(--text-faint);text-align:center;margin:18px 0 0;">Same-Origin Token · sessão expira em 8 h</p>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ APP ============ -->
+  <sc-if value="{{ loggedIn }}">
+    <div class="pm-shell" style="display:grid;grid-template-columns:252px 1fr;height:100vh;width:100vw;">
+
+      <!-- Sidebar -->
+      <aside class="glass-weak pm-sidebar {{ sidebarExtra }}" style="margin:14px 0 14px 14px;border-radius:var(--radius-xl);display:flex;flex-direction:column;padding:22px 14px;min-height:0;">
+        <div class="pm-brand" style="display:flex;align-items:center;gap:11px;padding:4px 8px 20px;">
+          <img src="assets/emblem-primary.png" alt="" style="width:36px;height:36px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));">
+          <span style="font-size:20px;font-weight:500;letter-spacing:-.02em;">Port<span style="color:var(--gold-400);">Master</span></span>
+          <button class="pm-drawer-close cir-iconbtn cir-iconbtn--sm" onClick="{{ closeDrawer }}" aria-label="Fechar menu" style="margin-left:auto;"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+        </div>
+        <nav style="display:flex;flex-direction:column;gap:3px;">
+          <sc-for list="{{ navMain }}" as="it" hint-placeholder-count="4">
+            <button class="pm-nav" style="{{ it.style }}" onClick="{{ it.onClick }}">
+              <i data-lucide="{{ it.icon }}" style="width:18px;height:18px;"></i><span>{{ it.label }}</span>
+            </button>
+          </sc-for>
+        </nav>
+        <p class="eyebrow pm-side-eyebrow" style="margin:22px 8px 8px;font-size:10px;">Administração</p>
+        <nav style="display:flex;flex-direction:column;gap:3px;">
+          <sc-for list="{{ navAdmin }}" as="it" hint-placeholder-count="2">
+            <button class="pm-nav" style="{{ it.style }}" onClick="{{ it.onClick }}">
+              <i data-lucide="{{ it.icon }}" style="width:18px;height:18px;"></i><span>{{ it.label }}</span>
+            </button>
+          </sc-for>
+        </nav>
+        <div class="pm-spacer" style="flex:1;"></div>
+        <div class="pm-account" style="padding-top:14px;border-top:1px solid var(--glass-border-soft);">
+          <button class="pm-nav" style="{{ contaStyle }}" onClick="{{ goConta }}">
+            <span class="cir-avatar cir-avatar--sm"><span>AF</span></span>
+            <span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;min-width:0;">
+              <span style="font-size:var(--text-sm);font-weight:500;color:var(--text-primary);">Ana Luiza Ferreira</span>
+              <span style="font-size:var(--text-xs);color:var(--text-muted);">Administrador</span>
+            </span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <div class="pm-main" style="display:flex;flex-direction:column;min-width:0;padding:14px;gap:14px;height:100vh;">
+        <header class="glass pm-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;border-radius:var(--radius-xl);flex:0 0 auto;">
+          <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+            <button class="pm-burger cir-iconbtn cir-iconbtn--md" onClick="{{ toggleDrawer }}" aria-label="Abrir menu"><i data-lucide="menu" style="width:20px;height:20px;"></i></button>
+            <div style="min-width:0;">
+              <p class="eyebrow" style="margin:0;">{{ pageEyebrow }}</p>
+              <h1 style="font-size:var(--text-xl);font-weight:500;margin:2px 0 0;white-space:nowrap;">{{ pageTitle }}</h1>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:260px;" class="cir-field pm-search">
+              <div class="cir-input-wrap">
+                <span class="cir-input__icon"><i data-lucide="search" style="width:16px;height:16px;"></i></span>
+                <input class="cir-input cir-input--has-icon" placeholder="Buscar contêiner, produto…" style="height:42px;">
+              </div>
+            </div>
+            <button class="cir-iconbtn cir-iconbtn--md" aria-label="Notificações"><i data-lucide="bell" style="width:18px;height:18px;"></i></button>
+          </div>
+        </header>
+
+        <div class="pm-scroll" style="flex:1;overflow-y:auto;padding:4px;min-height:0;">
+
+          <!-- ===== PAINEL ===== -->
+          <sc-if value="{{ isPainel }}">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="pm-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;">
+                <div class="glass" style="padding:18px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <span class="glass-teal" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--radius-md);"><i data-lucide="container" style="width:18px;height:18px;"></i></span>
+                  </div>
+                  <div style="font-size:var(--text-3xl);font-weight:500;line-height:1;letter-spacing:-.02em;">{{ statActive }}<span style="font-size:var(--text-lg);color:var(--text-muted);margin-left:4px;font-weight:400;">/10</span></div>
+                  <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:6px;">Contêineres ativos</div>
+                </div>
+                <div class="glass" style="padding:18px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <span class="glass-sage" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--radius-md);"><i data-lucide="ship" style="width:18px;height:18px;"></i></span>
+                    <span class="cir-badge cir-badge--sage" dot>em rota</span>
+                  </div>
+                  <div style="font-size:var(--text-3xl);font-weight:500;line-height:1;letter-spacing:-.02em;">{{ statTransit }}</div>
+                  <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:6px;">Em trânsito</div>
+                </div>
+                <div class="glass" style="padding:18px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <span class="glass-gold" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--radius-md);"><i data-lucide="weight" style="width:18px;height:18px;"></i></span>
+                  </div>
+                  <div style="font-size:var(--text-3xl);font-weight:500;line-height:1;letter-spacing:-.02em;">{{ statWeight }}<span style="font-size:var(--text-lg);color:var(--text-muted);margin-left:4px;font-weight:400;">t</span></div>
+                  <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:6px;">Carga no pátio</div>
+                </div>
+                <div class="glass" style="padding:18px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <span class="glass-orange" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--radius-md);"><i data-lucide="package" style="width:18px;height:18px;"></i></span>
+                  </div>
+                  <div style="font-size:var(--text-3xl);font-weight:500;line-height:1;letter-spacing:-.02em;">{{ statProducts }}</div>
+                  <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:6px;">Produtos no catálogo</div>
+                </div>
+              </div>
+
+              <div class="pm-cols-2" style="display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start;">
+                <div class="cir-card">
+                  <h3 class="cir-card__title">Ocupação do pátio</h3>
+                  <div style="display:flex;flex-direction:column;gap:16px;margin-top:8px;">
+                    <sc-for list="{{ dist }}" as="d" hint-placeholder-count="4">
+                      <div>
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;">
+                          <span style="display:flex;align-items:center;gap:9px;font-size:var(--text-sm);"><span style="width:9px;height:9px;border-radius:50%;background:{{ d.color }};box-shadow:0 0 8px {{ d.color }};"></span>{{ d.label }}</span>
+                          <span class="text-mono" style="font-size:var(--text-sm);color:var(--text-secondary);">{{ d.n }}</span>
+                        </div>
+                        <div style="height:6px;border-radius:999px;background:var(--glass-fill-strong);overflow:hidden;"><span style="{{ d.barStyle }}"></span></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div class="cir-card">
+                  <h3 class="cir-card__title">Atividade recente</h3>
+                  <ul style="list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:15px;">
+                    <sc-for list="{{ feed }}" as="f" hint-placeholder-count="5">
+                      <li style="display:flex;gap:12px;align-items:flex-start;">
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;flex:0 0 auto;background:var(--glass-fill);border:1px solid var(--glass-border-soft);color:{{ f.color }};"><i data-lucide="{{ f.icon }}" style="width:15px;height:15px;"></i></span>
+                        <div style="flex:1;min-width:0;">
+                          <div style="font-size:var(--text-sm);color:var(--text-secondary);line-height:1.4;"><b class="text-mono" style="color:var(--text-primary);font-weight:500;">{{ f.code }}</b> {{ f.text }}</div>
+                          <div style="font-size:var(--text-xs);color:var(--text-faint);margin-top:2px;">{{ f.label }} · {{ f.time }}</div>
+                        </div>
+                      </li>
+                    </sc-for>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== CONTÊINERES ===== -->
+          <sc-if value="{{ isConteineres }}">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="pm-toolbar" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                <div class="cir-tabs pm-tabs"><div class="cir-tabs__list">
+                  <sc-for list="{{ statusTabs }}" as="t" hint-placeholder-count="5">
+                    <button class="cir-tab" style="{{ t.style }}" onClick="{{ t.onClick }}">{{ t.label }}</button>
+                  </sc-for>
+                </div></div>
+                <button class="cir-btn cir-btn--primary cir-btn--sm" onClick="{{ openContainer }}"><span class="cir-btn__icon"><i data-lucide="plus" style="width:16px;height:16px;"></i></span><span>Registrar contêiner</span></button>
+              </div>
+
+              <div class="pm-cont-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;">
+                <sc-for list="{{ visibleContainers }}" as="c" hint-placeholder-count="6">
+                  <div class="glass pm-cardlift" style="padding:18px;cursor:pointer;" onClick="{{ c.open }}">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;">
+                      <div>
+                        <div class="text-mono" style="font-size:var(--text-md);font-weight:500;letter-spacing:.01em;">{{ c.code }}</div>
+                        <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:3px;">cap. {{ c.capText }} kg</div>
+                      </div>
+                      <span class="cir-badge {{ c.badgeClass }}"><span class="cir-badge__dot"></span>{{ c.statusLabel }}</span>
+                    </div>
+                    <div style="display:flex;align-items:flex-end;gap:14px;">
+                      <div style="position:relative;width:46px;height:62px;border:2px solid var(--glass-border);border-radius:7px;overflow:hidden;flex:0 0 auto;background:var(--glass-fill-weak);">
+                        <span style="{{ c.siloStyle }}"></span>
+                        <span style="position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,transparent 0,transparent 9px,rgba(255,255,255,.07) 9px,rgba(255,255,255,.07) 10px);"></span>
+                      </div>
+                      <div style="flex:1;min-width:0;">
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+                          <span style="font-size:var(--text-2xl);font-weight:500;line-height:1;letter-spacing:-.02em;">{{ c.pctText }}</span>
+                          <span class="text-mono" style="font-size:var(--text-xs);color:var(--text-muted);">{{ c.weightText }}</span>
+                        </div>
+                        <div style="height:7px;border-radius:999px;background:var(--glass-fill-strong);overflow:hidden;"><span style="{{ c.barStyle }}"></span></div>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== RESUMO ===== -->
+          <sc-if value="{{ isResumo }}">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="pm-toolbar pm-toolbar--resumo" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:14px;">
+                  <button class="cir-iconbtn cir-iconbtn--md" onClick="{{ back }}" aria-label="Voltar"><i data-lucide="arrow-left" style="width:18px;height:18px;"></i></button>
+                  <div>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                      <span class="text-mono" style="font-size:var(--text-2xl);font-weight:500;letter-spacing:.01em;">{{ sel.code }}</span>
+                      <span class="cir-badge {{ selBadgeClass }}"><span class="cir-badge__dot"></span>{{ selStatusLabel }}</span>
+                    </div>
+                    <div style="font-size:var(--text-sm);color:var(--text-muted);margin-top:3px;">Raio-X completo · manifesto e telemetria</div>
+                  </div>
+                </div>
+                <div class="pm-toolbar-actions" style="display:flex;gap:10px;">
+                  <button class="cir-btn cir-btn--secondary cir-btn--sm" style="{{ sealStyle }}"><span class="cir-btn__icon"><i data-lucide="lock" style="width:16px;height:16px;"></i></span><span>Lacrar</span></button>
+                  <button class="cir-btn cir-btn--primary cir-btn--sm" style="{{ dispatchStyle }}"><span class="cir-btn__icon"><i data-lucide="ship" style="width:16px;height:16px;"></i></span><span>Despachar</span></button>
+                </div>
+              </div>
+
+              <div class="pm-resumo" style="display:grid;grid-template-columns:320px 1fr;gap:14px;align-items:start;">
+                <div class="cir-card" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+                  <div style="position:relative;width:118px;height:168px;border:3px solid var(--glass-border);border-radius:12px;overflow:hidden;background:var(--glass-fill-weak);box-shadow:inset 0 2px 0 var(--glass-highlight);">
+                    <span style="{{ selFillStyle }}"></span>
+                    <span style="position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,transparent 0,transparent 15px,rgba(255,255,255,.06) 15px,rgba(255,255,255,.06) 17px);"></span>
+                    <span class="text-mono" style="position:absolute;top:8px;left:0;right:0;text-align:center;font-size:10px;color:var(--text-faint);">ISO 22GP</span>
+                  </div>
+                  <div style="text-align:center;">
+                    <div style="font-size:var(--text-4xl);font-weight:500;line-height:1;letter-spacing:-.02em;">{{ selPctText }}</div>
+                    <div style="font-size:var(--text-sm);color:var(--text-muted);margin-top:6px;">de ocupação</div>
+                  </div>
+                  <div style="width:100%;">
+                    <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--glass-border-soft);"><span style="font-size:var(--text-sm);color:var(--text-muted);">Peso atual</span><span class="text-mono" style="font-size:var(--text-sm);">{{ selCurText }} kg</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--glass-border-soft);"><span style="font-size:var(--text-sm);color:var(--text-muted);">Capacidade</span><span class="text-mono" style="font-size:var(--text-sm);">{{ selCapText }} kg</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--glass-border-soft);"><span style="font-size:var(--text-sm);color:var(--text-muted);">Espaço livre</span><span class="text-mono" style="font-size:var(--text-sm);">{{ selFreeText }} kg</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:11px 0;"><span style="font-size:var(--text-sm);color:var(--text-muted);">Itens no manifesto</span><span class="text-mono" style="font-size:var(--text-sm);">{{ selItemCount }}</span></div>
+                  </div>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:14px;min-width:0;">
+                  <div class="cir-card">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                      <h3 class="cir-card__title" style="margin:0;">Manifesto de carga</h3>
+                      <span class="cir-badge cir-badge--neutral">{{ selItemCount }} itens</span>
+                    </div>
+                    <sc-if value="{{ selHasManifest }}">
+                      <div style="margin-top:10px;">
+                        <div style="display:grid;grid-template-columns:1fr 150px 110px;gap:14px;padding:0 4px 10px;border-bottom:1px solid var(--glass-border-soft);font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;">
+                          <span>Produto</span><span>Classe de risco</span><span style="text-align:right;">Peso</span>
+                        </div>
+                        <sc-for list="{{ selManifest }}" as="m" hint-placeholder-count="3">
+                          <div class="pm-row" style="display:grid;grid-template-columns:1fr 150px 110px;gap:14px;align-items:center;padding:13px 4px;border-bottom:1px solid var(--glass-border-soft);border-radius:6px;">
+                            <span style="font-size:var(--text-sm);font-weight:500;">{{ m.productName }}</span>
+                            <span><span class="cir-badge {{ m.risk.cls }}">{{ m.risk.label }}</span></span>
+                            <span class="text-mono" style="font-size:var(--text-sm);text-align:right;">{{ m.weightText }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ selEmpty }}">
+                      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:36px;color:var(--text-muted);text-align:center;">
+                        <i data-lucide="package-open" style="width:30px;height:30px;"></i>
+                        <p style="margin:0;font-size:var(--text-sm);">Contêiner vazio. Nenhum produto carregado.</p>
+                      </div>
+                    </sc-if>
+                  </div>
+
+                  <div class="cir-card">
+                    <h3 class="cir-card__title">Telemetria · últimos eventos</h3>
+                    <ul style="list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;">
+                      <sc-for list="{{ selLogs }}" as="l" hint-placeholder-count="4">
+                        <li style="display:flex;gap:14px;align-items:flex-start;padding-bottom:18px;">
+                          <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;flex:0 0 auto;background:var(--glass-fill);border:1px solid var(--glass-border-soft);color:{{ l.ev.color }};"><i data-lucide="{{ l.ev.icon }}" style="width:16px;height:16px;"></i></span>
+                          <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:center;gap:9px;"><span style="font-size:var(--text-xs);font-weight:500;color:{{ l.ev.color }};text-transform:uppercase;letter-spacing:.06em;">{{ l.ev.label }}</span><span class="text-mono" style="font-size:var(--text-xs);color:var(--text-faint);">{{ l.t }}</span></div>
+                            <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:3px;">{{ l.desc }}</div>
+                          </div>
+                        </li>
+                      </sc-for>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== PRODUTOS ===== -->
+          <sc-if value="{{ isProdutos }}">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="pm-toolbar" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                <p style="margin:0;font-size:var(--text-sm);color:var(--text-muted);">{{ statProducts }} produtos no catálogo · classificação de risco IMDG</p>
+                <button class="cir-btn cir-btn--primary cir-btn--sm" onClick="{{ openProduct }}"><span class="cir-btn__icon"><i data-lucide="plus" style="width:16px;height:16px;"></i></span><span>Cadastrar produto</span></button>
+              </div>
+              <div class="cir-card pm-table" style="padding:0;overflow:hidden;">
+                <div class="pm-prod-head" style="display:grid;grid-template-columns:54px 1fr 150px 230px 52px;gap:16px;align-items:center;padding:15px 22px;border-bottom:1px solid var(--glass-border-soft);font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;">
+                  <span>ID</span><span>Produto</span><span>Densidade</span><span>Classe de risco</span><span></span>
+                </div>
+                <sc-for list="{{ products }}" as="p" hint-placeholder-count="10">
+                  <div class="pm-row pm-prod-row" style="display:grid;grid-template-columns:54px 1fr 150px 230px 52px;gap:16px;align-items:center;padding:15px 22px;border-bottom:1px solid var(--glass-border-soft);">
+                    <span class="text-mono" style="font-size:var(--text-sm);color:var(--text-muted);">{{ p.id }}</span>
+                    <span style="font-size:var(--text-sm);font-weight:500;">{{ p.name }}</span>
+                    <span class="text-mono" style="font-size:var(--text-sm);color:var(--text-secondary);">{{ p.densityText }} g/cm³</span>
+                    <span><span class="cir-badge {{ p.risk.cls }}">{{ p.riskFull }}</span></span>
+                    <span style="text-align:right;"><button class="cir-iconbtn cir-iconbtn--sm" aria-label="Editar" onClick="{{ editProduct }}"><i data-lucide="pencil" style="width:15px;height:15px;"></i></button></span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== MANIFESTOS ===== -->
+          <sc-if value="{{ isManifestos }}">
+            <div class="pm-mani" style="display:grid;grid-template-columns:1fr 360px;gap:14px;align-items:start;">
+              <div class="cir-card">
+                <h3 class="cir-card__title">Movimentar carga</h3>
+                <p style="margin:0 0 18px;font-size:var(--text-sm);color:var(--text-muted);">{{ maniDesc }}</p>
+                <div class="cir-tabs pm-tabs" style="margin-bottom:20px;"><div class="cir-tabs__list">
+                  <button class="cir-tab" style="{{ maniLoadStyle }}" onClick="{{ setManiLoad }}">Carregar</button>
+                  <button class="cir-tab" style="{{ maniUnloadStyle }}" onClick="{{ setManiUnload }}">Descarregar</button>
+                </div></div>
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                  <div class="cir-field">
+                    <label class="cir-field__label">Contêiner</label>
+                    <div style="position:relative;">
+                      <button class="pm-selbtn" onClick="{{ containerSelect.toggle }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--font-mono);font-size:var(--text-sm);color:var(--text-primary);background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:11px 14px;height:44px;cursor:pointer;text-align:left;transition:border-color .2s;">
+                        <span>{{ containerSelect.label }}</span>
+                        <i data-lucide="chevron-down" style="{{ containerSelect.chevStyle }}"></i>
+                      </button>
+                      <sc-if value="{{ containerSelect.isOpen }}">
+                        <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:60;border-radius:var(--radius-md);padding:6px;display:flex;flex-direction:column;background:rgba(13,39,46,.74);-webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);border:1px solid var(--glass-border);box-shadow:0 20px 48px rgba(0,0,0,.55),inset 0 1px 0 var(--glass-highlight);">
+                          <div style="position:relative;margin-bottom:5px;flex:0 0 auto;">
+                            <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);display:flex;pointer-events:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></span>
+                            <input value="{{ containerSelect.search }}" onInput="{{ containerSelect.onSearch }}" autoFocus="{{ true }}" placeholder="Buscar por código…" class="text-mono" style="width:100%;height:38px;padding:0 12px 0 34px;font-size:var(--text-sm);color:var(--text-primary);background:rgba(255,255,255,.06);border:1px solid var(--glass-border-soft);border-radius:9px;outline:none;">
+                          </div>
+                          <div style="max-height:220px;overflow:auto;display:flex;flex-direction:column;gap:1px;">
+                            <sc-for list="{{ containerSelect.options }}" as="o" hint-placeholder-count="6">
+                              <button class="pm-opt text-mono" onClick="{{ o.pick }}" style="{{ o.style }}"><span>{{ o.label }}</span><sc-if value="{{ o.selected }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold-300)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto;"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></button>
+                            </sc-for>
+                            <sc-if value="{{ containerSelect.empty }}">
+                              <div style="padding:16px;text-align:center;font-size:var(--text-sm);color:var(--text-muted);">Nenhum contêiner encontrado.</div>
+                            </sc-if>
+                          </div>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </div>
+                  <div class="cir-field">
+                    <label class="cir-field__label">Produto</label>
+                    <div style="position:relative;">
+                      <button class="pm-selbtn" onClick="{{ productSelect.toggle }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--font-sans);font-size:var(--text-base);color:var(--text-primary);background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:11px 14px;height:44px;cursor:pointer;text-align:left;transition:border-color .2s;">
+                        <span>{{ productSelect.label }}</span>
+                        <i data-lucide="chevron-down" style="{{ productSelect.chevStyle }}"></i>
+                      </button>
+                      <sc-if value="{{ productSelect.isOpen }}">
+                        <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:60;border-radius:var(--radius-md);padding:6px;display:flex;flex-direction:column;background:rgba(13,39,46,.74);-webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);border:1px solid var(--glass-border);box-shadow:0 20px 48px rgba(0,0,0,.55),inset 0 1px 0 var(--glass-highlight);">
+                          <div style="position:relative;margin-bottom:5px;flex:0 0 auto;">
+                            <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);display:flex;pointer-events:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></span>
+                            <input value="{{ productSelect.search }}" onInput="{{ productSelect.onSearch }}" autoFocus="{{ true }}" placeholder="Buscar por nome…" style="width:100%;height:38px;padding:0 12px 0 34px;font-family:var(--font-sans);font-size:var(--text-sm);color:var(--text-primary);background:rgba(255,255,255,.06);border:1px solid var(--glass-border-soft);border-radius:9px;outline:none;">
+                          </div>
+                          <div style="max-height:220px;overflow:auto;display:flex;flex-direction:column;gap:1px;">
+                            <sc-for list="{{ productSelect.options }}" as="o" hint-placeholder-count="10">
+                              <button class="pm-opt" onClick="{{ o.pick }}" style="{{ o.style }}"><span>{{ o.label }}</span><sc-if value="{{ o.selected }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold-300)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto;"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></button>
+                            </sc-for>
+                            <sc-if value="{{ productSelect.empty }}">
+                              <div style="padding:16px;text-align:center;font-size:var(--text-sm);color:var(--text-muted);">Nenhum produto encontrado.</div>
+                            </sc-if>
+                          </div>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </div>
+                  <div class="cir-field">
+                    <label class="cir-field__label">Quantidade (kg)</label>
+                    <div class="cir-input-wrap">
+                      <span class="cir-input__icon"><i data-lucide="weight" style="width:16px;height:16px;"></i></span>
+                      <input class="cir-input cir-input--has-icon" type="text" value="1.500">
+                    </div>
+                    <span class="cir-field__hint">Mínimo 0,0001 kg · checagem de classe de risco e limite de peso na confirmação.</span>
+                  </div>
+                  <div class="glass-weak" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:var(--radius-md);">
+                    <span style="font-size:var(--text-sm);color:var(--text-secondary);">Peso após a operação</span>
+                    <span class="text-mono" style="font-size:var(--text-md);font-weight:500;">{{ maniPreview }} <span style="color:var(--text-muted);">/ 24.000 kg</span></span>
+                  </div>
+                  <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                    <button class="cir-btn cir-btn--primary"><span class="cir-btn__icon"><i data-lucide="{{ maniActionIcon }}" style="width:16px;height:16px;"></i></span><span>{{ maniActionLabel }}</span></button>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <div class="cir-card glass-teal">
+                  <h3 class="cir-card__title">Regras de movimentação</h3>
+                  <ul style="list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:14px;">
+                    <li style="display:flex;gap:11px;align-items:flex-start;font-size:var(--text-sm);color:var(--text-secondary);"><i data-lucide="flask-conical" style="width:17px;height:17px;color:var(--gold-300);flex:0 0 auto;margin-top:1px;"></i><span>Classe de risco IMDG checada antes de cada carga.</span></li>
+                    <li style="display:flex;gap:11px;align-items:flex-start;font-size:var(--text-sm);color:var(--text-secondary);"><i data-lucide="scale" style="width:17px;height:17px;color:var(--gold-300);flex:0 0 auto;margin-top:1px;"></i><span>Limite de peso respeitado por transação atômica.</span></li>
+                    <li style="display:flex;gap:11px;align-items:flex-start;font-size:var(--text-sm);color:var(--text-secondary);"><i data-lucide="lock" style="width:17px;height:17px;color:var(--gold-300);flex:0 0 auto;margin-top:1px;"></i><span>Contêineres <b style="color:var(--text-primary);font-weight:500;">Lacrado</b> ou <b style="color:var(--text-primary);font-weight:500;">Em trânsito</b> não recebem movimentação.</span></li>
+                    <li style="display:flex;gap:11px;align-items:flex-start;font-size:var(--text-sm);color:var(--text-secondary);"><i data-lucide="rotate-ccw" style="width:17px;height:17px;color:var(--gold-300);flex:0 0 auto;margin-top:1px;"></i><span>Ao zerar o peso, o status volta a <b style="color:var(--text-primary);font-weight:500;">Vazio</b>.</span></li>
+                  </ul>
+                </div>
+                <div class="cir-card">
+                  <h3 class="cir-card__title" style="font-size:var(--text-md);">Ciclo de vida</h3>
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;">
+                    <span class="cir-badge cir-badge--neutral">Vazio</span><i data-lucide="chevron-right" style="width:14px;height:14px;color:var(--text-faint);"></i>
+                    <span class="cir-badge cir-badge--orange">Carregando</span><i data-lucide="chevron-right" style="width:14px;height:14px;color:var(--text-faint);"></i>
+                    <span class="cir-badge cir-badge--gold">Lacrado</span><i data-lucide="chevron-right" style="width:14px;height:14px;color:var(--text-faint);"></i>
+                    <span class="cir-badge cir-badge--sage">Em trânsito</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== USUÁRIOS ===== -->
+          <sc-if value="{{ isUsuarios }}">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="pm-toolbar" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                <p style="margin:0;font-size:var(--text-sm);color:var(--text-muted);">{{ userCount }} usuários cadastrados · controle de acesso por perfil</p>
+                <button class="cir-btn cir-btn--primary cir-btn--sm" onClick="{{ openUser }}"><span class="cir-btn__icon"><i data-lucide="user-plus" style="width:16px;height:16px;"></i></span><span>Cadastrar usuário</span></button>
+              </div>
+              <div class="cir-card pm-table" style="padding:0;overflow:hidden;">
+                <div class="pm-user-head" style="display:grid;grid-template-columns:1.3fr 1.3fr 1.2fr 96px;gap:16px;align-items:center;padding:15px 22px;border-bottom:1px solid var(--glass-border-soft);font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;">
+                  <span>Usuário</span><span>E-mail</span><span>Perfis</span><span></span>
+                </div>
+                <sc-for list="{{ users }}" as="u" hint-placeholder-count="5">
+                  <div class="pm-row pm-user-row" style="display:grid;grid-template-columns:1.3fr 1.3fr 1.2fr 96px;gap:16px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--glass-border-soft);">
+                    <span style="display:flex;align-items:center;gap:12px;min-width:0;">
+                      <span class="cir-avatar cir-avatar--md"><span>{{ u.initials }}</span></span>
+                      <span style="display:flex;flex-direction:column;min-width:0;"><span style="font-size:var(--text-sm);font-weight:500;">{{ u.name }}</span><span class="text-mono" style="font-size:var(--text-xs);color:var(--text-faint);">#{{ u.id }}</span></span>
+                    </span>
+                    <span class="text-mono" style="font-size:var(--text-sm);color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;">{{ u.email }}</span>
+                    <span style="display:flex;flex-wrap:wrap;gap:6px;">
+                      <sc-for list="{{ u.roles }}" as="r" hint-placeholder-count="1">
+                        <span class="cir-badge cir-badge--gold">{{ r }}</span>
+                      </sc-for>
+                    </span>
+                    <span style="display:flex;gap:6px;justify-content:flex-end;">
+                      <button class="cir-iconbtn cir-iconbtn--sm" aria-label="Editar" onClick="{{ editUser }}"><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+                      <button class="cir-iconbtn cir-iconbtn--sm" aria-label="Redefinir senha" onClick="{{ openPwd }}"><i data-lucide="key-round" style="width:15px;height:15px;"></i></button>
+                    </span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== PERFIS ===== -->
+          <sc-if value="{{ isPerfis }}">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="pm-toolbar" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                <p style="margin:0;font-size:var(--text-sm);color:var(--text-muted);">{{ roleCount }} perfis · permissões mapeadas via backed enums (contexto:ação)</p>
+                <button class="cir-btn cir-btn--primary cir-btn--sm" onClick="{{ openRole }}"><span class="cir-btn__icon"><i data-lucide="plus" style="width:16px;height:16px;"></i></span><span>Criar perfil</span></button>
+              </div>
+              <div class="pm-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px;">
+                <sc-for list="{{ roles }}" as="r" hint-placeholder-count="5">
+                  <div class="cir-card">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;">
+                      <div style="display:flex;align-items:center;gap:12px;">
+                        <span class="glass-gold" style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:var(--radius-md);"><i data-lucide="shield-check" style="width:19px;height:19px;"></i></span>
+                        <div>
+                          <div style="font-size:var(--text-md);font-weight:500;">{{ r.name }}</div>
+                          <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px;">{{ r.desc }}</div>
+                        </div>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto;">
+                        <span class="cir-badge cir-badge--neutral"><i data-lucide="users" style="width:12px;height:12px;"></i>{{ r.members }}</span>
+                        <button class="cir-iconbtn cir-iconbtn--sm" aria-label="Editar perfil" onClick="{{ editRole }}"><i data-lucide="pencil" style="width:15px;height:15px;"></i></button>
+                      </div>
+                    </div>
+                    <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px;">{{ r.count }} permissões</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                      <sc-for list="{{ r.chips }}" as="ch" hint-placeholder-count="6">
+                        <span class="text-mono" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:4px 9px;border-radius:999px;background:var(--glass-fill);border:1px solid var(--glass-border-soft);color:var(--text-secondary);"><span style="width:6px;height:6px;border-radius:50%;background:{{ ch.color }};"></span>{{ ch.text }}</span>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== MINHA CONTA ===== -->
+          <sc-if value="{{ isConta }}">
+            <div style="max-width:680px;display:flex;flex-direction:column;gap:14px;">
+              <div class="cir-card">
+                <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+                  <span class="cir-avatar cir-avatar--lg"><span>AF</span></span>
+                  <div>
+                    <div style="font-size:var(--text-lg);font-weight:500;">Ana Luiza Ferreira</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:5px;"><span class="cir-badge cir-badge--gold">Administrador</span><span class="text-mono" style="font-size:var(--text-xs);color:var(--text-faint);">#99</span></div>
+                  </div>
+                </div>
+                <div class="pm-cols-2" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                  <div class="cir-field">
+                    <label class="cir-field__label">Nome</label>
+                    <input class="cir-input" type="text" value="Ana Luiza Ferreira">
+                  </div>
+                  <div class="cir-field">
+                    <label class="cir-field__label">E-mail</label>
+                    <input class="cir-input" type="email" value="ana.ferreira@portmaster.com.br">
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+                  <button class="cir-btn cir-btn--ghost cir-btn--sm">Cancelar</button>
+                  <button class="cir-btn cir-btn--primary cir-btn--sm">Salvar alterações</button>
+                </div>
+              </div>
+              <div class="cir-card">
+                <h3 class="cir-card__title">Segurança</h3>
+                <p style="margin:0 0 18px;font-size:var(--text-sm);color:var(--text-muted);">Altere sua senha de acesso ao console.</p>
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                  <div class="cir-field">
+                    <label class="cir-field__label">Senha atual</label>
+                    <input class="cir-input" type="password" value="senha-atual-secreta">
+                  </div>
+                  <div class="pm-cols-2" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div class="cir-field">
+                      <label class="cir-field__label">Nova senha</label>
+                      <input class="cir-input" type="password" value="nova-senha">
+                      <span class="cir-field__hint">Mínimo 8 caracteres.</span>
+                    </div>
+                    <div class="cir-field">
+                      <label class="cir-field__label">Confirmar nova senha</label>
+                      <input class="cir-input" type="password" value="nova-senha">
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+                  <button class="cir-btn cir-btn--primary cir-btn--sm"><span class="cir-btn__icon"><i data-lucide="key-round" style="width:16px;height:16px;"></i></span><span>Alterar senha</span></button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ drawerOpen }}">
+      <div class="pm-drawer-scrim" onClick="{{ closeDrawer }}" style="position:fixed;inset:0;z-index:150;background:rgba(7,23,27,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);"></div>
+    </sc-if>
+    <sc-if value="{{ modalOpen }}">
+      <div class="pm-scrim" onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:1000;background:rgba(7,23,27,.62);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:24px;">
+        <div class="pm-dialog glass-strong" onClick="{{ stop }}" style="width:100%;max-width:472px;border-radius:var(--radius-xl);padding:26px 30px 28px;max-height:88vh;overflow:visible;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid var(--glass-border-soft);">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <span class="{{ modalTintClass }}" style="display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:var(--radius-md);flex:0 0 auto;"><i data-lucide="{{ modalIcon }}" style="width:21px;height:21px;"></i></span>
+              <div>
+                <p class="eyebrow" style="margin:0 0 3px;">{{ modalEyebrow }}</p>
+                <h2 style="font-size:var(--text-xl);font-weight:500;margin:0;line-height:1.1;">{{ modalTitle }}</h2>
+              </div>
+            </div>
+            <button class="cir-iconbtn cir-iconbtn--sm" onClick="{{ closeModal }}" aria-label="Fechar"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+          </div>
+
+          <sc-if value="{{ isModalContainer }}">
+            <p style="margin:0 0 20px;font-size:var(--text-sm);color:var(--text-muted);">O contêiner é criado com peso 0 kg e status Vazio.</p>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="cir-field">
+                <label class="cir-field__label">Código <span style="color:var(--text-faint);font-weight:400;">(opcional)</span></label>
+                <input class="cir-input text-mono" placeholder="CSQU3054383">
+                <span class="cir-field__hint">4 letras + 7 números. Em branco, será gerado automaticamente.</span>
+              </div>
+              <div class="cir-field">
+                <label class="cir-field__label">Capacidade máxima (kg)</label>
+                <input class="cir-input" type="text" value="24.000">
+                <span class="cir-field__hint">Mínimo 1 kg.</span>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isModalProduct }}">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="cir-field"><label class="cir-field__label">Nome</label><input class="cir-input" placeholder="Cloreto de Sódio"></div>
+              <div class="cir-field"><label class="cir-field__label">Densidade (g/cm³)</label><input class="cir-input" value="2.16"><span class="cir-field__hint">Deve ser maior que 0.</span></div>
+              <div class="cir-field"><label class="cir-field__label">Classe de risco (IMDG)</label>
+                <div style="position:relative;">
+                  <button class="pm-selbtn" onClick="{{ riskSelect.toggle }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--font-sans);font-size:var(--text-base);color:var(--text-primary);background:var(--glass-fill);border:1px solid var(--glass-border);border-radius:var(--radius-md);padding:11px 14px;height:44px;cursor:pointer;text-align:left;transition:border-color .2s;">
+                    <span>{{ riskSelect.label }}</span>
+                    <i data-lucide="chevron-down" style="{{ riskSelect.chevStyle }}"></i>
+                  </button>
+                  <sc-if value="{{ riskSelect.isOpen }}">
+                    <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:60;max-height:240px;overflow:auto;border-radius:var(--radius-md);padding:6px;display:flex;flex-direction:column;gap:1px;background:rgba(13,39,46,.74);-webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);border:1px solid var(--glass-border);box-shadow:0 20px 48px rgba(0,0,0,.55),inset 0 1px 0 var(--glass-highlight);">
+                      <sc-for list="{{ riskSelect.options }}" as="o" hint-placeholder-count="6">
+                        <button class="pm-opt" onClick="{{ o.pick }}" style="{{ o.style }}"><span>{{ o.label }}</span><sc-if value="{{ o.selected }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold-300)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto;"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isModalUser }}">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="cir-field"><label class="cir-field__label">Nome</label><input class="cir-input" placeholder="Maria Souza"></div>
+              <div class="cir-field"><label class="cir-field__label">E-mail</label><input class="cir-input" type="email" placeholder="maria.souza@portmaster.com.br"></div>
+              <sc-if value="{{ modalUserCreate }}">
+                <div class="cir-field"><label class="cir-field__label">Senha inicial</label><input class="cir-input" type="password" value="Mudar@1234"><span class="cir-field__hint">O usuário deverá alterá-la no primeiro acesso.</span></div>
+              </sc-if>
+              <div class="cir-field"><label class="cir-field__label">Perfis</label>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:2px;">
+                  <sc-for list="{{ rolesOpts }}" as="r" hint-placeholder-count="5">
+                    <button class="pm-chip" onClick="{{ r.toggle }}" style="{{ r.style }}"><span>{{ r.name }}</span><sc-if value="{{ r.selected }}"><i data-lucide="check" style="width:14px;height:14px;flex:0 0 auto;"></i></sc-if></button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isModalRole }}">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="cir-field"><label class="cir-field__label">Nome do perfil</label><input class="cir-input" placeholder="Suporte Técnico N1"></div>
+              <div class="cir-field"><label class="cir-field__label">Permissões</label>
+                <div style="display:flex;flex-direction:column;gap:16px;margin-top:4px;max-height:280px;overflow:auto;padding:2px 4px 2px 2px;">
+                  <sc-for list="{{ permGroups }}" as="g" hint-placeholder-count="5">
+                    <div>
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;"><span style="width:7px;height:7px;border-radius:50%;background:{{ g.color }};"></span><span style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">{{ g.label }}</span></div>
+                      <div style="display:flex;flex-wrap:wrap;gap:7px;">
+                        <sc-for list="{{ g.perms }}" as="p" hint-placeholder-count="4">
+                          <button class="pm-chip" onClick="{{ p.toggle }}" style="{{ p.style }}"><span>{{ p.text }}</span><sc-if value="{{ p.selected }}"><i data-lucide="check" style="width:12px;height:12px;flex:0 0 auto;"></i></sc-if></button>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isModalPwd }}">
+            <p style="margin:0 0 18px;font-size:var(--text-sm);color:var(--text-muted);">Defina uma nova senha de acesso para o usuário.</p>
+            <div class="cir-field"><label class="cir-field__label">Nova senha</label><input class="cir-input" type="password" value="SenhaGerada#2026"><span class="cir-field__hint">Mínimo 8 caracteres.</span></div>
+          </sc-if>
+
+          <div class="pm-dialog-actions" style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--glass-border-soft);">
+            <button class="cir-btn cir-btn--ghost cir-btn--sm" onClick="{{ closeModal }}">Cancelar</button>
+            <button class="cir-btn cir-btn--primary cir-btn--sm" onClick="{{ closeModal }}">{{ modalSubmit }}</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1320,&quot;height&quot;:860}}">
+class Component extends DCLogic {
+  state = { view: 'login', selectedId: 1, filter: 'all', modal: null, modalEdit: false, selOpen: null, selVals: {}, selSearch: {}, maniMode: 'load', permSel: {}, roleSel: {}, drawerOpen: false };
+
+  buildSelect(id, options, def, searchable){
+    const sv = this.state.selVals || {};
+    const cur = (sv[id] !== undefined) ? sv[id] : def;
+    const isOpen = this.state.selOpen === id;
+    const q = (this.state.selSearch && this.state.selSearch[id]) || '';
+    const ql = q.trim().toLowerCase();
+    const list = (searchable && ql) ? options.filter(o=>o.label.toLowerCase().includes(ql)) : options;
+    const curOpt = options.find(o=>o.value===cur) || options[0];
+    const optBase = { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'10px', width:'100%', textAlign:'left', fontFamily:'var(--font-sans)', fontSize:'var(--text-sm)', background:'transparent', border:'none', borderRadius:'10px', padding:'10px 11px', cursor:'pointer' };
+    return {
+      isOpen, searchable: !!searchable, search: q, empty: list.length===0,
+      label: curOpt ? curOpt.label : 'Selecione…',
+      toggle: ()=>this.setState(s=>({ selOpen: s.selOpen===id ? null : id, selSearch: Object.assign({}, s.selSearch, { [id]:'' }) })),
+      onSearch: (e)=>{ const v=e.target.value; this.setState(s=>({ selSearch: Object.assign({}, s.selSearch, { [id]:v }) })); },
+      chevStyle: { width:'16px', height:'16px', flex:'0 0 auto', transition:'transform .2s cubic-bezier(.22,1,.36,1)', transform: isOpen?'rotate(180deg)':'none', color:'var(--text-muted)' },
+      options: list.map(o=>({ value:o.value, label:o.label, selected:o.value===cur,
+        style: Object.assign({}, optBase, { color: o.value===cur ? 'var(--gold-200)' : 'var(--text-secondary)', background: o.value===cur ? 'var(--glass-fill)' : 'transparent' }),
+        pick: ()=>this.setState(s=>({ selVals: Object.assign({}, s.selVals, { [id]:o.value }), selOpen:null, selSearch: Object.assign({}, s.selSearch, { [id]:'' }) })) }))
+    };
+  }
+
+  fmt(n){ return Number(n).toLocaleString('pt-BR'); }
+
+  statusMeta(){ return {
+    Empty:     { label:'Vazio',       tone:'neutral', cls:'cir-badge--neutral', color:'var(--teal-300)' },
+    Loading:   { label:'Carregando',  tone:'orange',  cls:'cir-badge--orange',  color:'var(--orange-500)' },
+    Sealed:    { label:'Lacrado',     tone:'gold',    cls:'cir-badge--gold',    color:'var(--gold-500)' },
+    In_Transit:{ label:'Em trânsito', tone:'sage',    cls:'cir-badge--sage',    color:'var(--sage-400)' }
+  }; }
+
+  riskMeta(){ return {
+    Class_1_Explosives:          { label:'Explosivos',       code:'1', cls:'cir-badge--danger' },
+    Class_2_Gases:               { label:'Gases',            code:'2', cls:'cir-badge--teal' },
+    Class_3_Flammable_Liquids:   { label:'Líq. inflamáveis', code:'3', cls:'cir-badge--orange' },
+    Class_4_Flammable_Solids:    { label:'Sól. inflamáveis', code:'4', cls:'cir-badge--orange' },
+    Class_5_Oxidizing_Substances:{ label:'Oxidantes',        code:'5', cls:'cir-badge--gold' },
+    Class_6_Toxic_Substances:    { label:'Tóxicos',          code:'6', cls:'cir-badge--sage' },
+    Class_7_Radioactive_Materials:{label:'Radioativos',      code:'7', cls:'cir-badge--gold' },
+    Class_8_Corrosive_Substances:{ label:'Corrosivos',       code:'8', cls:'cir-badge--teal' },
+    Class_9_Miscellaneous:       { label:'Diversos',         code:'9', cls:'cir-badge--neutral' },
+    None:                        { label:'Sem classe',       code:'—', cls:'cir-badge--neutral' }
+  }; }
+
+  rawProducts(){ return [
+    { id:1, name:'Cloreto de Sódio',        density:2.16, riskClass:'None' },
+    { id:2, name:'Nitrato de Amônio',       density:1.72, riskClass:'Class_5_Oxidizing_Substances' },
+    { id:3, name:'Gasolina Comum',          density:0.74, riskClass:'Class_3_Flammable_Liquids' },
+    { id:4, name:'Ácido Sulfúrico',         density:1.84, riskClass:'Class_8_Corrosive_Substances' },
+    { id:5, name:'Gás Liquefeito (GLP)',    density:0.51, riskClass:'Class_2_Gases' },
+    { id:6, name:'Enxofre em Pó',           density:2.07, riskClass:'Class_4_Flammable_Solids' },
+    { id:7, name:'Pó de Alumínio',          density:2.70, riskClass:'Class_4_Flammable_Solids' },
+    { id:8, name:'Peróxido de Hidrogênio',  density:1.45, riskClass:'Class_5_Oxidizing_Substances' },
+    { id:9, name:'Fertilizante NPK',        density:1.10, riskClass:'Class_9_Miscellaneous' },
+    { id:10,name:'Cobalto-60 (selado)',     density:8.90, riskClass:'Class_7_Radioactive_Materials' }
+  ]; }
+
+  rawContainers(){ return [
+    { id:1, code:'TCLU2847163', status:'Loading',    currentWeight:12500, maxCapacity:24000 },
+    { id:2, code:'MSCU5503921', status:'Sealed',     currentWeight:21800, maxCapacity:22000 },
+    { id:3, code:'HLXU9043817', status:'In_Transit', currentWeight:18400, maxCapacity:20000 },
+    { id:4, code:'CSQU3054383', status:'Empty',      currentWeight:0,     maxCapacity:24000 },
+    { id:5, code:'PONU7712094', status:'Loading',    currentWeight:6200,  maxCapacity:26000 },
+    { id:6, code:'APZU4488120', status:'Sealed',     currentWeight:14900, maxCapacity:18000 },
+    { id:7, code:'TGHU6620455', status:'In_Transit', currentWeight:23100, maxCapacity:24000 },
+    { id:8, code:'BMOU1109887', status:'Empty',      currentWeight:0,     maxCapacity:20000 },
+    { id:9, code:'FSCU3367201', status:'Loading',    currentWeight:9800,  maxCapacity:22000 },
+    { id:10,code:'DRYU8841550', status:'Loading',    currentWeight:17600, maxCapacity:28000 }
+  ]; }
+
+  rawUsers(){ return [
+    { id:99, name:'Ana Luiza Ferreira', email:'ana.ferreira@portmaster.com.br',  roles:['Administrador'] },
+    { id:101,name:'Carlos Mendes',      email:'carlos.mendes@portmaster.com.br', roles:['Operador de Pátio'] },
+    { id:102,name:'Mariana Souza',      email:'mariana.souza@portmaster.com.br', roles:['Supervisor de Carga'] },
+    { id:103,name:'João Pedro Lima',    email:'joao.lima@portmaster.com.br',     roles:['Auditor'] },
+    { id:104,name:'Beatriz Almeida',    email:'beatriz.almeida@portmaster.com.br',roles:['Diretor de Operações','Supervisor de Carga'] }
+  ]; }
+
+  allPerms(){ return ['product:read','product:create','product:update','product:delete','container:read','container:create','container:update','container:delete','container:seal','container:dispatch','container:summary','manifest:load','manifest:unload','user:get','user:list','user:create','user:update','user:delete','user:change-password','user:update-roles','role:list','role:create','role:update-permissions']; }
+
+  rawRoles(){ return [
+    { id:1, name:'Administrador',        desc:'Acesso total ao sistema',          members:1, perms:this.allPerms() },
+    { id:2, name:'Diretor de Operações', desc:'Visão executiva e auditoria',      members:1, perms:['product:read','container:read','container:summary','user:list','user:get','role:list'] },
+    { id:3, name:'Operador de Pátio',    desc:'Movimentação e registro no pátio', members:1, perms:['product:read','container:read','container:create','container:update','container:summary','manifest:load','manifest:unload'] },
+    { id:4, name:'Supervisor de Carga',  desc:'Lacre e despacho de cargas',       members:2, perms:['product:read','container:read','container:summary','container:seal','container:dispatch','manifest:load','manifest:unload'] },
+    { id:5, name:'Auditor',              desc:'Somente leitura',                  members:1, perms:['product:read','container:read','container:summary','user:list','user:get','role:list'] }
+  ]; }
+
+  domainColor(d){ return ({ product:'var(--sage-400)', container:'var(--teal-300)', manifest:'var(--orange-400)', user:'var(--gold-400)', role:'var(--text-faint)' })[d] || 'var(--text-faint)'; }
+
+  buildManifest(c, prods){
+    if(!c || c.currentWeight===0) return [];
+    const idx=[(c.id-1)%prods.length, (c.id+2)%prods.length, (c.id+5)%prods.length];
+    const fr=[0.5,0.3,0.2]; let acc=0; const items=[];
+    for(let i=0;i<3;i++){ const p=prods[idx[i]]; let w = i<2 ? Math.round(c.currentWeight*fr[i]/50)*50 : c.currentWeight-acc; acc+=w; items.push({ productId:p.id, productName:p.name, riskClass:p.riskClass, weight:w }); }
+    return items;
+  }
+
+  buildLogs(c, manifest){
+    if(!c) return [];
+    const logs=[{ event:'Create', desc:'Contêiner registrado no pátio', t:'10/06 · 08:12' }];
+    manifest.forEach((m,i)=> logs.push({ event:'Load', desc:m.productName+' carregado (+'+this.fmt(m.weight)+' kg)', t:'10/06 · '+(9+i).toString().padStart(2,'0')+':'+(12+i*9).toString().padStart(2,'0') }));
+    if(c.status==='Sealed'||c.status==='In_Transit') logs.push({ event:'Seal', desc:'Contêiner lacrado com '+this.fmt(c.currentWeight)+' kg', t:'10/06 · 14:02' });
+    if(c.status==='In_Transit') logs.push({ event:'Dispatch', desc:'Saída autorizada para o navio Mercosul Star', t:'10/06 · 15:20' });
+    return logs.slice(-5).reverse();
+  }
+
+  eventMeta(e){ return ({
+    Create:  { label:'Registro', icon:'plus-circle',        color:'var(--teal-300)' },
+    Load:    { label:'Carga',    icon:'arrow-down-to-line',  color:'var(--sage-400)' },
+    Unload:  { label:'Descarga', icon:'arrow-up-from-line',  color:'var(--orange-400)' },
+    Seal:    { label:'Lacre',    icon:'lock',                color:'var(--gold-400)' },
+    Dispatch:{ label:'Despacho', icon:'ship',                color:'var(--gold-300)' }
+  })[e] || { label:e, icon:'circle', color:'var(--text-muted)' }; }
+
+  componentDidMount(){ this._icons(); }
+  componentDidUpdate(){ this._icons(); }
+  _icons(){ if(window.lucide){ try{ window.lucide.createIcons(); }catch(e){} } }
+
+  renderVals(){
+    const view = this.state.view;
+    const SM = this.statusMeta(), RM = this.riskMeta();
+    const baseNav = { display:'flex', alignItems:'center', gap:'12px', padding:'11px 13px', borderRadius:'var(--radius-md)', border:'none', borderLeft:'2px solid transparent', background:'transparent', color:'var(--text-muted)', fontFamily:'var(--font-sans)', fontSize:'var(--text-sm)', fontWeight:500, cursor:'pointer', textAlign:'left', width:'100%' };
+    const activeNav = Object.assign({}, baseNav, { background:'var(--glass-fill-strong)', color:'var(--text-primary)', borderLeft:'2px solid var(--gold-400)', boxShadow:'inset 0 1px 0 var(--glass-highlight)' });
+    const mk = (key,icon,label)=>({ key, icon, label, active:view===key, onClick:()=>this.setState({ view:key, drawerOpen:false }), style: view===key?activeNav:baseNav });
+
+    const products = this.rawProducts().map(p=>{ const risk=RM[p.riskClass]; return { ...p, risk, riskFull: risk.code==='—' ? risk.label : ('Classe '+risk.code+' · '+risk.label), densityText:this.fmt(p.density) }; });
+    const containers = this.rawContainers().map(c=>{
+      const m = SM[c.status]; const pct = Math.round(c.currentWeight/c.maxCapacity*100);
+      return { ...c, statusLabel:m.label, badgeClass:m.cls, color:m.color, fillPct:pct, pctText:pct+'%',
+        capText:this.fmt(c.maxCapacity), weightText:this.fmt(c.currentWeight)+' / '+this.fmt(c.maxCapacity),
+        barStyle:{ display:'block', width:pct+'%', height:'100%', borderRadius:'999px', background:m.color, boxShadow:'0 0 10px '+m.color },
+        siloStyle:{ position:'absolute', left:0, right:0, bottom:0, height:pct+'%', background:'linear-gradient(180deg,'+m.color+',transparent 220%)', opacity:.85 },
+        open:()=>this.setState({ view:'resumo', selectedId:c.id }) };
+    });
+
+    const filter = this.state.filter;
+    const visibleContainers = containers.filter(c=> filter==='all' ? true : c.status===filter);
+    const tabActive = { background:'var(--gold-500)', color:'var(--ink-950)', boxShadow:'0 4px 12px rgba(236,186,40,.3)' };
+    const statusTabs = [['all','Todos'],['Empty','Vazios'],['Loading','Carregando'],['Sealed','Lacrados'],['In_Transit','Em trânsito']]
+      .map(([v,l])=>({ value:v, label:l, style: filter===v ? tabActive : {}, onClick:()=>this.setState({ filter:v }) }));
+
+    // selected container detail
+    const rawSel = this.rawContainers().find(c=>c.id===this.state.selectedId) || this.rawContainers()[0];
+    const sel = containers.find(c=>c.id===rawSel.id);
+    const selManifest = this.buildManifest(rawSel, this.rawProducts()).map(m=>({ ...m, risk:RM[m.riskClass], weightText:this.fmt(m.weight)+' kg' }));
+    const selLogs = this.buildLogs(rawSel, selManifest).map(l=>({ ...l, ev:this.eventMeta(l.event) }));
+
+    // painel stats
+    const statActive = containers.filter(c=>c.status!=='Empty').length;
+    const statTransit = containers.filter(c=>c.status==='In_Transit').length;
+    const totalW = containers.reduce((a,c)=>a+c.currentWeight,0);
+    const statWeight = (totalW/1000).toLocaleString('pt-BR',{ minimumFractionDigits:1, maximumFractionDigits:1 });
+    const distDefs = [['Empty','Vazio'],['Loading','Carregando'],['Sealed','Lacrado'],['In_Transit','Em trânsito']];
+    const dist = distDefs.map(([k,l])=>{ const n=containers.filter(c=>c.status===k).length; const col=SM[k].color;
+      return { label:l, n, color:col, barStyle:{ display:'block', width:(n/10*100)+'%', height:'100%', borderRadius:'999px', background:col } }; });
+    const feed = [
+      { code:'TGHU6620455', text:'despachado para o navio Mercosul Star', icon:'ship', color:'var(--gold-300)', label:'Despacho', time:'agora' },
+      { code:'MSCU5503921', text:'lacrado com 21.800 kg', icon:'lock', color:'var(--gold-400)', label:'Lacre', time:'12 min' },
+      { code:'TCLU2847163', text:'recebeu Cloreto de Sódio (+7.000 kg)', icon:'arrow-down-to-line', color:'var(--sage-400)', label:'Carga', time:'26 min' },
+      { code:'HLXU9043817', text:'em trânsito para o cais 3', icon:'ship', color:'var(--gold-300)', label:'Despacho', time:'1 h' },
+      { code:'CSQU3054383', text:'registrado no pátio', icon:'plus-circle', color:'var(--teal-300)', label:'Registro', time:'2 h' }
+    ];
+
+    const users = this.rawUsers().map(u=>({ ...u, initials:u.name.split(' ').slice(0,2).map(w=>w[0]).join('') }));
+    const roles = this.rawRoles().map(r=>({ ...r, count:r.perms.length,
+      chips:r.perms.map(p=>({ text:p, color:this.domainColor(p.split(':')[0]) })) }));
+
+    const titles = { painel:['Console','Painel operacional'], conteineres:['Pátio','Contêineres'], resumo:['Contêiner', sel?sel.code:''], produtos:['Catálogo','Produtos'], manifestos:['Logística','Manifestos de carga'], usuarios:['Administração','Usuários'], perfis:['Administração','Perfis & permissões'], conta:['Conta','Minha conta'] };
+    const pm = titles[view] || titles.painel;
+
+    // ---- forms / modais ----
+    const mo = this.state.modal, edit = this.state.modalEdit;
+    const nounMap = { container:'contêiner', product:'produto', user:'usuário', role:'perfil', pwd:'senha' };
+    const verbMap = { container:'Registrar', product:'Cadastrar', user:'Cadastrar', role:'Criar', pwd:'Redefinir' };
+    const modalTitle = mo ? (edit ? 'Editar '+nounMap[mo] : verbMap[mo]+' '+nounMap[mo]) : '';
+    const modalSubmit = mo==='pwd' ? 'Redefinir senha' : (edit ? 'Salvar alterações' : (mo ? verbMap[mo]+' '+nounMap[mo] : ''));
+    const riskOptions = Object.keys(RM).map(k=>({ value:k, label: RM[k].code==='—' ? RM[k].label : ('Classe '+RM[k].code+' · '+RM[k].label) }));
+    const domLabels = { product:'Produtos', container:'Contêineres', manifest:'Manifestos', user:'Usuários', role:'Perfis' };
+    const chipOn = { display:'inline-flex', alignItems:'center', gap:'6px', fontFamily:'var(--font-mono)', fontSize:'11px', padding:'6px 11px', borderRadius:'var(--radius-pill)', background:'var(--glass-gold)', border:'1px solid rgba(236,186,40,.42)', color:'var(--gold-200)', cursor:'pointer' };
+    const chipOff = { display:'inline-flex', alignItems:'center', gap:'6px', fontFamily:'var(--font-mono)', fontSize:'11px', padding:'6px 11px', borderRadius:'var(--radius-pill)', background:'var(--glass-fill)', border:'1px solid var(--glass-border-soft)', color:'var(--text-muted)', cursor:'pointer' };
+    const permSel = this.state.permSel || {};
+    const permGroups = Object.keys(domLabels).map(d=>({ label:domLabels[d], color:this.domainColor(d), perms:this.allPerms().filter(p=>p.split(':')[0]===d).map(p=>{ const def=(d==='product'||d==='container'); const sel=(permSel[p]!==undefined)?permSel[p]:def; return { text:p, selected:sel, style: sel?chipOn:chipOff, toggle:()=>this.setState(s=>({ permSel: Object.assign({}, s.permSel, { [p]: !sel }) })) }; }) }));
+    const roleOn = { display:'inline-flex', alignItems:'center', gap:'8px', fontSize:'var(--text-sm)', padding:'9px 14px', borderRadius:'var(--radius-pill)', background:'var(--glass-gold)', border:'1px solid rgba(236,186,40,.42)', color:'var(--gold-100)', cursor:'pointer' };
+    const roleOff = { display:'inline-flex', alignItems:'center', gap:'8px', fontSize:'var(--text-sm)', padding:'9px 14px', borderRadius:'var(--radius-pill)', background:'var(--glass-fill)', border:'1px solid var(--glass-border-soft)', color:'var(--text-secondary)', cursor:'pointer' };
+    const roleSelMap = this.state.roleSel || {};
+    const rolesOpts = this.rawRoles().map((r,i)=>{ const def=i===2; const sel=(roleSelMap[r.name]!==undefined)?roleSelMap[r.name]:def; return { name:r.name, selected:sel, style: sel?roleOn:roleOff, toggle:()=>this.setState(s=>({ roleSel: Object.assign({}, s.roleSel, { [r.name]: !sel }) })) }; });
+    const riskSelect = this.buildSelect('risk', riskOptions, 'None');
+    const maniC = containers.map(c=>({ value:c.code, label:c.code+' — '+c.statusLabel }));
+    const maniP = this.rawProducts().map(p=>({ value:p.name, label:p.name }));
+    const containerSelect = this.buildSelect('maniC', maniC, maniC[0].value, true);
+    const productSelect = this.buildSelect('maniP', maniP, maniP[0].value, true);
+    const modalMeta = { container:{icon:'container',tint:'glass-teal',eyebrow:'Pátio'}, product:{icon:'package',tint:'glass-sage',eyebrow:'Catálogo'}, user:{icon:'user-round',tint:'glass-gold',eyebrow:'Administração'}, role:{icon:'shield-check',tint:'glass-gold',eyebrow:'Administração'}, pwd:{icon:'key-round',tint:'glass-orange',eyebrow:'Segurança'} };
+    const mm = mo ? modalMeta[mo] : null;
+    const openModal = (t)=>()=>this.setState({ modal:t, modalEdit:false, selOpen:null });
+    const openEdit = (t)=>()=>this.setState({ modal:t, modalEdit:true, selOpen:null });
+
+    return {
+      modalOpen: !!mo, modalTitle, modalSubmit,
+      isModalContainer: mo==='container', isModalProduct: mo==='product', isModalUser: mo==='user', isModalRole: mo==='role', isModalPwd: mo==='pwd',
+      modalUserCreate: mo==='user' && !edit,
+      permGroups, rolesOpts, riskSelect, containerSelect, productSelect,
+      maniLoadStyle: this.state.maniMode==='load' ? tabActive : {}, maniUnloadStyle: this.state.maniMode==='unload' ? tabActive : {},
+      setManiLoad: ()=>this.setState({ maniMode:'load' }), setManiUnload: ()=>this.setState({ maniMode:'unload' }),
+      maniDesc: this.state.maniMode==='load' ? 'Adicione um produto a um contêiner em carregamento.' : 'Remova um produto de um contêiner em carregamento.',
+      maniActionLabel: this.state.maniMode==='load' ? 'Carregar' : 'Descarregar',
+      maniIsLoad: this.state.maniMode==='load', maniIsUnload: this.state.maniMode==='unload',
+      maniPreview: this.state.maniMode==='load' ? '14.000' : '11.000',
+      modalIcon: mm?mm.icon:'', modalTintClass: mm?mm.tint:'', modalEyebrow: mm?mm.eyebrow:'',
+      openContainer: openModal('container'), openProduct: openModal('product'), editProduct: openEdit('product'),
+      openUser: openModal('user'), editUser: openEdit('user'), openRole: openModal('role'), editRole: openEdit('role'), openPwd: openModal('pwd'),
+      closeModal: ()=>this.setState({ modal:null, selOpen:null }), stop: (e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); },
+      isLogin: view==='login', loggedIn: view!=='login',
+      isPainel: view==='painel', isConteineres: view==='conteineres', isResumo: view==='resumo',
+      isProdutos: view==='produtos', isManifestos: view==='manifestos', isUsuarios: view==='usuarios',
+      isPerfis: view==='perfis', isConta: view==='conta',
+      enter: ()=>this.setState({ view:'conteineres' }),
+      goConta: ()=>this.setState({ view:'conta', drawerOpen:false }),
+      contaStyle: view==='conta'?activeNav:baseNav,
+      drawerOpen: this.state.drawerOpen,
+      sidebarExtra: this.state.drawerOpen ? 'pm-drawer-open' : '',
+      toggleDrawer: ()=>this.setState(s=>({ drawerOpen: !s.drawerOpen })),
+      closeDrawer: ()=>this.setState({ drawerOpen:false }),
+      navMain: [ mk('painel','layout-dashboard','Painel'), mk('conteineres','container','Contêineres'), mk('produtos','package','Produtos'), mk('manifestos','clipboard-list','Manifestos') ],
+      navAdmin: [ mk('usuarios','users','Usuários'), mk('perfis','shield-check','Perfis & permissões') ],
+      pageEyebrow: pm[0], pageTitle: pm[1],
+      statActive, statTransit, statWeight, statProducts: products.length,
+      dist, feed,
+      statusTabs, visibleContainers,
+      products, users, roles,
+      sel, selManifest, selLogs,
+      selStatusLabel: sel?sel.statusLabel:'', selBadgeClass: sel?sel.badgeClass:'', selColor: sel?sel.color:'',
+      selPctText: sel?sel.pctText:'', selWeightText: sel?sel.weightText:'', selCapText: sel?sel.capText:'',
+      selFillStyle: sel?{ position:'absolute', left:0, right:0, bottom:0, height:sel.fillPct+'%', background:'linear-gradient(180deg,'+sel.color+', color-mix(in oklab,'+sel.color+' 40%, transparent))', transition:'height .5s' }:{},
+      back: ()=>this.setState({ view:'conteineres' }),
+      selStatus: sel?sel.status:'', selEmpty: sel?sel.currentWeight===0:true, selHasManifest: selManifest.length>0,
+      selFreeText: sel?this.fmt(rawSel.maxCapacity-rawSel.currentWeight):'0',
+      selItemCount: selManifest.length,
+      selSealEnabled: sel?(sel.status==='Loading' && sel.fillPct>=10):false,
+      selDispatchEnabled: sel?(sel.status==='Sealed'):false,
+      sealStyle: (sel && sel.status==='Loading' && sel.fillPct>=10) ? {} : { opacity:.4, pointerEvents:'none' },
+      dispatchStyle: (sel && sel.status==='Sealed') ? {} : { opacity:.4, pointerEvents:'none' },
+      selCurText: sel?this.fmt(rawSel.currentWeight):'0',
+      allContainers: containers, roleCount: roles.length, userCount: users.length
+    };
+  }
+}
+</script>
+</body>
+</html>
