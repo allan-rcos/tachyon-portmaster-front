@@ -1,0 +1,18 @@
+route,tipo,auth,pagina,data_loader,islands
+/,redirect,-,pages/+config.js (→ /painel),-,-
+/entrar,form,publica,pages/entrar/+Page.tsx,features/auth (login via codec),LoginForm.island
+/painel,dashboard,protegida,pages/painel/+Page.tsx,features/metrics/loaders/getMetrics,OccupancyChart.island
+/painel/conteineres,lista,protegida,pages/painel/conteineres/+Page.tsx,features/containers/loaders/listContainers,-
+/painel/conteineres/nova,form,protegida,pages/painel/conteineres/nova/+Page.tsx,-,ContainerForm.island
+/painel/conteineres/@id,detalhe/resumo,protegida,pages/painel/conteineres/@id/+Page.tsx,getContainerSummary + listProducts,ContainerActions.island / ManifestEditor.island
+/painel/conteineres/@id/editar,form,protegida,pages/painel/conteineres/@id/editar/+Page.tsx,features/containers/loaders/getContainer,ContainerForm.island
+/painel/produtos,lista,protegida,pages/painel/produtos/+Page.tsx,features/products/loaders/listProducts,-
+/painel/produtos/nova,form,protegida,pages/painel/produtos/nova/+Page.tsx,-,ProductForm.island
+/painel/produtos/@id/editar,form,protegida,pages/painel/produtos/@id/editar/+Page.tsx,features/products/loaders/getProduct,ProductForm.island (+ ConfirmDialog)
+/painel/usuarios,lista,protegida,pages/painel/usuarios/+Page.tsx,features/users/loaders/listUsers,-
+/painel/usuarios/nova,form,protegida,pages/painel/usuarios/nova/+Page.tsx,listRoles,UserForm.island
+/painel/usuarios/@id/editar,form,protegida,pages/painel/usuarios/@id/editar/+Page.tsx,getUser + listRoles,UserForm.island / UserAdminActions.island
+/painel/perfis,lista,protegida,pages/painel/perfis/+Page.tsx,features/roles/loaders/listRoles,-
+/painel/perfis/nova,form,protegida,pages/painel/perfis/nova/+Page.tsx,-,RoleForm.island (PermissionMatrix)
+/painel/perfis/@id/permissoes,form,protegida,pages/painel/perfis/@id/permissoes/+Page.tsx,listRoles (busca por id),RoleForm.island (PermissionMatrix)
+/painel/conta,perfil+form,protegida,pages/painel/conta/+Page.tsx,features/account/loaders/getAccount,AccountForm.island / PasswordChange.island

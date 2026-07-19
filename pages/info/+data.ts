@@ -10,36 +10,42 @@ export interface SystemInfo {
 
 export interface DataProps {
   frontend: SystemInfo;
+  title: string;
+  description: string;
 }
 
-export async function data(pageContext: PageContextServer): Promise<DataProps> {
+export async function data(_pageContext: PageContextServer): Promise<DataProps> {
   // No futuro, estes dados de infraestrutura e do backend
   // virão de chamadas HTTP aqui.
 
   // Detecção do runtime WinterTC que está servindo o SSR.
   // `globalThis.tjs` só existe no txiki.js; `Bun` só no Bun; etc.
-  const tjs = (globalThis as any).tjs;
-  const bun = (globalThis as any).Bun;
+  const g = globalThis as { tjs?: { version: string }; Bun?: { version: string } };
+  const tjs = g.tjs;
+  const bun = g.Bun;
   const runtime = tjs
     ? `txiki.js v${tjs.version}`
     : typeof process !== 'undefined' && process.versions?.llrt
-      ? "LLRT"
+      ? 'LLRT'
       : bun
         ? `Bun v${bun.version}`
-        : "Node";
+        : 'Node';
 
   // Uso de memória residente (Web Standard/edge-compatível, com fallbacks).
-  const memoryUsage = typeof process !== 'undefined' && process.memoryUsage
-    ? Math.round(process.memoryUsage().rss / 1024 / 1024)
-    : 12; // Fallback aproximado para runtimes isolados (~10MB)
+  const memoryUsage =
+    typeof process !== 'undefined' && process.memoryUsage
+      ? Math.round(process.memoryUsage().rss / 1024 / 1024)
+      : 12; // Fallback aproximado para runtimes isolados (~10MB)
 
   return {
     frontend: {
-      name: "Tychyon Portmaster",
-      version: "0.1.0",
-      environment: import.meta.env.PROD ? "production" : "development",
+      name: 'Tachyon PortMaster',
+      version: '0.1.0',
+      environment: import.meta.env.PROD ? 'production' : 'development',
       runtime,
-      memory_usage_mb: memoryUsage
-    }
+      memory_usage_mb: memoryUsage,
+    },
+    title: 'Informações do sistema',
+    description: 'Diagnóstico de runtime e telemetria de infraestrutura ativa.',
   };
 }

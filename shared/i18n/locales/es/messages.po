@@ -1,0 +1,329 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-07-19 16:27-0300\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: es\n"
+
+msgid "PortMaster"
+msgstr ""
+
+msgid "bare metal, alive"
+msgstr ""
+
+msgid "Novo"
+msgstr ""
+
+msgid "Editar"
+msgstr ""
+
+msgid "Excluir"
+msgstr ""
+
+msgid "Salvar"
+msgstr ""
+
+msgid "Criar"
+msgstr ""
+
+msgid "Cancelar"
+msgstr ""
+
+msgid "Confirmar"
+msgstr ""
+
+msgid "Ações"
+msgstr ""
+
+msgid "Buscar"
+msgstr ""
+
+msgid "Carregando…"
+msgstr ""
+
+msgid "Nada por aqui ainda."
+msgstr ""
+
+msgid "Não foi possível concluir. Tente novamente."
+msgstr ""
+
+msgid "Voltar"
+msgstr ""
+
+msgid "Sair"
+msgstr ""
+
+msgid "Anterior"
+msgstr ""
+
+msgid "Próximo"
+msgstr ""
+
+msgid "Nome muito curto"
+msgstr ""
+
+msgid "Nome muito longo"
+msgstr ""
+
+msgid "Informe o e-mail"
+msgstr ""
+
+msgid "E-mail inválido"
+msgstr ""
+
+msgid "Informe a senha"
+msgstr ""
+
+msgid "Mínimo de 6 caracteres"
+msgstr ""
+
+msgid "Informe a senha atual"
+msgstr ""
+
+msgid "Selecione ao menos um perfil"
+msgstr ""
+
+msgid "Selecione ao menos uma permissão"
+msgstr ""
+
+msgid "Código muito curto"
+msgstr ""
+
+msgid "Código muito longo"
+msgstr ""
+
+msgid "Use letras, números e hífen"
+msgstr ""
+
+msgid "A capacidade deve ser positiva"
+msgstr ""
+
+msgid "A densidade deve ser positiva"
+msgstr ""
+
+msgid "A quantidade deve ser positiva"
+msgstr ""
+
+msgid "Selecione um produto"
+msgstr ""
+
+msgid "Painel"
+msgstr ""
+
+msgid "Contêineres"
+msgstr ""
+
+msgid "Produtos"
+msgstr ""
+
+msgid "Usuários"
+msgstr ""
+
+msgid "Perfis"
+msgstr ""
+
+msgid "Conta"
+msgstr ""
+
+msgid "Entrar"
+msgstr ""
+
+msgid "Acesse o pátio digital do porto."
+msgstr ""
+
+msgid "E-mail"
+msgstr ""
+
+msgid "Senha"
+msgstr ""
+
+msgid "E-mail ou senha inválidos."
+msgstr ""
+
+msgid "faster than the metal"
+msgstr ""
+
+msgid "Painel operacional"
+msgstr ""
+
+msgid "Telemetria do pátio em tempo real."
+msgstr ""
+
+msgid "Contêineres ativos"
+msgstr ""
+
+msgid "Total de contêineres"
+msgstr ""
+
+msgid "Ocupação do pátio"
+msgstr ""
+
+msgid "Produtos no catálogo"
+msgstr ""
+
+msgid "Divisão por status"
+msgstr ""
+
+msgid "Vazio"
+msgstr ""
+
+msgid "Carregando"
+msgstr ""
+
+msgid "Lacrado"
+msgstr ""
+
+msgid "Em trânsito"
+msgstr ""
+
+msgid "Contêineres ativos e histórico do pátio."
+msgstr ""
+
+msgid "Registrar contêiner"
+msgstr ""
+
+msgid "Código"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Peso atual"
+msgstr ""
+
+msgid "Capacidade"
+msgstr ""
+
+msgid "Ocupação"
+msgstr ""
+
+msgid "Resumo do contêiner"
+msgstr ""
+
+msgid "Manifesto de carga"
+msgstr ""
+
+msgid "Telemetria recente"
+msgstr ""
+
+msgid "Produto"
+msgstr ""
+
+msgid "Quantidade"
+msgstr ""
+
+msgid "Lacrar"
+msgstr ""
+
+msgid "Despachar"
+msgstr ""
+
+msgid "Carregar"
+msgstr ""
+
+msgid "Descarregar"
+msgstr ""
+
+msgid "Contêiner vazio. Nenhum produto carregado."
+msgstr ""
+
+msgid "Lacrar este contêiner? A carga não poderá mais ser alterada."
+msgstr ""
+
+msgid "Despachar este contêiner para transporte?"
+msgstr ""
+
+msgid "Remover este contêiner do porto?"
+msgstr ""
+
+msgid "Dados do contêiner"
+msgstr ""
+
+msgid "Capacidade máxima (kg)"
+msgstr ""
+
+msgid "Catálogo de produtos e classes de risco."
+msgstr ""
+
+msgid "Cadastrar produto"
+msgstr ""
+
+msgid "Nome"
+msgstr ""
+
+msgid "Densidade"
+msgstr ""
+
+msgid "Classe de risco"
+msgstr ""
+
+msgid "Dados do produto"
+msgstr ""
+
+msgid "Remover este produto do catálogo?"
+msgstr ""
+
+msgid "Contas com acesso ao sistema."
+msgstr ""
+
+msgid "Novo usuário"
+msgstr ""
+
+msgid "Senha inicial"
+msgstr ""
+
+msgid "Redefinir senha"
+msgstr ""
+
+msgid "Nova senha"
+msgstr ""
+
+msgid "Dados do usuário"
+msgstr ""
+
+msgid "Remover este usuário?"
+msgstr ""
+
+msgid "Senha alterada com sucesso."
+msgstr ""
+
+msgid "Perfis de acesso e permissões (RBAC)."
+msgstr ""
+
+msgid "Novo perfil"
+msgstr ""
+
+msgid "Nome do perfil"
+msgstr ""
+
+msgid "Permissões"
+msgstr ""
+
+msgid "Dados do perfil"
+msgstr ""
+
+msgid "Sincronizar permissões"
+msgstr ""
+
+msgid "Minha conta"
+msgstr ""
+
+msgid "Seus dados cadastrais e segurança."
+msgstr ""
+
+msgid "Perfil"
+msgstr ""
+
+msgid "Meus perfis"
+msgstr ""
+
+msgid "Segurança"
+msgstr ""
+
+msgid "Senha atual"
+msgstr ""
+
+msgid "Alterar senha"
+msgstr ""

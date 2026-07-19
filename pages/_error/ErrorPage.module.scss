@@ -1,0 +1,19 @@
+.page {
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 0 1rem;
+}
+
+.title {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  color: var(--color-text, #222);
+}
+
+.message {
+  color: var(--color-text-muted, #666);
+}
+
+.link {
+  color: var(--color-accent, #6b8e23);
+}

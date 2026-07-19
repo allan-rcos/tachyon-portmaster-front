@@ -2,25 +2,64 @@
   "name": "portmaster",
   "type": "module",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
+    "@babel/preset-typescript": "^8.0.1",
+    "@eslint/js": "^9.17.0",
+    "@lingui/cli": "^6.5.0",
+    "@lingui/format-po": "^6.5.0",
+    "@lingui/macro": "^5.9.5",
+    "@lingui/vite-plugin": "^6.5.0",
+    "@solidjs/testing-library": "^0.8.10",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/bun": "latest",
-    "sass": "^1.101.0"
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-solid": "^0.14.5",
+    "jsdom": "^29.1.1",
+    "msw": "^2.15.0",
+    "prettier": "^3.9.5",
+    "sass": "^1.101.0",
+    "typescript-eslint": "^8.64.0",
+    "vite-plugin-solid": "^2.11.12",
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@lingui/core": "^6.5.0",
+    "@tanstack/solid-form": "^1.33.2",
+    "@tanstack/solid-query": "^5.101.2",
+    "@tanstack/zod-form-adapter": "^0.42.1",
+    "chart.js": "^4.5.1",
+    "flatbuffers": "^25.9.23",
     "solid-js": "^1.9.14",
+    "tachyon-design": "workspace:*",
     "vike": "^0.4.260",
     "vike-solid": "^0.8.3",
     "vike-txiki-adapter": "workspace:*",
-    "vite": "^8.1.0"
+    "vite": "^8.1.0",
+    "zod": "^4.4.3"
   },
   "scripts": {
     "dev": "vite",
     "build:adapter": "bun run --filter vike-txiki-adapter build",
     "build": "bun run build:adapter && bunx --bun vite build",
-    "start": "vike-txiki-adapter start"
+    "start": "vike-txiki-adapter start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "gen:fbs": "flatc --ts --gen-object-api --gen-all -o services/gen/fbs swagger/flatbuffers/schemas/api.fbs",
+    "i18n:po": "vike-txiki-adapter i18n-po --catalog shared/i18n/messages/catalog.ts --out shared/i18n/locales --locales pt-BR,en,es --source pt-BR",
+    "i18n:extract": "lingui extract",
+    "i18n:compile": "lingui compile"
   }
 }

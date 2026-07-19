@@ -1,4 +1,5 @@
 import { useData } from 'vike-solid/useData';
+
 import type { DataProps } from './+data';
 import './Page.scss';
 
@@ -31,7 +32,9 @@ export default function Page() {
             <tbody>
               <tr>
                 <td>Versão</td>
-                <td><code>{data.frontend.version}</code></td>
+                <td>
+                  <code>{data.frontend.version}</code>
+                </td>
               </tr>
               <tr>
                 <td>Ambiente</td>
@@ -47,7 +50,7 @@ export default function Page() {
 
         <section class="info-card backend-placeholder">
           <div class="placeholder-content">
-            <h3>[ Backend API (Rust) ]</h3>
+            <h2>[ Backend API (Rust) ]</h2>
             <p>Aguardando integração com ConnectRPC</p>
           </div>
         </section>

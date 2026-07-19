@@ -1,0 +1,329 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-07-19 16:27-0300\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: pt-BR\n"
+
+msgid "PortMaster"
+msgstr "PortMaster"
+
+msgid "bare metal, alive"
+msgstr "bare metal, alive"
+
+msgid "Novo"
+msgstr "Novo"
+
+msgid "Editar"
+msgstr "Editar"
+
+msgid "Excluir"
+msgstr "Excluir"
+
+msgid "Salvar"
+msgstr "Salvar"
+
+msgid "Criar"
+msgstr "Criar"
+
+msgid "Cancelar"
+msgstr "Cancelar"
+
+msgid "Confirmar"
+msgstr "Confirmar"
+
+msgid "Ações"
+msgstr "Ações"
+
+msgid "Buscar"
+msgstr "Buscar"
+
+msgid "Carregando…"
+msgstr "Carregando…"
+
+msgid "Nada por aqui ainda."
+msgstr "Nada por aqui ainda."
+
+msgid "Não foi possível concluir. Tente novamente."
+msgstr "Não foi possível concluir. Tente novamente."
+
+msgid "Voltar"
+msgstr "Voltar"
+
+msgid "Sair"
+msgstr "Sair"
+
+msgid "Anterior"
+msgstr "Anterior"
+
+msgid "Próximo"
+msgstr "Próximo"
+
+msgid "Nome muito curto"
+msgstr "Nome muito curto"
+
+msgid "Nome muito longo"
+msgstr "Nome muito longo"
+
+msgid "Informe o e-mail"
+msgstr "Informe o e-mail"
+
+msgid "E-mail inválido"
+msgstr "E-mail inválido"
+
+msgid "Informe a senha"
+msgstr "Informe a senha"
+
+msgid "Mínimo de 6 caracteres"
+msgstr "Mínimo de 6 caracteres"
+
+msgid "Informe a senha atual"
+msgstr "Informe a senha atual"
+
+msgid "Selecione ao menos um perfil"
+msgstr "Selecione ao menos um perfil"
+
+msgid "Selecione ao menos uma permissão"
+msgstr "Selecione ao menos uma permissão"
+
+msgid "Código muito curto"
+msgstr "Código muito curto"
+
+msgid "Código muito longo"
+msgstr "Código muito longo"
+
+msgid "Use letras, números e hífen"
+msgstr "Use letras, números e hífen"
+
+msgid "A capacidade deve ser positiva"
+msgstr "A capacidade deve ser positiva"
+
+msgid "A densidade deve ser positiva"
+msgstr "A densidade deve ser positiva"
+
+msgid "A quantidade deve ser positiva"
+msgstr "A quantidade deve ser positiva"
+
+msgid "Selecione um produto"
+msgstr "Selecione um produto"
+
+msgid "Painel"
+msgstr "Painel"
+
+msgid "Contêineres"
+msgstr "Contêineres"
+
+msgid "Produtos"
+msgstr "Produtos"
+
+msgid "Usuários"
+msgstr "Usuários"
+
+msgid "Perfis"
+msgstr "Perfis"
+
+msgid "Conta"
+msgstr "Conta"
+
+msgid "Entrar"
+msgstr "Entrar"
+
+msgid "Acesse o pátio digital do porto."
+msgstr "Acesse o pátio digital do porto."
+
+msgid "E-mail"
+msgstr "E-mail"
+
+msgid "Senha"
+msgstr "Senha"
+
+msgid "E-mail ou senha inválidos."
+msgstr "E-mail ou senha inválidos."
+
+msgid "faster than the metal"
+msgstr "faster than the metal"
+
+msgid "Painel operacional"
+msgstr "Painel operacional"
+
+msgid "Telemetria do pátio em tempo real."
+msgstr "Telemetria do pátio em tempo real."
+
+msgid "Contêineres ativos"
+msgstr "Contêineres ativos"
+
+msgid "Total de contêineres"
+msgstr "Total de contêineres"
+
+msgid "Ocupação do pátio"
+msgstr "Ocupação do pátio"
+
+msgid "Produtos no catálogo"
+msgstr "Produtos no catálogo"
+
+msgid "Divisão por status"
+msgstr "Divisão por status"
+
+msgid "Vazio"
+msgstr "Vazio"
+
+msgid "Carregando"
+msgstr "Carregando"
+
+msgid "Lacrado"
+msgstr "Lacrado"
+
+msgid "Em trânsito"
+msgstr "Em trânsito"
+
+msgid "Contêineres ativos e histórico do pátio."
+msgstr "Contêineres ativos e histórico do pátio."
+
+msgid "Registrar contêiner"
+msgstr "Registrar contêiner"
+
+msgid "Código"
+msgstr "Código"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Peso atual"
+msgstr "Peso atual"
+
+msgid "Capacidade"
+msgstr "Capacidade"
+
+msgid "Ocupação"
+msgstr "Ocupação"
+
+msgid "Resumo do contêiner"
+msgstr "Resumo do contêiner"
+
+msgid "Manifesto de carga"
+msgstr "Manifesto de carga"
+
+msgid "Telemetria recente"
+msgstr "Telemetria recente"
+
+msgid "Produto"
+msgstr "Produto"
+
+msgid "Quantidade"
+msgstr "Quantidade"
+
+msgid "Lacrar"
+msgstr "Lacrar"
+
+msgid "Despachar"
+msgstr "Despachar"
+
+msgid "Carregar"
+msgstr "Carregar"
+
+msgid "Descarregar"
+msgstr "Descarregar"
+
+msgid "Contêiner vazio. Nenhum produto carregado."
+msgstr "Contêiner vazio. Nenhum produto carregado."
+
+msgid "Lacrar este contêiner? A carga não poderá mais ser alterada."
+msgstr "Lacrar este contêiner? A carga não poderá mais ser alterada."
+
+msgid "Despachar este contêiner para transporte?"
+msgstr "Despachar este contêiner para transporte?"
+
+msgid "Remover este contêiner do porto?"
+msgstr "Remover este contêiner do porto?"
+
+msgid "Dados do contêiner"
+msgstr "Dados do contêiner"
+
+msgid "Capacidade máxima (kg)"
+msgstr "Capacidade máxima (kg)"
+
+msgid "Catálogo de produtos e classes de risco."
+msgstr "Catálogo de produtos e classes de risco."
+
+msgid "Cadastrar produto"
+msgstr "Cadastrar produto"
+
+msgid "Nome"
+msgstr "Nome"
+
+msgid "Densidade"
+msgstr "Densidade"
+
+msgid "Classe de risco"
+msgstr "Classe de risco"
+
+msgid "Dados do produto"
+msgstr "Dados do produto"
+
+msgid "Remover este produto do catálogo?"
+msgstr "Remover este produto do catálogo?"
+
+msgid "Contas com acesso ao sistema."
+msgstr "Contas com acesso ao sistema."
+
+msgid "Novo usuário"
+msgstr "Novo usuário"
+
+msgid "Senha inicial"
+msgstr "Senha inicial"
+
+msgid "Redefinir senha"
+msgstr "Redefinir senha"
+
+msgid "Nova senha"
+msgstr "Nova senha"
+
+msgid "Dados do usuário"
+msgstr "Dados do usuário"
+
+msgid "Remover este usuário?"
+msgstr "Remover este usuário?"
+
+msgid "Senha alterada com sucesso."
+msgstr "Senha alterada com sucesso."
+
+msgid "Perfis de acesso e permissões (RBAC)."
+msgstr "Perfis de acesso e permissões (RBAC)."
+
+msgid "Novo perfil"
+msgstr "Novo perfil"
+
+msgid "Nome do perfil"
+msgstr "Nome do perfil"
+
+msgid "Permissões"
+msgstr "Permissões"
+
+msgid "Dados do perfil"
+msgstr "Dados do perfil"
+
+msgid "Sincronizar permissões"
+msgstr "Sincronizar permissões"
+
+msgid "Minha conta"
+msgstr "Minha conta"
+
+msgid "Seus dados cadastrais e segurança."
+msgstr "Seus dados cadastrais e segurança."
+
+msgid "Perfil"
+msgstr "Perfil"
+
+msgid "Meus perfis"
+msgstr "Meus perfis"
+
+msgid "Segurança"
+msgstr "Segurança"
+
+msgid "Senha atual"
+msgstr "Senha atual"
+
+msgid "Alterar senha"
+msgstr "Alterar senha"

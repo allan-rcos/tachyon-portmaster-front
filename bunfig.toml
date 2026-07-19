@@ -1,0 +1,5 @@
+# Linker "hoisted": instala dependências como diretórios reais em node_modules
+# (em vez de symlinks para .bun/). Evita problemas de symlink no Windows
+# (EPERM/dangling) que quebram a resolução de módulos (vitest, eslint, etc.).
+[install]
+linker = "hoisted"

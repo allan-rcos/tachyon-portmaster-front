@@ -1,0 +1,48 @@
+@use '@ds/ui' as ui;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 520px;
+}
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.input {
+  @include ui.input;
+}
+.invalid {
+  border-color: var(--red-500);
+}
+.error {
+  margin: 0;
+  color: var(--red-400);
+  font-size: var(--text-sm);
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.spacer {
+  margin-left: auto;
+}
+.submit {
+  @include ui.button-primary;
+}
+.cancel {
+  @include ui.button-ghost;
+}
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

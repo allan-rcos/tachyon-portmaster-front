@@ -6,6 +6,15 @@ out
 dist
 *.tgz
 
+# gerado por comando (codegen / catálogos compilados) — regenerável no build
+# flatc (bun run gen:fbs)
+services/gen/fbs/
+# lingui compile (catálogos compilados)
+shared/i18n/locales/**/*.mjs
+shared/i18n/locales/**/*.js
+# cache do lingui
+.lingui
+
 # code coverage
 coverage
 *.lcov
@@ -36,3 +45,5 @@ tmp/*
 
 # Finder (MacOS) folder config
 .DS_Store
+
+.claude

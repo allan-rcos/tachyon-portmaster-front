@@ -1,0 +1,61 @@
+@use '@ds/glass' as glass;
+
+.bar {
+  display: flex;
+  height: 14px;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  @include glass.glass-inset;
+  margin-bottom: var(--space-5);
+}
+.segment {
+  height: 100%;
+  transition: width 0.4s var(--ease-out);
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+}
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  dt {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-muted);
+  }
+  dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--fw-medium);
+  }
+}
+.dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.segment[data-tone='gold'],
+.dot[data-tone='gold'] {
+  background: var(--gold-500);
+}
+.segment[data-tone='sage'],
+.dot[data-tone='sage'] {
+  background: var(--sage-400);
+}
+.segment[data-tone='teal'],
+.dot[data-tone='teal'] {
+  background: var(--teal-500);
+}
+.segment[data-tone='neutral'],
+.dot[data-tone='neutral'] {
+  background: var(--ink-600);
+}

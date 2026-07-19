@@ -1,0 +1,20 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-muted);
+}
+.error {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--red-400);
+}
+.hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-faint);
+}

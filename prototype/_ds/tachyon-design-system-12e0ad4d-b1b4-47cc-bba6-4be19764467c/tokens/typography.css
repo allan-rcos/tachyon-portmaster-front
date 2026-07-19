@@ -7,37 +7,37 @@
 :root {
   /* families */
   --font-script: 'Parisienne', cursive;
-  --font-sans:   'Ubuntu', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono:   'Ubuntu Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-sans: 'Ubuntu', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Ubuntu Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   /* weights (Ubuntu ships 300/400/500/700) */
-  --fw-light:   300; /* @kind font */
+  --fw-light: 300; /* @kind font */
   --fw-regular: 400; /* @kind font */
-  --fw-medium:  500; /* @kind font */
-  --fw-bold:    700; /* @kind font */
+  --fw-medium: 500; /* @kind font */
+  --fw-bold: 700; /* @kind font */
 
   /* type scale — 1.250 major-third, base 16px */
-  --text-2xs:  0.694rem;  /* 11.1px */
-  --text-xs:   0.8rem;    /* 12.8px */
-  --text-sm:   0.875rem;  /* 14px   */
-  --text-base: 1rem;      /* 16px   */
-  --text-md:   1.125rem;  /* 18px   */
-  --text-lg:   1.25rem;   /* 20px   */
-  --text-xl:   1.563rem;  /* 25px   */
-  --text-2xl:  1.953rem;  /* 31px   */
-  --text-3xl:  2.441rem;  /* 39px   */
-  --text-4xl:  3.052rem;  /* 49px   */
-  --text-5xl:  3.815rem;  /* 61px   */
+  --text-2xs: 0.694rem; /* 11.1px */
+  --text-xs: 0.8rem; /* 12.8px */
+  --text-sm: 0.875rem; /* 14px   */
+  --text-base: 1rem; /* 16px   */
+  --text-md: 1.125rem; /* 18px   */
+  --text-lg: 1.25rem; /* 20px   */
+  --text-xl: 1.563rem; /* 25px   */
+  --text-2xl: 1.953rem; /* 31px   */
+  --text-3xl: 2.441rem; /* 39px   */
+  --text-4xl: 3.052rem; /* 49px   */
+  --text-5xl: 3.815rem; /* 61px   */
 
   /* line heights */
-  --leading-tight:  1.1;
-  --leading-snug:   1.28;
+  --leading-tight: 1.1;
+  --leading-snug: 1.28;
   --leading-normal: 1.55;
   --leading-relaxed: 1.7;
 
   /* tracking */
-  --tracking-tight:  -0.02em;
+  --tracking-tight: -0.02em;
   --tracking-normal: 0;
-  --tracking-wide:   0.04em;
-  --tracking-caps:   0.14em;  /* eyebrow / overline all-caps */
+  --tracking-wide: 0.04em;
+  --tracking-caps: 0.14em; /* eyebrow / overline all-caps */
 }

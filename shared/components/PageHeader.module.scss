@@ -1,0 +1,30 @@
+.bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.title {
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-medium);
+  letter-spacing: -0.02em;
+}
+.subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+}
+.action {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  .bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .action :global(a),
+  .action :global(button) {
+    width: 100%;
+  }
+}

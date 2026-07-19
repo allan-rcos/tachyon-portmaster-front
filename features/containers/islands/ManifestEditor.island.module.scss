@@ -1,0 +1,46 @@
+@use '@ds/ui' as ui;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--glass-border-soft);
+}
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: var(--space-4);
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.select,
+.input {
+  @include ui.input;
+}
+.invalid {
+  border-color: var(--red-500);
+}
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.load {
+  @include ui.button-primary;
+  @include ui.button-sm;
+}
+.unload {
+  @include ui.button-secondary;
+  @include ui.button-sm;
+}
+
+@media (max-width: 480px) {
+  .fields {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,21 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text);
+}
+.emblem {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  color: var(--teal-200);
+}
+.word {
+  font-size: var(--text-lg);
+  font-weight: var(--fw-medium);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.lit {
+  color: var(--gold-400);
+}

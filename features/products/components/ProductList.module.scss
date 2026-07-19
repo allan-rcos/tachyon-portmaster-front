@@ -1,0 +1,18 @@
+@use '@ds/ui' as ui;
+
+.newBtn {
+  @include ui.button-primary;
+}
+.name {
+  font-weight: var(--fw-medium);
+}
+.editLink {
+  display: inline-flex;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  &:hover {
+    color: var(--color-text);
+    background: var(--glass-fill);
+  }
+}

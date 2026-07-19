@@ -9,23 +9,23 @@
    ============================================================ */
 :root {
   /* ---- Brand: GOLD (primary) ---------------------------- */
-  --gold-50:  #fdf7e4;
+  --gold-50: #fdf7e4;
   --gold-100: #faecbe;
   --gold-200: #f4dd8a;
   --gold-300: #efce56;
   --gold-400: #ecc23a;
-  --gold-500: #ecba28;   /* core primary */
+  --gold-500: #ecba28; /* core primary */
   --gold-600: #c99a14;
   --gold-700: #9c7710;
   --gold-800: #6f550d;
   --gold-900: #443408;
 
   /* ---- Brand: SAGE -------------------------------------- */
-  --sage-50:  #f1f4ec;
+  --sage-50: #f1f4ec;
   --sage-100: #dde5d1;
   --sage-200: #c2d0ad;
   --sage-300: #a6ba89;
-  --sage-400: #8ea37b;   /* core */
+  --sage-400: #8ea37b; /* core */
   --sage-500: #768c63;
   --sage-600: #5e7150;
   --sage-700: #47553d;
@@ -33,24 +33,24 @@
   --sage-900: #1a1f17;
 
   /* ---- Brand: TEAL -------------------------------------- */
-  --teal-50:  #e6f0f2;
+  --teal-50: #e6f0f2;
   --teal-100: #bfd9de;
   --teal-200: #8fbcc4;
   --teal-300: #569ba6;
   --teal-400: #38818f;
-  --teal-500: #2a7384;   /* core */
+  --teal-500: #2a7384; /* core */
   --teal-600: #225d6b;
   --teal-700: #1a4751;
   --teal-800: #123139;
   --teal-900: #0b2026;
 
   /* ---- Brand: ORANGE ------------------------------------ */
-  --orange-50:  #fdf0e2;
+  --orange-50: #fdf0e2;
   --orange-100: #f9d7b4;
   --orange-200: #f2b87c;
   --orange-300: #e99a48;
   --orange-400: #e1882f;
-  --orange-500: #d97c20;   /* core */
+  --orange-500: #d97c20; /* core */
   --orange-600: #b56314;
   --orange-700: #8a4b0f;
   --orange-800: #5d330a;
@@ -58,7 +58,7 @@
 
   /* ---- Ink (deep teal-tinted neutrals for the base) ----- */
   --ink-950: #07171b;
-  --ink-900: #0a2024;   /* page base */
+  --ink-900: #0a2024; /* page base */
   --ink-850: #0d272d;
   --ink-800: #11313a;
   --ink-700: #173f49;
@@ -66,8 +66,8 @@
   --ink-500: #335f6b;
 
   /* ---- Paper / cream (warm light neutrals) -------------- */
-  --paper-50:  #fbf9f3;
-  --paper-100: #f4efe3;   /* core paper */
+  --paper-50: #fbf9f3;
+  --paper-100: #f4efe3; /* core paper */
   --paper-200: #e7ddc8;
   --paper-300: #d4c6a8;
 
@@ -86,47 +86,47 @@
   --glass-blur-lg: 32px;
 
   /* light glass — for surfaces over the dark ink base */
-  --glass-fill:        rgba(255, 255, 255, 0.07);
-  --glass-fill-weak:   rgba(255, 255, 255, 0.04);
+  --glass-fill: rgba(255, 255, 255, 0.07);
+  --glass-fill-weak: rgba(255, 255, 255, 0.04);
   --glass-fill-strong: rgba(255, 255, 255, 0.13);
-  --glass-border:      rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.16);
   --glass-border-soft: rgba(255, 255, 255, 0.09);
-  --glass-highlight:   rgba(255, 255, 255, 0.55);  /* top inner edge */
+  --glass-highlight: rgba(255, 255, 255, 0.55); /* top inner edge */
   --glass-inner-shadow: rgba(0, 0, 0, 0.28);
 
   /* tinted glass — brand-washed frosted panels */
-  --glass-gold:   rgba(236, 186, 40, 0.16);
-  --glass-teal:   rgba(42, 115, 132, 0.22);
-  --glass-sage:   rgba(142, 163, 123, 0.18);
+  --glass-gold: rgba(236, 186, 40, 0.16);
+  --glass-teal: rgba(42, 115, 132, 0.22);
+  --glass-sage: rgba(142, 163, 123, 0.18);
   --glass-orange: rgba(217, 124, 32, 0.16);
 
   /* ======================================================
      SEMANTIC ALIASES
      ====================================================== */
-  --bg-base:        var(--ink-900);
-  --bg-elevated:    var(--ink-800);
+  --bg-base: var(--ink-900);
+  --bg-elevated: var(--ink-800);
 
-  --accent:         var(--gold-500);
-  --accent-hover:   var(--gold-400);
-  --accent-press:   var(--gold-600);
-  --on-accent:      var(--ink-950);
+  --accent: var(--gold-500);
+  --accent-hover: var(--gold-400);
+  --accent-press: var(--gold-600);
+  --on-accent: var(--ink-950);
 
-  --success:        var(--sage-400);
-  --info:           var(--teal-400);
-  --warning:        var(--orange-500);
-  --danger:         var(--red-500);
+  --success: var(--sage-400);
+  --info: var(--teal-400);
+  --warning: var(--orange-500);
+  --danger: var(--red-500);
 
-  --text-primary:   var(--paper-50);
+  --text-primary: var(--paper-50);
   --text-secondary: rgba(244, 239, 227, 0.74);
-  --text-muted:     rgba(244, 239, 227, 0.52);
-  --text-faint:     rgba(244, 239, 227, 0.34);
-  --text-on-paper:  var(--ink-900);
-  --text-link:      var(--gold-300);
+  --text-muted: rgba(244, 239, 227, 0.52);
+  --text-faint: rgba(244, 239, 227, 0.34);
+  --text-on-paper: var(--ink-900);
+  --text-link: var(--gold-300);
 
-  --surface-glass:        var(--glass-fill);
+  --surface-glass: var(--glass-fill);
   --surface-glass-strong: var(--glass-fill-strong);
-  --border-glass:         var(--glass-border);
-  --border-hairline:      var(--glass-border-soft);
+  --border-glass: var(--glass-border);
+  --border-hairline: var(--glass-border-soft);
 
   --focus-ring: rgba(236, 186, 40, 0.55);
 }

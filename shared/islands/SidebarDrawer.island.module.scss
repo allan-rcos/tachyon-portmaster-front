@@ -1,0 +1,31 @@
+.burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border-soft);
+  background: var(--glass-fill);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-drawer);
+  background: var(--overlay-veil);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (max-width: 860px) {
+  .burger {
+    display: inline-flex;
+  }
+  .overlay {
+    display: block;
+  }
+}

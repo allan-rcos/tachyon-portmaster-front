@@ -1,0 +1,99 @@
+@use '@ds/glass' as glass;
+@use '@ds/ui' as ui;
+
+.trigger {
+  @include ui.button-base;
+  @include ui.button-sm;
+}
+.primary {
+  @include ui.button-primary;
+  @include ui.button-sm;
+}
+.secondary {
+  @include ui.button-secondary;
+  @include ui.button-sm;
+}
+.danger {
+  @include ui.button-danger;
+  @include ui.button-sm;
+}
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: var(--overlay-veil);
+  -webkit-backdrop-filter: blur(10px) saturate(115%);
+  backdrop-filter: blur(10px) saturate(115%);
+  animation: fade 0.2s ease;
+}
+
+.dialog {
+  @include glass.glass-l3;
+  z-index: var(--z-dialog);
+  width: 100%;
+  max-width: 26rem;
+  padding: var(--space-6);
+  animation: pop 0.3s var(--ease-spring);
+}
+.title {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-3);
+}
+.message {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+}
+.error {
+  margin: 0 0 var(--space-4);
+  color: var(--red-400);
+  font-size: var(--text-sm);
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+}
+
+@media (max-width: 640px) {
+  .scrim {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .dialog {
+    max-width: none;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  .actions {
+    flex-direction: column-reverse;
+  }
+  .actions > li {
+    width: 100%;
+  }
+  .actions > li > .trigger {
+    width: 100%;
+  }
+}

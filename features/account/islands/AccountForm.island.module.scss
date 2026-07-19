@@ -1,0 +1,29 @@
+@use '@ds/ui' as ui;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.input {
+  @include ui.input;
+}
+.invalid {
+  border-color: var(--red-500);
+}
+.submit {
+  @include ui.button-primary;
+  align-self: flex-start;
+}
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

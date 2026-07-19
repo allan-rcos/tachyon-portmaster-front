@@ -1,0 +1,15 @@
+@use '@ds/glass' as glass;
+
+.empty {
+  @include glass.glass-inset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-6);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+.message {
+  margin: 0;
+}

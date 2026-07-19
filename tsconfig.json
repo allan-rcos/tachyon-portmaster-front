@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     // Environment setup & latest features
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",
@@ -9,6 +9,12 @@
     "jsxImportSource": "solid-js",
     "allowJs": true,
     "types": ["bun"],
+
+    // Path alias — @/ aponta para a raiz do projeto
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
 
     // Bundler mode
     "moduleResolution": "bundler",
@@ -21,7 +27,10 @@
     "strict": true,
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
+    // Desligado: o catálogo i18n (`Messages = Record<string,string>`) e os
+    // acessos indexados seguros do app tornam `t.foo`/`arr[0]` em
+    // `T | undefined` sob esta flag, gerando ruído em massa sem valor real.
+    "noUncheckedIndexedAccess": false,
     "noImplicitOverride": true,
 
     // Some stricter flags (disabled by default)

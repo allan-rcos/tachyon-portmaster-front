@@ -1,0 +1,69 @@
+@use '@ds/glass' as glass;
+
+.page {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  min-height: 100dvh;
+}
+
+.promo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-12);
+}
+.headline {
+  font-size: var(--text-3xl);
+  font-weight: var(--fw-medium);
+  letter-spacing: -0.02em;
+}
+.desc {
+  margin: 0;
+  max-width: 42ch;
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+}
+.script {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-script);
+  font-size: var(--text-2xl);
+  color: var(--gold-300);
+}
+
+.formPanel {
+  @include glass.glass-l1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-5);
+  margin: var(--space-6);
+  padding: var(--space-10);
+  border-radius: var(--radius-xl);
+}
+.hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-faint);
+  text-align: center;
+
+  code {
+    color: var(--color-text-muted);
+  }
+}
+
+@media (max-width: 860px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+  .promo {
+    padding: var(--space-8) var(--space-6) var(--space-2);
+  }
+  .script {
+    display: none;
+  }
+  .formPanel {
+    margin: var(--space-4);
+    padding: var(--space-6);
+  }
+}

@@ -1,0 +1,56 @@
+@use '@ds/ui' as ui;
+@use '@ds/glass' as glass;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.input {
+  @include ui.input;
+  max-width: 420px;
+}
+.invalid {
+  border-color: var(--red-500);
+}
+.readonly {
+  display: block;
+  padding: 0.6rem 0.85rem;
+  font-weight: var(--fw-medium);
+  @include glass.glass-inset;
+  max-width: 420px;
+}
+.matrixWrap {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.matrixLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+  padding: 0;
+}
+.error {
+  margin: 0;
+  color: var(--red-400);
+  font-size: var(--text-sm);
+}
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.submit {
+  @include ui.button-primary;
+}
+.cancel {
+  @include ui.button-ghost;
+}
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

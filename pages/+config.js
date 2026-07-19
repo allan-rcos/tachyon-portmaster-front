@@ -1,13 +1,14 @@
 // pages/+config.js
-// @ts-ignore
+// @ts-expect-error — vike-solid/config não expõe tipos
 import vikeSolid from 'vike-solid/config';
 
 export default {
   extends: [vikeSolid],
-  title: 'Tachyon PortMaster',
   description: 'Sistema de Alocação de Contêineres e Carga',
-  // Raiz redireciona para a única tela existente hoje.
+  // Raiz redireciona para o painel operacional.
   redirects: {
-    '/': '/info'
-  }
+    '/': '/painel',
+  },
+  // O <title> é definido dinamicamente em pages/+Head.tsx a partir de
+  // `data.title` — não definimos `title` aqui para evitar dois <title>.
 };

@@ -1,0 +1,43 @@
+@use '@ds/ui' as ui;
+@use '@ds/glass' as glass;
+
+.wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  margin-top: var(--space-8);
+}
+.card {
+  @include glass.glass-l1;
+  padding: var(--space-5);
+}
+.title {
+  font-size: var(--text-md);
+  margin-bottom: var(--space-4);
+}
+.resetForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.input {
+  @include ui.input;
+}
+.invalid {
+  border-color: var(--red-500);
+}
+.resetBtn {
+  @include ui.button-secondary;
+  align-self: flex-start;
+}
+.ok {
+  margin: var(--space-3) 0 0;
+  color: var(--sage-300);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 720px) {
+  .wrap {
+    grid-template-columns: 1fr;
+  }
+}

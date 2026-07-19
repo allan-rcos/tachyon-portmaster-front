@@ -1,0 +1,68 @@
+@use '@ds/ui' as ui;
+@use '@ds/glass' as glass;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 560px;
+}
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+.input {
+  @include ui.input;
+}
+.roles {
+  @include glass.glass-inset;
+  border: 1px solid var(--glass-border-soft);
+  padding: var(--space-4);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.rolesLabel {
+  font-weight: var(--fw-medium);
+  color: var(--color-accent);
+  padding: 0 var(--space-2);
+}
+.roleItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+
+  input {
+    accent-color: var(--color-accent);
+    width: 16px;
+    height: 16px;
+  }
+}
+.error {
+  margin: 0;
+  color: var(--red-400);
+  font-size: var(--text-sm);
+}
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.submit {
+  @include ui.button-primary;
+}
+.cancel {
+  @include ui.button-ghost;
+}
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

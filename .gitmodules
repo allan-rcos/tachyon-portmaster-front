@@ -2,3 +2,11 @@
 	path = swagger
 	url = git@github.com:allan-rcos/tachyon-swagger.git
 	branch = flatbuffers-openapi
+[submodule "packages/vike-txiki-adapter"]
+	path = packages/vike-txiki-adapter
+	url = git@github.com:allan-rcos/vike-txiki-adapter.git
+	branch = main
+[submodule "packages/tachyon-design"]
+	path = packages/tachyon-design
+	url = git@github.com:allan-rcos/tachyon-design.git
+	branch = main
