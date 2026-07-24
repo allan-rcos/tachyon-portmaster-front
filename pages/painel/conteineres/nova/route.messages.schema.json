@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/conteineres-nova.json",
+  "title": "i18n da rota /painel/conteineres/nova (containerNewMessages)",
+  "type": "object",
+  "allOf": [{ "$ref": "https://portmaster.app/i18n/form/container.json" }],
+  "required": ["containers_title", "containers_subtitle", "containers_new"],
+  "patternProperties": {
+    "^containers_": { "type": "string", "minLength": 1 }
+  }
+}

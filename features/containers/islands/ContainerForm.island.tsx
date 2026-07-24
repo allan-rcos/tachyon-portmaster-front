@@ -1,29 +1,40 @@
 import { createForm } from '@tanstack/solid-form';
 import { createMutation } from '@tanstack/solid-query';
 import { Show, type JSX } from 'solid-js';
+import { createContainer, updateContainer } from 'tachyon-portmaster-sdk/containers';
 
 import styles from './ContainerForm.island.module.scss';
 import {
   createContainerCreateSchema,
   createContainerUpdateSchema,
+  type ContainerSchemaText,
 } from '../schemas/container.schema';
 
-import { browserCall } from '@/services/clients/browser';
-import { createContainer, updateContainer } from '@/services/codecs/flow/v1/container';
-import { FormField } from '@/shared/components/FormField';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { IslandProvider } from '@/shared/islands/IslandProvider';
-import { cn } from '@/shared/utils/cn';
-import { errText } from '@/shared/utils/formErrors';
+import { browserClient } from '@/features/core/api/client';
+import { FormField } from '@/features/core/components/FormField';
+import { IslandProvider } from '@/features/core/islands/IslandProvider';
+import { cn } from '@/features/core/utils/ui';
+import { errText } from '@/features/core/utils/ui';
 
 interface FormValues {
   code: string;
   max_capacity: string;
 }
 
+/** Texto que o formulário de contêiner consome (contrato local). */
+export interface ContainerFormText extends ContainerSchemaText {
+  data: string;
+  code: string;
+  maxCapacity: string;
+  submitError: string;
+  create: string;
+  save: string;
+  cancel: string;
+}
+
 export interface ContainerFormProps {
   mode: 'create' | 'edit';
-  t: Messages;
+  t: ContainerFormText;
   containerId?: string;
   defaultValues?: { code: string; max_capacity: number };
 }
@@ -33,10 +44,10 @@ function Inner(props: ContainerFormProps): JSX.Element {
     mutationFn: (value: FormValues) => {
       if (props.mode === 'create') {
         const body = createContainerCreateSchema(props.t).parse(value);
-        return browserCall(createContainer, { body });
+        return createContainer(browserClient, body);
       }
       const body = createContainerUpdateSchema(props.t).parse(value);
-      return browserCall(updateContainer, { params: { id: props.containerId! }, body });
+      return updateContainer(browserClient, props.containerId!, body);
     },
     onSuccess: () => {
       window.location.href = '/painel/conteineres';

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/usuarios-editar.json",
+  "title": "i18n da rota /painel/usuarios/@id/editar (userEditMessages)",
+  "type": "object",
+  "allOf": [{ "$ref": "https://portmaster.app/i18n/form/user.json" }],
+  "required": [
+    "users_reset_password",
+    "users_new_password",
+    "users_password_changed",
+    "users_delete_confirm",
+    "users_title",
+    "users_subtitle"
+  ],
+  "patternProperties": {
+    "^users_": { "type": "string", "minLength": 1 }
+  }
+}

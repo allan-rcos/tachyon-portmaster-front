@@ -1,8 +1,8 @@
-import { lingui } from '@lingui/vite-plugin';
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { fileURLToPath } from 'node:url';
 import vike from 'vike/plugin';
 import vikeSolid from 'vike-solid/vite';
-import { txiki, linguiMacroTs } from 'vike-txiki-adapter/vite';
+import { txiki } from 'vike-txiki-adapter/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -12,7 +12,25 @@ export default defineConfig({
   //
   // `txiki()` engata no `vite build` e gera `dist/txiki/server.mjs` ao final —
   // um único build já produz o servidor pronto para o `tjs`.
-  plugins: [linguiMacroTs(), vike(), vikeSolid(), txiki(), lingui()],
+  //
+  // `paraglideVitePlugin` compila `messages/{locale}.json` (via `project.inlang`)
+  // para funções `m.*()` tree-shakeable em `paraglide/` (auto-gitignorado). O
+  // locale é sempre passado explicitamente (`m.foo({}, { locale })`) no `+data`,
+  // então `strategy` é só fallback — nada de estado global/AsyncLocalStorage.
+  plugins: [
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './paraglide',
+      strategy: ['baseLocale'],
+      emitTsDeclarations: true,
+      // `isServer` sem `import.meta.env` (bare) — o bundle do txiki (rolldown)
+      // não resolve `import.meta` nesse passo; `typeof window` é seguro nos dois.
+      isServer: "typeof window === 'undefined'",
+    }),
+    vike(),
+    vikeSolid(),
+    txiki(),
+  ],
   resolve: {
     alias: {
       // Fonte única do design system (tokens/glass/ui em SASS). Para trocar a

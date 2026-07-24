@@ -1,27 +1,44 @@
 import { Show, type JSX } from 'solid-js';
 import { For } from 'solid-js';
+import { CONTAINER_STATUS } from 'tachyon-portmaster-sdk/common';
+import type { Container } from 'tachyon-portmaster-sdk/containers';
 
 import styles from './ContainerList.module.scss';
 
-import { CONTAINER_STATUS } from '@/services/gen/flow/v1/common';
-import type { Container } from '@/services/gen/flow/v1/container';
-import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
-import { DataTable, type Column } from '@/shared/components/DataTable';
-import { EmptyState } from '@/shared/components/EmptyState';
-import { Icon } from '@/shared/components/Icon';
-import { PageHeader } from '@/shared/components/PageHeader';
-import { Pagination } from '@/shared/components/Pagination';
-import { StatusBadge } from '@/shared/components/StatusBadge';
-import { CONTAINER_STATUS_LABEL } from '@/shared/i18n/labels';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { formatWeight, formatPercent } from '@/shared/utils/formatters';
+import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
+import { DataTable, type Column } from '@/features/core/components/DataTable';
+import { EmptyState } from '@/features/core/components/EmptyState';
+import { Icon } from '@/features/core/components/Icon';
+import { PageHeader } from '@/features/core/components/PageHeader';
+import { Pagination } from '@/features/core/components/Pagination';
+import { StatusBadge } from '@/features/core/components/StatusBadge';
+import { CONTAINER_STATUS_LABEL } from '@/features/core/i18n/labels';
+import { formatWeight, formatPercent } from '@/features/core/utils/formatters';
+
+/** Chaves de texto que esta lista consome (contrato — a página provê os valores). */
+export interface ContainerListText {
+  title: string;
+  subtitle: string;
+  new: string;
+  code: string;
+  status: string;
+  weight: string;
+  capacity: string;
+  occupancy: string;
+  actions: string;
+  edit: string;
+  search: string;
+  empty: string;
+  previous: string;
+  next: string;
+}
 
 export interface ContainerListProps {
   items: Container[];
   total: number;
   nextCursor?: string;
   filters: { search: string; status: string };
-  t: Messages;
+  t: ContainerListText;
 }
 
 function occupancy(c: Container): number {

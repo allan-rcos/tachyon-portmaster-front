@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/perfis-nova.json",
+  "title": "i18n da rota /painel/perfis/nova (roleNewMessages)",
+  "type": "object",
+  "allOf": [{ "$ref": "https://portmaster.app/i18n/form/role.json" }],
+  "required": ["roles_title", "roles_subtitle", "roles_new"],
+  "patternProperties": {
+    "^roles_": { "type": "string", "minLength": 1 }
+  }
+}

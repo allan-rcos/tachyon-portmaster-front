@@ -1,12 +1,17 @@
 import type { PageContextServer } from 'vike/types';
 
-import type { IncomingHeaders } from '@/services/clients/server';
-import { resolveLocale, loadMessages } from '@/shared/i18n/server';
+import { roleNewMessages, type RoleNewText } from './messages';
 
-export type Data = Awaited<ReturnType<typeof data>>;
+import type { IncomingHeaders } from '@/features/core/api/client';
+import { resolveLocale } from '@/features/core/i18n/locale';
 
-export async function data(pageContext: PageContextServer) {
-  const locale = resolveLocale(pageContext.headers as IncomingHeaders);
-  const t = loadMessages(locale, 'roles');
+export interface Data {
+  t: RoleNewText;
+  title: string;
+  description: string;
+}
+
+export async function data(pageContext: PageContextServer): Promise<Data> {
+  const t = roleNewMessages(resolveLocale(pageContext.headers as IncomingHeaders));
   return { t, title: t.new, description: t.subtitle };
 }

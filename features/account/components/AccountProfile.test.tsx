@@ -1,12 +1,12 @@
 import { render } from '@solidjs/testing-library';
+import type { AccountProfile as Profile } from 'tachyon-portmaster-sdk/account';
 import { describe, it, expect } from 'vitest';
 
 import { AccountProfile } from './AccountProfile';
 
-import type { AccountProfile as Profile } from '@/services/gen/flow/v1/account';
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { accountMessages } from '@/pages/painel/conta/messages';
 
-const t = { ...ptBR.common, ...ptBR.account };
+const t = accountMessages('pt-BR');
 const profile: Profile = {
   id: 'usr_1',
   name: 'Ana Marés',

@@ -1,31 +1,36 @@
-import { redirect } from 'vike/abort';
+import type { Permission } from 'tachyon-portmaster-sdk/common';
+import { redirect, render } from 'vike/abort';
 import type { GuardAsync } from 'vike/types';
 
-import { serverCall } from '@/services/clients/server';
-import { getAccount } from '@/services/codecs/flow/v1/account';
+import { hasPermissions, loadAccount } from '@/features/core/auth/session';
 
 // Rotas públicas (sem auth). Todo o resto exige sessão.
 const PUBLIC = ['/entrar'];
 
-function readCookie(pageContext: Parameters<GuardAsync>[0]): string | undefined {
-  const headers = pageContext.headers as Record<string, string> | null | undefined;
-  const fromHeader = headers?.cookie ?? headers?.Cookie;
-  if (fromHeader) return fromHeader;
-  // Navegação client-side: não há headers de request; usa document.cookie.
-  return typeof document !== 'undefined' ? document.cookie : undefined;
+function isPublic(path: string): boolean {
+  return PUBLIC.some((p) => path === p || path.startsWith(p + '/'));
 }
 
-/** Auth server-side: encaminha o cookie ao backend (GET /account).
- *  401 → redireciona ao login. O backend valida o cookie `auth_token`
- *  (same-origin token). */
+/**
+ * Guard único que aplica auth + autorização por página. As permissões exigidas
+ * são declaradas por página no value-file `+permissions.js` (config custom
+ * `permissions`, resolução closest-wins — sem cascata indevida); aqui só lemos
+ * `pageContext.config.permissions` da rota casada e conferimos.
+ *
+ *   • cookie inválido/ausente (401) → redirect ao login (fluxo preservado);
+ *   • falta de permissão            → render(403) Forbidden (página _error).
+ */
 export const guard: GuardAsync = async (pageContext) => {
-  const path = pageContext.urlPathname;
-  if (PUBLIC.some((p) => path === p || path.startsWith(p + '/'))) return;
+  if (isPublic(pageContext.urlPathname)) return;
 
-  const cookie = readCookie(pageContext);
+  let account;
   try {
-    await serverCall(getAccount, {}, { cookie });
+    account = await loadAccount(pageContext);
   } catch {
-    throw redirect(`/entrar?redirect=${encodeURIComponent(path)}`);
+    throw redirect(`/entrar?redirect=${encodeURIComponent(pageContext.urlPathname)}`);
   }
+
+  const required = ((pageContext.config as { permissions?: Permission[] }).permissions ??
+    []) as Permission[];
+  if (!hasPermissions(account, required)) throw render(403);
 };

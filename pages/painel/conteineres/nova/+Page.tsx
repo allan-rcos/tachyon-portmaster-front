@@ -4,9 +4,9 @@ import { useData } from 'vike-solid/useData';
 import type { Data } from './+data';
 
 import { ContainerForm } from '@/features/containers/islands/ContainerForm.island';
-import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
-import { PageHeader } from '@/shared/components/PageHeader';
-import { FormSkeleton } from '@/shared/components/Skeleton';
+import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
+import { PageHeader } from '@/features/core/components/PageHeader';
+import { FormSkeleton } from '@/features/core/components/Skeleton';
 
 export default function NewContainerPage() {
   const data = useData<Data>();

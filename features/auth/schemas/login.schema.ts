@@ -1,8 +1,13 @@
 import { z } from 'zod';
 
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
+/** Chaves de erro que este schema consome (contrato local). */
+export interface LoginSchemaText {
+  emailRequired: string;
+  emailInvalid: string;
+  passwordRequired: string;
+}
 
-export function createLoginSchema(t?: Messages) {
+export function createLoginSchema(t?: LoginSchemaText) {
   return z.object({
     email: z
       .string()

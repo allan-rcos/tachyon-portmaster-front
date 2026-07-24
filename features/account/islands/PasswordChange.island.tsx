@@ -1,21 +1,34 @@
 import { createForm } from '@tanstack/solid-form';
 import { createMutation } from '@tanstack/solid-query';
 import { type JSX } from 'solid-js';
+import { changePassword } from 'tachyon-portmaster-sdk/account';
 
 import styles from './PasswordChange.island.module.scss';
-import { createPasswordChangeSchema, type PasswordChangeData } from '../schemas/account.schema';
+import {
+  createPasswordChangeSchema,
+  type PasswordChangeData,
+  type PasswordChangeSchemaText,
+} from '../schemas/account.schema';
 
-import { browserCall } from '@/services/clients/browser';
-import { changePassword } from '@/services/codecs/flow/v1/account';
-import { FormField } from '@/shared/components/FormField';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { IslandProvider } from '@/shared/islands/IslandProvider';
-import { cn } from '@/shared/utils/cn';
-import { errText } from '@/shared/utils/formErrors';
+import { browserClient } from '@/features/core/api/client';
+import { FormField } from '@/features/core/components/FormField';
+import { IslandProvider } from '@/features/core/islands/IslandProvider';
+import { cn } from '@/features/core/utils/ui';
+import { errText } from '@/features/core/utils/ui';
 
-function Inner(props: { t: Messages }): JSX.Element {
+/** Texto que a troca de senha consome (contrato local). */
+export interface PasswordChangeText extends PasswordChangeSchemaText {
+  security: string;
+  currentPassword: string;
+  newPassword: string;
+  submitError: string;
+  passwordChanged: string;
+  changePassword: string;
+}
+
+function Inner(props: { t: PasswordChangeText }): JSX.Element {
   const mutation = createMutation(() => ({
-    mutationFn: (value: PasswordChangeData) => browserCall(changePassword, { body: value }),
+    mutationFn: (value: PasswordChangeData) => changePassword(browserClient, value),
     onSuccess: () => form.reset(),
   }));
 
@@ -95,7 +108,7 @@ function Inner(props: { t: Messages }): JSX.Element {
 }
 
 /** Troca da própria senha (island). */
-export function PasswordChange(props: { t: Messages }): JSX.Element {
+export function PasswordChange(props: { t: PasswordChangeText }): JSX.Element {
   return (
     <IslandProvider>
       <Inner t={props.t} />

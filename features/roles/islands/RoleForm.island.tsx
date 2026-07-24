@@ -1,23 +1,36 @@
 import { createForm } from '@tanstack/solid-form';
 import { createMutation } from '@tanstack/solid-query';
 import { Show, type JSX } from 'solid-js';
+import type { Permission } from 'tachyon-portmaster-sdk/common';
+import { createRole, updateRolePermissions } from 'tachyon-portmaster-sdk/roles';
 
 import { PermissionMatrix } from './PermissionMatrix';
 import styles from './RoleForm.island.module.scss';
-import { createRoleSchema, createRolePermissionsSchema } from '../schemas/role.schema';
+import {
+  createRoleSchema,
+  createRolePermissionsSchema,
+  type RoleSchemaText,
+} from '../schemas/role.schema';
 
-import { browserCall } from '@/services/clients/browser';
-import { createRole, updateRolePermissions } from '@/services/codecs/flow/v1/role';
-import type { Permission } from '@/services/gen/flow/v1/common';
-import { FormField } from '@/shared/components/FormField';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { IslandProvider } from '@/shared/islands/IslandProvider';
-import { cn } from '@/shared/utils/cn';
-import { errText } from '@/shared/utils/formErrors';
+import { browserClient } from '@/features/core/api/client';
+import { FormField } from '@/features/core/components/FormField';
+import { IslandProvider } from '@/features/core/islands/IslandProvider';
+import { cn } from '@/features/core/utils/ui';
+import { errText } from '@/features/core/utils/ui';
+
+/** Texto que o formulário de perfil consome (contrato local). */
+export interface RoleFormText extends RoleSchemaText {
+  name: string;
+  permissions: string;
+  submitError: string;
+  create: string;
+  save: string;
+  cancel: string;
+}
 
 export interface RoleFormProps {
   mode: 'create' | 'permissions';
-  t: Messages;
+  t: RoleFormText;
   roleId?: string;
   defaultName?: string;
   defaultPermissions?: Permission[];
@@ -32,13 +45,10 @@ function Inner(props: RoleFormProps): JSX.Element {
   const mutation = createMutation(() => ({
     mutationFn: (value: FormValues) => {
       if (props.mode === 'create') {
-        return browserCall(createRole, {
-          body: { name: value.name, permissions: value.permissions },
-        });
+        return createRole(browserClient, { name: value.name, permissions: value.permissions });
       }
-      return browserCall(updateRolePermissions, {
-        params: { id: props.roleId! },
-        body: { permissions: value.permissions },
+      return updateRolePermissions(browserClient, props.roleId!, {
+        permissions: value.permissions,
       });
     },
     onSuccess: () => {

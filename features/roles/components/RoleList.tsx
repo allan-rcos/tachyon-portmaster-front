@@ -1,18 +1,30 @@
 import type { JSX } from 'solid-js';
 import { Show } from 'solid-js';
+import type { Role } from 'tachyon-portmaster-sdk/roles';
 
 import styles from './RoleList.module.scss';
 
-import type { Role } from '@/services/gen/flow/v1/admin';
-import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
-import { DataTable, type Column } from '@/shared/components/DataTable';
-import { EmptyState } from '@/shared/components/EmptyState';
-import { Icon } from '@/shared/components/Icon';
-import { PageHeader } from '@/shared/components/PageHeader';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { formatNumber } from '@/shared/utils/formatters';
+import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
+import { DataTable, type Column } from '@/features/core/components/DataTable';
+import { EmptyState } from '@/features/core/components/EmptyState';
+import { Icon } from '@/features/core/components/Icon';
+import { PageHeader } from '@/features/core/components/PageHeader';
+import { formatNumber } from '@/features/core/utils/formatters';
 
-export function RoleList(props: { items: Role[]; total: number; t: Messages }): JSX.Element {
+/** Chaves de texto que esta lista consome (contrato — a página provê). */
+export interface RoleListText {
+  title: string;
+  subtitle: string;
+  new: string;
+  name: string;
+  userCount: string;
+  permissions: string;
+  actions: string;
+  edit: string;
+  empty: string;
+}
+
+export function RoleList(props: { items: Role[]; total: number; t: RoleListText }): JSX.Element {
   const columns = (): Column<Role>[] => [
     {
       header: props.t.name,

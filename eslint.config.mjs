@@ -7,7 +7,6 @@ export default tseslint.config(
   // Ignorados globais (código gerado, build, workspaces, ferramentas)
   {
     ignores: [
-      'services/gen/**',
       'dist/**',
       'out/**',
       'packages/**',
@@ -15,6 +14,8 @@ export default tseslint.config(
       '.claude/**',
       'prototype/**',
       'swagger/**',
+      // Saída do compilador Paraglide (funções `m.*` geradas) — não lintar.
+      'paraglide/**',
     ],
   },
 
@@ -49,8 +50,9 @@ export default tseslint.config(
       ],
 
       // Web Standards — proibir Node.js built-ins (txiki não suporta).
-      // `paths` casa nomes de módulo exatos (evita falso-positivo em ex. `@/services/http`);
-      // o `group: ['node:*']` cobre o protocolo node: (inclui subpaths tipo node:fs/promises).
+      // `paths` casa nomes de módulo exatos; o `group: ['node:*']` cobre o
+      // protocolo node: (inclui subpaths tipo node:fs/promises). Os patterns
+      // também barram os diretórios extintos (services/ → SDK; shared/ → core).
       'no-restricted-imports': [
         'error',
         {
@@ -77,15 +79,24 @@ export default tseslint.config(
               group: ['node:*'],
               message: 'txiki não suporta protocolo node:. Use Web Standards.',
             },
+            {
+              group: ['@/services', '@/services/*'],
+              message:
+                'services/ foi dissolvido: comunicação com a API vive no SDK (tachyon-portmaster-sdk/*) e o client em @/features/core/api/client.',
+            },
+            {
+              group: ['@/shared', '@/shared/*'],
+              message: 'shared/ foi movido para features/core. Use @/features/core/*.',
+            },
           ],
         },
       ],
     },
   },
 
-  // Config files (Vite/Vitest/Lingui) rodam em Node — liberam os built-ins.
+  // Config e scripts (Vite/Vitest/tools) rodam em Node — liberam os built-ins.
   {
-    files: ['*.{js,mjs,cjs,ts}', 'vite.config.ts', 'vitest.config.ts', 'lingui.config.js'],
+    files: ['*.{js,mjs,cjs,ts}', 'vite.config.ts', 'vitest.config.ts', 'tools/**/*.mjs'],
     rules: {
       'no-restricted-imports': 'off',
     },

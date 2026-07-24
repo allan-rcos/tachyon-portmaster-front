@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { UserForm } from './UserForm.island';
+import { userFormMessages } from './UserForm.messages';
 
-import ptBR from '@/shared/i18n/messages/pt-BR';
 import { setInput, stubLocation } from '@/test/utils';
 
-const t = { ...ptBR.common, ...ptBR.users };
+const t = userFormMessages('pt-BR');
 const roles = [{ id: 'rol_auditor', name: 'Auditor' }];
 let loc: ReturnType<typeof stubLocation>;
 beforeEach(() => {

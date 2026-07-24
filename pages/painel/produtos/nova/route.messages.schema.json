@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/produtos-nova.json",
+  "title": "i18n da rota /painel/produtos/nova (productNewMessages)",
+  "type": "object",
+  "allOf": [{ "$ref": "https://portmaster.app/i18n/form/product.json" }],
+  "required": ["products_title", "products_subtitle", "products_new"],
+  "patternProperties": {
+    "^products_": { "type": "string", "minLength": 1 }
+  }
+}

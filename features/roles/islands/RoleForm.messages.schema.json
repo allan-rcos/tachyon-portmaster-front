@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/form/role.json",
+  "title": "i18n do formulário de perfil (roleFormMessages)",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://portmaster.app/i18n/common.json" },
+    { "$ref": "https://portmaster.app/i18n/val.json" }
+  ],
+  "required": ["roles_name", "roles_permissions"],
+  "patternProperties": {
+    "^roles_": { "type": "string", "minLength": 1 }
+  }
+}

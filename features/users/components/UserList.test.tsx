@@ -1,12 +1,12 @@
 import { render } from '@solidjs/testing-library';
+import type { UserAdmin } from 'tachyon-portmaster-sdk/users';
 import { describe, it, expect } from 'vitest';
 
 import { UserList } from './UserList';
 
-import type { UserAdmin } from '@/services/gen/flow/v1/admin';
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { usersListMessages } from '@/pages/painel/usuarios/messages';
 
-const t = { ...ptBR.common, ...ptBR.users };
+const t = usersListMessages('pt-BR');
 const items: UserAdmin[] = [
   {
     id: 'usr_1',

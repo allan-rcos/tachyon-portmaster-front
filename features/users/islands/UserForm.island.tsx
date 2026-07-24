@@ -1,26 +1,42 @@
 import { createForm } from '@tanstack/solid-form';
 import { createMutation } from '@tanstack/solid-query';
 import { For, Show, type JSX } from 'solid-js';
+import { createUser, updateUser, updateUserRoles } from 'tachyon-portmaster-sdk/users';
 
 import styles from './UserForm.island.module.scss';
-import { createUserCreateSchema, createUserUpdateSchema } from '../schemas/user.schema';
+import {
+  createUserCreateSchema,
+  createUserUpdateSchema,
+  type UserSchemaText,
+} from '../schemas/user.schema';
 
-import { browserCall } from '@/services/clients/browser';
-import { createUser, updateUser, updateUserRoles } from '@/services/codecs/flow/v1/user';
-import { FormField } from '@/shared/components/FormField';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { IslandProvider } from '@/shared/islands/IslandProvider';
-import { cn } from '@/shared/utils/cn';
-import { errText } from '@/shared/utils/formErrors';
+import { browserClient } from '@/features/core/api/client';
+import { FormField } from '@/features/core/components/FormField';
+import { IslandProvider } from '@/features/core/islands/IslandProvider';
+import { cn } from '@/features/core/utils/ui';
+import { errText } from '@/features/core/utils/ui';
 
 export interface RoleOption {
   id: string;
   name: string;
 }
 
+/** Texto que o formulário de usuário consome (contrato local). */
+export interface UserFormText extends UserSchemaText {
+  data: string;
+  name: string;
+  email: string;
+  initialPassword: string;
+  roles: string;
+  submitError: string;
+  create: string;
+  save: string;
+  cancel: string;
+}
+
 export interface UserFormProps {
   mode: 'create' | 'edit';
-  t: Messages;
+  t: UserFormText;
   roles: RoleOption[];
   userId?: string;
   defaultValues?: { name: string; email: string; role_ids: string[] };
@@ -40,23 +56,15 @@ function Inner(props: UserFormProps): JSX.Element {
   const mutation = createMutation(() => ({
     mutationFn: async (value: FormValues) => {
       if (props.mode === 'create') {
-        return browserCall(createUser, {
-          body: {
-            name: value.name,
-            email: value.email,
-            initial_password: value.initial_password,
-            role_ids: value.role_ids,
-          },
+        return createUser(browserClient, {
+          name: value.name,
+          email: value.email,
+          initial_password: value.initial_password,
+          role_ids: value.role_ids,
         });
       }
-      await browserCall(updateUser, {
-        params: { id: props.userId! },
-        body: { name: value.name, email: value.email },
-      });
-      return browserCall(updateUserRoles, {
-        params: { id: props.userId! },
-        body: { role_ids: value.role_ids },
-      });
+      await updateUser(browserClient, props.userId!, { name: value.name, email: value.email });
+      return updateUserRoles(browserClient, props.userId!, { role_ids: value.role_ids });
     },
     onSuccess: () => {
       window.location.href = '/painel/usuarios';

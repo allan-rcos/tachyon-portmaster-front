@@ -2,9 +2,9 @@ import { useData } from 'vike-solid/useData';
 
 import type { Data } from './+data';
 
+import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
+import { PageHeader } from '@/features/core/components/PageHeader';
 import { MetricsPanel } from '@/features/metrics/components/MetricsPanel';
-import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
-import { PageHeader } from '@/shared/components/PageHeader';
 
 export default function PainelPage() {
   const data = useData<Data>();

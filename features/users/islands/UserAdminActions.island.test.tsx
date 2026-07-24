@@ -4,10 +4,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { UserAdminActions } from './UserAdminActions.island';
 
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { userEditMessages } from '@/pages/painel/usuarios/@id/editar/messages';
 import { setInput, stubLocation } from '@/test/utils';
 
-const t = { ...ptBR.common, ...ptBR.users };
+const t = userEditMessages('pt-BR');
 let loc: ReturnType<typeof stubLocation>;
 beforeEach(() => {
   loc = stubLocation();

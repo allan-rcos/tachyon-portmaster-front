@@ -4,10 +4,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { ContainerActions } from './ContainerActions.island';
 
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { containerDetailMessages } from '@/pages/painel/conteineres/@id/messages';
 import { stubLocation } from '@/test/utils';
 
-const t = { ...ptBR.common, ...ptBR.containers };
+const t = containerDetailMessages('pt-BR');
 let loc: ReturnType<typeof stubLocation>;
 beforeEach(() => {
   loc = stubLocation();

@@ -1,12 +1,12 @@
 import { render } from '@solidjs/testing-library';
+import type { Container } from 'tachyon-portmaster-sdk/containers';
 import { describe, it, expect } from 'vitest';
 
 import { ContainerList } from './ContainerList';
 
-import type { Container } from '@/services/gen/flow/v1/container';
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { containersListMessages } from '@/pages/painel/conteineres/messages';
 
-const t = { ...ptBR.common, ...ptBR.containers };
+const t = containersListMessages('pt-BR');
 const items: Container[] = [
   { id: 'ctr_1', code: 'MSKU-4410', current_weight: 12000, max_capacity: 28000, status: 'Loading' },
   { id: 'ctr_2', code: 'TCLU-9982', current_weight: 20000, max_capacity: 24000, status: 'Sealed' },
@@ -17,7 +17,10 @@ describe('ContainerList', () => {
     const { getByRole } = render(() => (
       <ContainerList items={items} total={2} filters={{ search: '', status: '' }} t={t} />
     ));
-    expect(getByRole('link', { name: 'MSKU-4410' })).toHaveAttribute('href', '/painel/conteineres/ctr_1');
+    expect(getByRole('link', { name: 'MSKU-4410' })).toHaveAttribute(
+      'href',
+      '/painel/conteineres/ctr_1',
+    );
     expect(getByRole('link', { name: new RegExp(t.new) })).toHaveAttribute(
       'href',
       '/painel/conteineres/nova',

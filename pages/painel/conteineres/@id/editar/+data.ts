@@ -1,16 +1,24 @@
+import type { Container } from 'tachyon-portmaster-sdk/containers';
 import type { PageContextServer } from 'vike/types';
 
+import { containerEditMessages, type ContainerEditText } from './messages';
+
 import { getContainer } from '@/features/containers/loaders/getContainer';
-import type { IncomingHeaders } from '@/services/clients/server';
-import { resolveLocale, loadMessages } from '@/shared/i18n/server';
+import type { IncomingHeaders } from '@/features/core/api/client';
+import { resolveLocale } from '@/features/core/i18n/locale';
 
-export type Data = Awaited<ReturnType<typeof data>>;
+export interface Data {
+  id: string;
+  container: Container;
+  t: ContainerEditText;
+  title: string;
+  description: string;
+}
 
-export async function data(pageContext: PageContextServer) {
+export async function data(pageContext: PageContextServer): Promise<Data> {
   const id = pageContext.routeParams.id;
   const headers = pageContext.headers as IncomingHeaders;
-  const locale = resolveLocale(headers);
-  const t = loadMessages(locale, 'containers');
+  const t = containerEditMessages(resolveLocale(headers));
   const container = await getContainer(id, headers);
   return { id, container, t, title: `${t.edit} ${container.code}`, description: t.subtitle };
 }

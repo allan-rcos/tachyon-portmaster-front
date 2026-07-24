@@ -1,17 +1,26 @@
+import type { UserAdmin } from 'tachyon-portmaster-sdk/users';
 import type { PageContextServer } from 'vike/types';
 
+import { userEditMessages, type UserEditText } from './messages';
+
+import type { IncomingHeaders } from '@/features/core/api/client';
+import { resolveLocale } from '@/features/core/i18n/locale';
 import { listRoles } from '@/features/roles/loaders/listRoles';
 import { getUser } from '@/features/users/loaders/getUser';
-import type { IncomingHeaders } from '@/services/clients/server';
-import { resolveLocale, loadMessages } from '@/shared/i18n/server';
 
-export type Data = Awaited<ReturnType<typeof data>>;
+export interface Data {
+  id: string;
+  user: UserAdmin;
+  roles: { id: string; name: string }[];
+  t: UserEditText;
+  title: string;
+  description: string;
+}
 
-export async function data(pageContext: PageContextServer) {
+export async function data(pageContext: PageContextServer): Promise<Data> {
   const id = pageContext.routeParams.id;
   const headers = pageContext.headers as IncomingHeaders;
-  const locale = resolveLocale(headers);
-  const t = loadMessages(locale, 'users');
+  const t = userEditMessages(resolveLocale(headers));
   const [user, roles] = await Promise.all([getUser(id, headers), listRoles(headers)]);
   return {
     id,

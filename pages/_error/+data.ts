@@ -1,10 +1,20 @@
 import type { PageContextServer } from 'vike/types';
 
-export type Data = Awaited<ReturnType<typeof data>>;
+export interface Data {
+  title: string;
+  description: string;
+}
 
 // Título/descrição da página de erro (consumidos por pages/+Head.tsx).
-// Estático — a página de erro não depende de dados do backend.
-export async function data(pageContext: PageContextServer) {
+// Estático — distingue 403 (Forbidden, via render(403) no guard), 404 e 500.
+export async function data(pageContext: PageContextServer): Promise<Data> {
+  const status = (pageContext as { abortStatusCode?: number }).abortStatusCode;
+  if (status === 403) {
+    return {
+      title: 'Acesso negado',
+      description: 'Você não tem permissão para acessar esta página.',
+    };
+  }
   const is404 = pageContext.is404;
   return {
     title: is404 ? 'Página não encontrada' : 'Erro no servidor',

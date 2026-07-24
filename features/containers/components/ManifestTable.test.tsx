@@ -4,9 +4,9 @@ import { describe, it, expect } from 'vitest';
 import { ManifestTable } from './ManifestTable';
 import { TelemetryLog } from './TelemetryLog';
 
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { containerDetailMessages } from '@/pages/painel/conteineres/@id/messages';
 
-const t = { ...ptBR.common, ...ptBR.containers };
+const t = containerDetailMessages('pt-BR');
 
 describe('ManifestTable', () => {
   it('lista itens do manifesto', () => {

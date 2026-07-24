@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/conta.json",
+  "title": "i18n da rota /painel/conta (accountMessages)",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://portmaster.app/i18n/common.json" },
+    { "$ref": "https://portmaster.app/i18n/val.json" }
+  ],
+  "required": [
+    "account_title",
+    "account_subtitle",
+    "account_profile",
+    "account_roles",
+    "account_name",
+    "account_email",
+    "account_security",
+    "account_current_password",
+    "account_new_password",
+    "account_change_password",
+    "account_password_changed"
+  ],
+  "patternProperties": {
+    "^account_": { "type": "string", "minLength": 1 }
+  }
+}

@@ -1,21 +1,33 @@
 import { createForm } from '@tanstack/solid-form';
 import { createMutation } from '@tanstack/solid-query';
 import { type JSX } from 'solid-js';
+import { updateAccount } from 'tachyon-portmaster-sdk/account';
 
 import styles from './AccountForm.island.module.scss';
-import { createAccountSchema, type AccountFormData } from '../schemas/account.schema';
+import {
+  createAccountSchema,
+  type AccountFormData,
+  type AccountSchemaText,
+} from '../schemas/account.schema';
 
-import { browserCall } from '@/services/clients/browser';
-import { updateAccount } from '@/services/codecs/flow/v1/account';
-import { FormField } from '@/shared/components/FormField';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { IslandProvider } from '@/shared/islands/IslandProvider';
-import { cn } from '@/shared/utils/cn';
-import { errText } from '@/shared/utils/formErrors';
+import { browserClient } from '@/features/core/api/client';
+import { FormField } from '@/features/core/components/FormField';
+import { IslandProvider } from '@/features/core/islands/IslandProvider';
+import { cn } from '@/features/core/utils/ui';
+import { errText } from '@/features/core/utils/ui';
 
-function Inner(props: { name: string; email: string; t: Messages }): JSX.Element {
+/** Texto que o formulário de dados da conta consome (contrato local). */
+export interface AccountFormText extends AccountSchemaText {
+  profile: string;
+  name: string;
+  email: string;
+  submitError: string;
+  save: string;
+}
+
+function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.Element {
   const mutation = createMutation(() => ({
-    mutationFn: (value: AccountFormData) => browserCall(updateAccount, { body: value }),
+    mutationFn: (value: AccountFormData) => updateAccount(browserClient, value),
     onSuccess: () => window.location.reload(),
   }));
 
@@ -91,7 +103,11 @@ function Inner(props: { name: string; email: string; t: Messages }): JSX.Element
 }
 
 /** Formulário de dados da própria conta (island). */
-export function AccountForm(props: { name: string; email: string; t: Messages }): JSX.Element {
+export function AccountForm(props: {
+  name: string;
+  email: string;
+  t: AccountFormText;
+}): JSX.Element {
   return (
     <IslandProvider>
       <Inner {...props} />

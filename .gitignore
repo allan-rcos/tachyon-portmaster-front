@@ -6,14 +6,11 @@ out
 dist
 *.tgz
 
-# gerado por comando (codegen / catálogos compilados) — regenerável no build
-# flatc (bun run gen:fbs)
-services/gen/fbs/
-# lingui compile (catálogos compilados)
-shared/i18n/locales/**/*.mjs
-shared/i18n/locales/**/*.js
-# cache do lingui
-.lingui
+# gerado por comando (codegen) — regenerável no build
+# (o flatc do SDK gera packages/tachyon-portmaster-sdk/src/fbs-gen — COMMITADO)
+# Paraglide: saída do compilador i18n (funções `m.*` tree-shakeable).
+# Também traz seu próprio .gitignore, mas explicitamos aqui.
+paraglide/
 
 # code coverage
 coverage

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/conteineres.json",
+  "title": "i18n da rota /painel/conteineres (containersListMessages)",
+  "type": "object",
+  "allOf": [{ "$ref": "https://portmaster.app/i18n/common.json" }],
+  "required": [
+    "containers_title",
+    "containers_subtitle",
+    "containers_new",
+    "containers_code",
+    "containers_status",
+    "containers_weight",
+    "containers_capacity",
+    "containers_occupancy"
+  ],
+  "patternProperties": {
+    "^containers_": { "type": "string", "minLength": 1 }
+  }
+}

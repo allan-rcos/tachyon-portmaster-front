@@ -1,9 +1,14 @@
+import { PERMISSION } from 'tachyon-portmaster-sdk/common';
 import { z } from 'zod';
 
-import { PERMISSION } from '@/services/gen/flow/v1/common';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
+/** Chaves de erro dos schemas de perfil (contrato local). */
+export interface RoleSchemaText {
+  nameShort: string;
+  nameLong: string;
+  permissionsRequired: string;
+}
 
-export function createRoleSchema(t?: Messages) {
+export function createRoleSchema(t?: RoleSchemaText) {
   return z.object({
     name: z
       .string()
@@ -17,7 +22,7 @@ export function createRoleSchema(t?: Messages) {
 }
 
 /** Só permissões (modo de sincronização de um perfil existente). */
-export function createRolePermissionsSchema(t?: Messages) {
+export function createRolePermissionsSchema(t?: Pick<RoleSchemaText, 'permissionsRequired'>) {
   return z.object({
     permissions: z
       .array(z.enum(PERMISSION))

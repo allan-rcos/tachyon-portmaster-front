@@ -6,15 +6,16 @@
 //  NOTA: isto é infraestrutura de teste — NÃO é importado pelo app
 //  em runtime. O app fala com o swagger real via services/clients.
 // ============================================================
-import type { Role, UserAdmin } from '@/services/gen/flow/v1/admin';
-import type { Permission } from '@/services/gen/flow/v1/common';
-import { PERMISSION } from '@/services/gen/flow/v1/common';
+import type { Permission } from 'tachyon-portmaster-sdk/common';
+import { PERMISSION } from 'tachyon-portmaster-sdk/common';
 import type {
   CargoManifestItem,
   Container,
   TelemetryLogItem,
-} from '@/services/gen/flow/v1/container';
-import type { Product } from '@/services/gen/flow/v1/product';
+} from 'tachyon-portmaster-sdk/containers';
+import type { Product } from 'tachyon-portmaster-sdk/products';
+import type { Role } from 'tachyon-portmaster-sdk/roles';
+import type { UserAdmin } from 'tachyon-portmaster-sdk/users';
 
 export interface SeedUser extends UserAdmin {
   password: string;

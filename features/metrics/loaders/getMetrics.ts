@@ -1,6 +1,7 @@
-import { serverCall, type IncomingHeaders } from '@/services/clients/server';
-import { getMetrics as codec } from '@/services/codecs/flow/v1/metrics';
+import { getMetrics as apiGetMetrics } from 'tachyon-portmaster-sdk/metrics';
+
+import { serverClient, type IncomingHeaders } from '@/features/core/api/client';
 
 export function getMetrics(headers: IncomingHeaders) {
-  return serverCall(codec, {}, headers);
+  return apiGetMetrics(serverClient(headers));
 }

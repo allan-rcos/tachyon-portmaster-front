@@ -1,9 +1,21 @@
 import { z } from 'zod';
 
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
+/** Chaves de erro dos schemas de usuário (contratos locais). */
+export interface UserSchemaText {
+  nameShort: string;
+  nameLong: string;
+  emailRequired: string;
+  emailInvalid: string;
+  passwordMin: string;
+  rolesRequired: string;
+}
+
+export interface PasswordResetSchemaText {
+  passwordMin: string;
+}
 
 // Mensagens de validação com i18n (island recebe `t` do SSR). Fallback pt-BR.
-function msgs(t?: Messages) {
+function msgs(t?: UserSchemaText) {
   return {
     nameShort: t?.nameShort ?? 'Nome muito curto',
     nameLong: t?.nameLong ?? 'Nome muito longo',
@@ -14,7 +26,7 @@ function msgs(t?: Messages) {
   };
 }
 
-export function createUserCreateSchema(t?: Messages) {
+export function createUserCreateSchema(t?: UserSchemaText) {
   const m = msgs(t);
   return z.object({
     name: z.string().trim().min(2, m.nameShort).max(120, m.nameLong),
@@ -24,7 +36,7 @@ export function createUserCreateSchema(t?: Messages) {
   });
 }
 
-export function createUserUpdateSchema(t?: Messages) {
+export function createUserUpdateSchema(t?: UserSchemaText) {
   const m = msgs(t);
   return z.object({
     name: z.string().trim().min(2, m.nameShort).max(120, m.nameLong),
@@ -33,9 +45,9 @@ export function createUserUpdateSchema(t?: Messages) {
   });
 }
 
-export function createPasswordResetSchema(t?: Messages) {
+export function createPasswordResetSchema(t?: PasswordResetSchemaText) {
   return z.object({
-    new_password: z.string().min(6, msgs(t).passwordMin),
+    new_password: z.string().min(6, t?.passwordMin ?? 'Mínimo de 6 caracteres'),
   });
 }
 

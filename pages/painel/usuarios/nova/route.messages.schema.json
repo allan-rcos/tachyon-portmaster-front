@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/usuarios-nova.json",
+  "title": "i18n da rota /painel/usuarios/nova (userNewMessages)",
+  "type": "object",
+  "allOf": [{ "$ref": "https://portmaster.app/i18n/form/user.json" }],
+  "required": ["users_title", "users_subtitle", "users_new"],
+  "patternProperties": {
+    "^users_": { "type": "string", "minLength": 1 }
+  }
+}

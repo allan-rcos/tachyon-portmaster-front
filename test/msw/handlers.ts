@@ -6,9 +6,8 @@
 // ============================================================
 import { http, HttpResponse, passthrough } from 'msw';
 
+import { MockApiError } from './error';
 import { resolveMock } from './resolver';
-
-import { HttpError } from '@/services/http';
 
 async function handle(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -37,7 +36,7 @@ async function handle(request: Request): Promise<Response> {
     if (data === null || data === undefined) return new HttpResponse(null, { status: 204 });
     return HttpResponse.json(data);
   } catch (e) {
-    if (e instanceof HttpError) {
+    if (e instanceof MockApiError) {
       return HttpResponse.json({ message: e.message }, { status: e.status });
     }
     throw e;

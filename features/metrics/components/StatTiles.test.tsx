@@ -1,12 +1,12 @@
 import { render } from '@solidjs/testing-library';
+import type { Metrics } from 'tachyon-portmaster-sdk/metrics';
 import { describe, it, expect } from 'vitest';
 
 import { StatTiles } from './StatTiles';
 
-import type { Metrics } from '@/services/gen/flow/v1/metrics';
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { painelMessages } from '@/pages/painel/messages';
 
-const t = { ...ptBR.common, ...ptBR.painel };
+const t = painelMessages('pt-BR');
 const metrics: Metrics = {
   active_containers: 6,
   total_containers: 8,

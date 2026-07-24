@@ -5,11 +5,12 @@
 //
 //  Infra de teste — não faz parte do bundle do app.
 // ============================================================
-import { db, nextId, recalcWeight, type SeedContainer, type SeedUser } from './db';
 
-import type { Paged, Permission, RiskClass } from '@/services/gen/flow/v1/common';
-import type { Container } from '@/services/gen/flow/v1/container';
-import { HttpError } from '@/services/http';
+import type { Paged, Permission, RiskClass } from 'tachyon-portmaster-sdk/common';
+import type { Container } from 'tachyon-portmaster-sdk/containers';
+
+import { db, nextId, recalcWeight, type SeedContainer, type SeedUser } from './db';
+import { MockApiError } from './error';
 
 export interface MockReq {
   method: string;
@@ -35,7 +36,7 @@ function authUser(ctx?: string): SeedUser | null {
 
 function requireAuth(cookie?: string): SeedUser {
   const u = authUser(cookie);
-  if (!u) throw new HttpError(401, 'Não autenticado');
+  if (!u) throw new MockApiError(401, 'Não autenticado');
   return u;
 }
 
@@ -60,7 +61,7 @@ function toContainer(c: SeedContainer): Container {
 
 function containerById(id: string): SeedContainer {
   const c = db.containers.find((x) => x.id === id);
-  if (!c) throw new HttpError(404, 'Contêiner não encontrado');
+  if (!c) throw new MockApiError(404, 'Contêiner não encontrado');
   return c;
 }
 
@@ -95,7 +96,7 @@ export function resolveMock(req: MockReq): unknown {
   // ---------- AUTH ----------
   if (method === 'POST' && path === '/v1/auth/login') {
     const user = db.users.find((u) => u.email === body.email && u.password === body.password);
-    if (!user) throw new HttpError(401, 'Credenciais inválidas');
+    if (!user) throw new MockApiError(401, 'Credenciais inválidas');
     return {
       token: `mock_${user.id}`,
       token_type: 'Bearer',
@@ -115,7 +116,7 @@ export function resolveMock(req: MockReq): unknown {
   }
   if (path === '/v1/account/password' && method === 'PUT') {
     const me = requireAuth(cookie);
-    if (me.password !== body.current_password) throw new HttpError(422, 'Senha atual incorreta');
+    if (me.password !== body.current_password) throw new MockApiError(422, 'Senha atual incorreta');
     me.password = body.new_password;
     return null;
   }
@@ -230,7 +231,7 @@ export function resolveMock(req: MockReq): unknown {
     requireAuth(cookie);
     const c = containerById(body.container_id);
     const p = db.products.find((x) => x.id === body.product_id);
-    if (!p) throw new HttpError(404, 'Produto não encontrado');
+    if (!p) throw new MockApiError(404, 'Produto não encontrado');
     const qty = Number(body.quantity);
     const existing = c.manifest.find((m) => m.product_id === p.id);
     if (existing) {
@@ -259,7 +260,7 @@ export function resolveMock(req: MockReq): unknown {
     const c = containerById(body.container_id);
     const qty = Number(body.quantity);
     const existing = c.manifest.find((m) => m.product_id === body.product_id);
-    if (!existing) throw new HttpError(422, 'Produto não está no contêiner');
+    if (!existing) throw new MockApiError(422, 'Produto não está no contêiner');
     const p = db.products.find((x) => x.id === body.product_id)!;
     existing.quantity -= qty;
     if (existing.quantity <= 0) {
@@ -303,7 +304,7 @@ export function resolveMock(req: MockReq): unknown {
     if (id && !id.includes('/')) {
       requireAuth(cookie);
       const p = db.products.find((x) => x.id === id);
-      if (!p) throw new HttpError(404, 'Produto não encontrado');
+      if (!p) throw new MockApiError(404, 'Produto não encontrado');
       if (method === 'GET') return p;
       if (method === 'PUT') {
         Object.assign(p, {
@@ -340,7 +341,7 @@ export function resolveMock(req: MockReq): unknown {
     if (id?.endsWith('/permissions') && method === 'PUT') {
       requireAuth(cookie);
       const r = db.roles.find((x) => x.id === id.replace('/permissions', ''));
-      if (!r) throw new HttpError(404, 'Perfil não encontrado');
+      if (!r) throw new MockApiError(404, 'Perfil não encontrado');
       r.permissions = (body.permissions ?? []) as Permission[];
       return r;
     }
@@ -382,7 +383,7 @@ export function resolveMock(req: MockReq): unknown {
       requireAuth(cookie);
       const baseId = id.split('/')[0];
       const u = db.users.find((x) => x.id === baseId);
-      if (!u) throw new HttpError(404, 'Usuário não encontrado');
+      if (!u) throw new MockApiError(404, 'Usuário não encontrado');
       if (id === baseId && method === 'GET') return publicUser(u);
       if (id === baseId && method === 'PUT') {
         u.name = body.name ?? u.name;
@@ -410,5 +411,5 @@ export function resolveMock(req: MockReq): unknown {
     }
   }
 
-  throw new HttpError(404, `Rota mocada inexistente: ${method} ${path}`);
+  throw new MockApiError(404, `Rota mocada inexistente: ${method} ${path}`);
 }

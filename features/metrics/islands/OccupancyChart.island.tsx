@@ -1,12 +1,12 @@
 import { Chart } from 'chart.js/auto';
 import { onMount, onCleanup, For, type JSX } from 'solid-js';
+import type { OccupancyDivision } from 'tachyon-portmaster-sdk/metrics';
 
 import styles from './OccupancyChart.island.module.scss';
+import type { MetricsPanelText } from '../components/MetricsPanel';
 import { segmentsOf } from '../components/OccupancyBreakdown';
 
-import type { OccupancyDivision } from '@/services/gen/flow/v1/metrics';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { formatNumber } from '@/shared/utils/formatters';
+import { formatNumber } from '@/features/core/utils/formatters';
 
 const TONE_VAR: Record<string, string> = {
   gold: '--gold-500',
@@ -20,7 +20,10 @@ function cssVar(name: string): string {
 }
 
 /** Donut interativo (Chart.js canvas) da divisão por status. */
-export function OccupancyChart(props: { division: OccupancyDivision; t: Messages }): JSX.Element {
+export function OccupancyChart(props: {
+  division: OccupancyDivision;
+  t: MetricsPanelText;
+}): JSX.Element {
   let canvas!: HTMLCanvasElement;
   let chart: Chart | undefined;
 

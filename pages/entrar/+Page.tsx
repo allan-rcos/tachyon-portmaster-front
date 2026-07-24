@@ -5,8 +5,8 @@ import type { Data } from './+data';
 import styles from './LoginPage.module.scss';
 
 import { LoginForm } from '@/features/auth/islands/LoginForm.island';
-import { Brand } from '@/shared/components/Brand';
-import { FormSkeleton } from '@/shared/components/Skeleton';
+import { Brand } from '@/features/core/components/Brand';
+import { FormSkeleton } from '@/features/core/components/Skeleton';
 
 export default function LoginPage() {
   const data = useData<Data>();

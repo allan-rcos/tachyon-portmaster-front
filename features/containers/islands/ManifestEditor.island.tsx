@@ -1,18 +1,18 @@
 import { createForm } from '@tanstack/solid-form';
 import { createMutation } from '@tanstack/solid-query';
 import { createSignal, For, type JSX } from 'solid-js';
+import { loadItem, unloadItem } from 'tachyon-portmaster-sdk/containers';
 
 import styles from './ManifestEditor.island.module.scss';
+import type { ContainerDetailText } from '../components/ContainerSummary';
 import { createLoadItemSchema, type LoadItemData } from '../schemas/manifest.schema';
 
-import { browserCall } from '@/services/clients/browser';
-import { loadItem, unloadItem } from '@/services/codecs/flow/v1/manifest';
-import { FormField } from '@/shared/components/FormField';
-import { Icon } from '@/shared/components/Icon';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { IslandProvider } from '@/shared/islands/IslandProvider';
-import { cn } from '@/shared/utils/cn';
-import { errText } from '@/shared/utils/formErrors';
+import { browserClient } from '@/features/core/api/client';
+import { FormField } from '@/features/core/components/FormField';
+import { Icon } from '@/features/core/components/Icon';
+import { IslandProvider } from '@/features/core/islands/IslandProvider';
+import { cn } from '@/features/core/utils/ui';
+import { errText } from '@/features/core/utils/ui';
 
 export interface ProductOption {
   id: string;
@@ -22,19 +22,19 @@ export interface ProductOption {
 function Inner(props: {
   containerId: string;
   products: ProductOption[];
-  t: Messages;
+  t: ContainerDetailText;
 }): JSX.Element {
   const [target, setTarget] = createSignal<'load' | 'unload'>('load');
 
   const mkOpts = () => ({ onSuccess: () => window.location.reload() });
   const loadMut = createMutation(() => ({
     mutationFn: (v: LoadItemData) =>
-      browserCall(loadItem, { body: { container_id: props.containerId, ...v } }),
+      loadItem(browserClient, { container_id: props.containerId, ...v }),
     ...mkOpts(),
   }));
   const unloadMut = createMutation(() => ({
     mutationFn: (v: LoadItemData) =>
-      browserCall(unloadItem, { body: { container_id: props.containerId, ...v } }),
+      unloadItem(browserClient, { container_id: props.containerId, ...v }),
     ...mkOpts(),
   }));
   const pending = () => loadMut.isPending || unloadMut.isPending;
@@ -134,7 +134,7 @@ function Inner(props: {
 export function ManifestEditor(props: {
   containerId: string;
   products: ProductOption[];
-  t: Messages;
+  t: ContainerDetailText;
 }): JSX.Element {
   return (
     <IslandProvider>

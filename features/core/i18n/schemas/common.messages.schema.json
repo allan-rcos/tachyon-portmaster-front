@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/common.json",
+  "title": "Fragmento i18n: termos de UI transversais (commonText)",
+  "type": "object",
+  "required": [
+    "common_new",
+    "common_edit",
+    "common_delete",
+    "common_save",
+    "common_create",
+    "common_cancel",
+    "common_confirm",
+    "common_actions",
+    "common_search",
+    "common_loading",
+    "common_empty",
+    "common_submit_error",
+    "common_back",
+    "common_logout",
+    "common_previous",
+    "common_next"
+  ],
+  "patternProperties": {
+    "^common_": { "type": "string", "minLength": 1 }
+  }
+}

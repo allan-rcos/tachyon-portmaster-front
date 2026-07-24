@@ -1,16 +1,16 @@
-import { serverCall, type IncomingHeaders } from '@/services/clients/server';
-import { listContainers as codec } from '@/services/codecs/flow/v1/container';
+import { listContainers as apiListContainers } from 'tachyon-portmaster-sdk/containers';
+
+import { serverClient, type IncomingHeaders } from '@/features/core/api/client';
 
 const PAGE_SIZE = '8';
 
 export function listContainers(headers: IncomingHeaders, query?: URLSearchParams) {
-  const params = new URLSearchParams();
-  params.set('limit', query?.get('limit') ?? PAGE_SIZE);
+  const params: Record<string, string> = { limit: query?.get('limit') ?? PAGE_SIZE };
   const cursor = query?.get('cursor');
-  if (cursor) params.set('cursor', cursor);
+  if (cursor) params.cursor = cursor;
   const search = query?.get('search');
-  if (search) params.set('search', search);
+  if (search) params.search = search;
   const status = query?.get('status');
-  if (status) params.set('status', status);
-  return serverCall(codec, { query: params }, headers);
+  if (status) params.status = status;
+  return apiListContainers(serverClient(headers), params);
 }

@@ -1,11 +1,11 @@
 import { For, type JSX } from 'solid-js';
+import type { Metrics } from 'tachyon-portmaster-sdk/metrics';
 
+import type { MetricsPanelText } from './MetricsPanel';
 import styles from './StatTiles.module.scss';
 
-import type { Metrics } from '@/services/gen/flow/v1/metrics';
-import { Icon, type IconName } from '@/shared/components/Icon';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { formatNumber, formatPercent } from '@/shared/utils/formatters';
+import { Icon, type IconName } from '@/features/core/components/Icon';
+import { formatNumber, formatPercent } from '@/features/core/utils/formatters';
 
 interface Tile {
   label: string;
@@ -15,7 +15,7 @@ interface Tile {
 }
 
 /** Cartões de KPI do painel (SSR). */
-export function StatTiles(props: { metrics: Metrics; t: Messages }): JSX.Element {
+export function StatTiles(props: { metrics: Metrics; t: MetricsPanelText }): JSX.Element {
   const tiles = (): Tile[] => [
     {
       label: props.t.activeContainers,

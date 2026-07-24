@@ -1,9 +1,14 @@
+import { RISK_CLASS } from 'tachyon-portmaster-sdk/common';
 import { z } from 'zod';
 
-import { RISK_CLASS } from '@/services/gen/flow/v1/common';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
+/** Chaves de erro que este schema consome (contrato local — a página resolve). */
+export interface ProductSchemaText {
+  nameShort: string;
+  nameLong: string;
+  densityPositive: string;
+}
 
-export function createProductSchema(t?: Messages) {
+export function createProductSchema(t?: ProductSchemaText) {
   return z.object({
     name: z
       .string()

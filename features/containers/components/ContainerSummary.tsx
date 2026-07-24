@@ -1,4 +1,5 @@
 import type { JSX } from 'solid-js';
+import type { ContainerSummary as Summary } from 'tachyon-portmaster-sdk/containers';
 import { ClientOnly } from 'vike-solid/ClientOnly';
 
 import styles from './ContainerSummary.module.scss';
@@ -7,13 +8,41 @@ import { TelemetryLog } from './TelemetryLog';
 import { ContainerActions } from '../islands/ContainerActions.island';
 import { ManifestEditor, type ProductOption } from '../islands/ManifestEditor.island';
 
-import type { ContainerSummary as Summary } from '@/services/gen/flow/v1/container';
-import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
-import { Card } from '@/shared/components/Card';
-import { Icon } from '@/shared/components/Icon';
-import { StatusBadge } from '@/shared/components/StatusBadge';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { formatWeight, formatPercent } from '@/shared/utils/formatters';
+import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
+import { Card } from '@/features/core/components/Card';
+import { Icon } from '@/features/core/components/Icon';
+import { StatusBadge } from '@/features/core/components/StatusBadge';
+import { formatWeight, formatPercent } from '@/features/core/utils/formatters';
+
+/**
+ * Texto do detalhe do contêiner (contrato do cluster: ContainerSummary +
+ * ManifestTable + TelemetryLog + ContainerActions + ManifestEditor). Um único
+ * `t` resolvido na página alimenta todos; cada um usa o subconjunto que precisa.
+ */
+export interface ContainerDetailText {
+  title: string;
+  edit: string;
+  weight: string;
+  capacity: string;
+  occupancy: string;
+  manifest: string;
+  logs: string;
+  emptyManifest: string;
+  product: string;
+  quantity: string;
+  empty: string;
+  seal: string;
+  dispatch: string;
+  delete: string;
+  sealConfirm: string;
+  dispatchConfirm: string;
+  deleteConfirm: string;
+  cancel: string;
+  load: string;
+  unload: string;
+  productRequired: string;
+  quantityPositive: string;
+}
 
 function occupancy(weight: number, capacity: number): number {
   return capacity ? Math.round((weight / capacity) * 1000) / 10 : 0;
@@ -22,13 +51,15 @@ function occupancy(weight: number, capacity: number): number {
 export function ContainerSummary(props: {
   summary: Summary;
   products: ProductOption[];
-  t: Messages;
+  t: ContainerDetailText;
 }): JSX.Element {
   const c = () => props.summary.container;
 
   return (
     <section>
-      <Breadcrumbs items={[{ label: props.t.title, href: '/painel/conteineres' }, { label: c().code }]} />
+      <Breadcrumbs
+        items={[{ label: props.t.title, href: '/painel/conteineres' }, { label: c().code }]}
+      />
 
       <header class={styles.head}>
         <div class={styles.title}>

@@ -1,15 +1,15 @@
 import { render, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import type { Permission } from 'tachyon-portmaster-sdk/common';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { PermissionMatrix } from './PermissionMatrix';
 import { RoleForm } from './RoleForm.island';
+import { roleFormMessages } from './RoleForm.messages';
 
-import type { Permission } from '@/services/gen/flow/v1/common';
-import ptBR from '@/shared/i18n/messages/pt-BR';
 import { setInput, stubLocation } from '@/test/utils';
 
-const t = { ...ptBR.common, ...ptBR.roles };
+const t = roleFormMessages('pt-BR');
 let loc: ReturnType<typeof stubLocation>;
 beforeEach(() => {
   loc = stubLocation();

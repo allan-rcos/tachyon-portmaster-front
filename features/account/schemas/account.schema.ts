@@ -1,8 +1,19 @@
 import { z } from 'zod';
 
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
+/** Chaves de erro dos schemas de conta (contratos locais). */
+export interface AccountSchemaText {
+  nameShort: string;
+  nameLong: string;
+  emailRequired: string;
+  emailInvalid: string;
+}
 
-export function createAccountSchema(t?: Messages) {
+export interface PasswordChangeSchemaText {
+  currentPasswordRequired: string;
+  passwordMin: string;
+}
+
+export function createAccountSchema(t?: AccountSchemaText) {
   return z.object({
     name: z
       .string()
@@ -17,7 +28,7 @@ export function createAccountSchema(t?: Messages) {
   });
 }
 
-export function createPasswordChangeSchema(t?: Messages) {
+export function createPasswordChangeSchema(t?: PasswordChangeSchemaText) {
   return z.object({
     current_password: z.string().min(1, t?.currentPasswordRequired ?? 'Informe a senha atual'),
     new_password: z.string().min(6, t?.passwordMin ?? 'Mínimo de 6 caracteres'),

@@ -1,28 +1,39 @@
 import { createForm } from '@tanstack/solid-form';
 import { createMutation } from '@tanstack/solid-query';
 import { type JSX } from 'solid-js';
+import { login } from 'tachyon-portmaster-sdk/auth';
 
 import styles from './LoginForm.island.module.scss';
-import { createLoginSchema, type LoginFormData } from '../schemas/login.schema';
+import {
+  createLoginSchema,
+  type LoginFormData,
+  type LoginSchemaText,
+} from '../schemas/login.schema';
 
-import { browserCall } from '@/services/clients/browser';
-import { login } from '@/services/codecs/flow/v1/auth';
-import { FormField } from '@/shared/components/FormField';
-import { Icon } from '@/shared/components/Icon';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { IslandProvider } from '@/shared/islands/IslandProvider';
-import { cn } from '@/shared/utils/cn';
-import { setCookie } from '@/shared/utils/cookies';
-import { errText } from '@/shared/utils/formErrors';
+import { browserClient } from '@/features/core/api/client';
+import { FormField } from '@/features/core/components/FormField';
+import { Icon } from '@/features/core/components/Icon';
+import { IslandProvider } from '@/features/core/islands/IslandProvider';
+import { setCookie } from '@/features/core/utils/cookies';
+import { cn } from '@/features/core/utils/ui';
+import { errText } from '@/features/core/utils/ui';
+
+/** Texto que o formulário de login consome (contrato local). */
+export interface LoginFormText extends LoginSchemaText {
+  email: string;
+  password: string;
+  invalid: string;
+  submit: string;
+}
 
 function redirectTarget(): string {
   const to = new URLSearchParams(window.location.search).get('redirect');
   return to && to.startsWith('/') ? to : '/painel';
 }
 
-function LoginFormInner(props: { t: Messages }): JSX.Element {
+function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
   const mutation = createMutation(() => ({
-    mutationFn: (v: LoginFormData) => browserCall(login, { body: v }),
+    mutationFn: (v: LoginFormData) => login(browserClient, v),
     onSuccess: (res) => {
       setCookie('auth_token', res.token);
       window.location.href = redirectTarget();
@@ -104,7 +115,7 @@ function LoginFormInner(props: { t: Messages }): JSX.Element {
 
 /** Formulário de login (island). Autentica na API (same-origin token) e grava
  *  o cookie `auth_token`, depois recarrega para a rota destino (novo SSR). */
-export function LoginForm(props: { t: Messages }): JSX.Element {
+export function LoginForm(props: { t: LoginFormText }): JSX.Element {
   return (
     <IslandProvider>
       <LoginFormInner t={props.t} />

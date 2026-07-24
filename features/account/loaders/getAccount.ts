@@ -1,6 +1,7 @@
-import { serverCall, type IncomingHeaders } from '@/services/clients/server';
-import { getAccount as codec } from '@/services/codecs/flow/v1/account';
+import { getAccount as apiGetAccount } from 'tachyon-portmaster-sdk/account';
+
+import { serverClient, type IncomingHeaders } from '@/features/core/api/client';
 
 export function getAccount(headers: IncomingHeaders) {
-  return serverCall(codec, {}, headers);
+  return apiGetAccount(serverClient(headers));
 }

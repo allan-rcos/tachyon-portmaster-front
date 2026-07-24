@@ -1,19 +1,35 @@
 import type { JSX } from 'solid-js';
 import { Show } from 'solid-js';
+import type { Product } from 'tachyon-portmaster-sdk/products';
 
 import styles from './ProductList.module.scss';
 
-import type { Product } from '@/services/gen/flow/v1/product';
-import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
-import { DataTable, type Column } from '@/shared/components/DataTable';
-import { EmptyState } from '@/shared/components/EmptyState';
-import { Icon } from '@/shared/components/Icon';
-import { PageHeader } from '@/shared/components/PageHeader';
-import { RiskBadge } from '@/shared/components/RiskBadge';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { formatDensity } from '@/shared/utils/formatters';
+import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
+import { DataTable, type Column } from '@/features/core/components/DataTable';
+import { EmptyState } from '@/features/core/components/EmptyState';
+import { Icon } from '@/features/core/components/Icon';
+import { PageHeader } from '@/features/core/components/PageHeader';
+import { RiskBadge } from '@/features/core/components/RiskBadge';
+import { formatDensity } from '@/features/core/utils/formatters';
 
-export function ProductList(props: { items: Product[]; total: number; t: Messages }): JSX.Element {
+/** Chaves de texto que esta lista consome (contrato — a página provê). */
+export interface ProductListText {
+  title: string;
+  subtitle: string;
+  new: string;
+  name: string;
+  density: string;
+  riskClass: string;
+  actions: string;
+  edit: string;
+  empty: string;
+}
+
+export function ProductList(props: {
+  items: Product[];
+  total: number;
+  t: ProductListText;
+}): JSX.Element {
   const columns = (): Column<Product>[] => [
     {
       header: props.t.name,

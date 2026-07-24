@@ -1,8 +1,14 @@
 import { z } from 'zod';
 
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
+/** Chaves de erro dos schemas de contêiner (contrato local). */
+export interface ContainerSchemaText {
+  codeShort: string;
+  codeLong: string;
+  codeFormat: string;
+  capacityPositive: string;
+}
 
-export function createContainerCreateSchema(t?: Messages) {
+export function createContainerCreateSchema(t?: ContainerSchemaText) {
   return z.object({
     code: z
       .string()
@@ -16,7 +22,7 @@ export function createContainerCreateSchema(t?: Messages) {
   });
 }
 
-export function createContainerUpdateSchema(t?: Messages) {
+export function createContainerUpdateSchema(t?: Pick<ContainerSchemaText, 'capacityPositive'>) {
   return z.object({
     max_capacity: z.coerce
       .number()

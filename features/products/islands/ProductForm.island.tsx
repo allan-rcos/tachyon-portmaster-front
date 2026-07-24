@@ -1,20 +1,19 @@
 import { createForm } from '@tanstack/solid-form';
 import { createMutation } from '@tanstack/solid-query';
 import { For, Show, type JSX } from 'solid-js';
+import { RISK_CLASS, type RiskClass } from 'tachyon-portmaster-sdk/common';
+import { createProduct, updateProduct, deleteProduct } from 'tachyon-portmaster-sdk/products';
 
 import styles from './ProductForm.island.module.scss';
-import { createProductSchema } from '../schemas/product.schema';
+import { createProductSchema, type ProductSchemaText } from '../schemas/product.schema';
 
-import { browserCall } from '@/services/clients/browser';
-import { createProduct, updateProduct, deleteProduct } from '@/services/codecs/flow/v1/product';
-import { RISK_CLASS, type RiskClass } from '@/services/gen/flow/v1/common';
-import { FormField } from '@/shared/components/FormField';
-import { RISK_CLASS_LABEL } from '@/shared/i18n/labels';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { ConfirmDialog } from '@/shared/islands/ConfirmDialog.island';
-import { IslandProvider } from '@/shared/islands/IslandProvider';
-import { cn } from '@/shared/utils/cn';
-import { errText } from '@/shared/utils/formErrors';
+import { browserClient } from '@/features/core/api/client';
+import { FormField } from '@/features/core/components/FormField';
+import { RISK_CLASS_LABEL } from '@/features/core/i18n/labels';
+import { ConfirmDialog } from '@/features/core/islands/ConfirmDialog.island';
+import { IslandProvider } from '@/features/core/islands/IslandProvider';
+import { cn } from '@/features/core/utils/ui';
+import { errText } from '@/features/core/utils/ui';
 
 interface FormValues {
   name: string;
@@ -22,9 +21,23 @@ interface FormValues {
   risk_class: RiskClass;
 }
 
+/** Texto que o formulário consome (contrato local — a página/form resolve). */
+export interface ProductFormText extends ProductSchemaText {
+  data: string;
+  name: string;
+  density: string;
+  riskClass: string;
+  submitError: string;
+  create: string;
+  save: string;
+  cancel: string;
+  delete: string;
+  deleteConfirm: string;
+}
+
 export interface ProductFormProps {
   mode: 'create' | 'edit';
-  t: Messages;
+  t: ProductFormText;
   productId?: string;
   defaultValues?: { name: string; density: number; risk_class: RiskClass };
 }
@@ -34,8 +47,8 @@ function Inner(props: ProductFormProps): JSX.Element {
     mutationFn: (value: FormValues) => {
       const body = createProductSchema(props.t).parse(value);
       return props.mode === 'create'
-        ? browserCall(createProduct, { body })
-        : browserCall(updateProduct, { params: { id: props.productId! }, body });
+        ? createProduct(browserClient, body)
+        : updateProduct(browserClient, props.productId!, body);
     },
     onSuccess: () => {
       window.location.href = '/painel/produtos';
@@ -151,11 +164,7 @@ function Inner(props: ProductFormProps): JSX.Element {
               message={props.t.deleteConfirm}
               confirmLabel={props.t.delete}
               cancelLabel={props.t.cancel}
-              onConfirm={() =>
-                browserCall(deleteProduct, { params: { id: props.productId! } }).then(
-                  () => undefined,
-                )
-              }
+              onConfirm={() => deleteProduct(browserClient, props.productId!).then(() => undefined)}
               onDone={() => {
                 window.location.href = '/painel/produtos';
               }}

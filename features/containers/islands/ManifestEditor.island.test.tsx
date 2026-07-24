@@ -4,10 +4,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { ManifestEditor } from './ManifestEditor.island';
 
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { containerDetailMessages } from '@/pages/painel/conteineres/@id/messages';
 import { setInput, stubLocation } from '@/test/utils';
 
-const t = { ...ptBR.common, ...ptBR.containers };
+const t = containerDetailMessages('pt-BR');
 const products = [
   { id: 'prd_soja', name: 'Farelo de soja' },
   { id: 'prd_cafe', name: 'Café verde em grãos' },

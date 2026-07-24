@@ -1,26 +1,32 @@
 import { createForm } from '@tanstack/solid-form';
 import { createMutation } from '@tanstack/solid-query';
 import { type JSX } from 'solid-js';
+import { resetUserPassword, deleteUser } from 'tachyon-portmaster-sdk/users';
 
 import styles from './UserAdminActions.island.module.scss';
-import { createPasswordResetSchema } from '../schemas/user.schema';
+import { createPasswordResetSchema, type PasswordResetSchemaText } from '../schemas/user.schema';
 
-import { browserCall } from '@/services/clients/browser';
-import { resetUserPassword, deleteUser } from '@/services/codecs/flow/v1/user';
-import { FormField } from '@/shared/components/FormField';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { ConfirmDialog } from '@/shared/islands/ConfirmDialog.island';
-import { IslandProvider } from '@/shared/islands/IslandProvider';
-import { cn } from '@/shared/utils/cn';
-import { errText } from '@/shared/utils/formErrors';
+import { browserClient } from '@/features/core/api/client';
+import { FormField } from '@/features/core/components/FormField';
+import { ConfirmDialog } from '@/features/core/islands/ConfirmDialog.island';
+import { IslandProvider } from '@/features/core/islands/IslandProvider';
+import { cn } from '@/features/core/utils/ui';
+import { errText } from '@/features/core/utils/ui';
 
-function Inner(props: { userId: string; t: Messages }): JSX.Element {
+/** Texto que as ações administrativas consomem (contrato local). */
+export interface UserAdminActionsText extends PasswordResetSchemaText {
+  resetPassword: string;
+  newPassword: string;
+  passwordChanged: string;
+  delete: string;
+  deleteConfirm: string;
+  cancel: string;
+}
+
+function Inner(props: { userId: string; t: UserAdminActionsText }): JSX.Element {
   const reset = createMutation(() => ({
     mutationFn: (value: string) =>
-      browserCall(resetUserPassword, {
-        params: { id: props.userId },
-        body: { new_password: value },
-      }),
+      resetUserPassword(browserClient, props.userId, { new_password: value }),
     onSuccess: () => form.reset(),
   }));
 
@@ -80,9 +86,7 @@ function Inner(props: { userId: string; t: Messages }): JSX.Element {
           message={props.t.deleteConfirm}
           confirmLabel={props.t.delete}
           cancelLabel={props.t.cancel}
-          onConfirm={() =>
-            browserCall(deleteUser, { params: { id: props.userId } }).then(() => undefined)
-          }
+          onConfirm={() => deleteUser(browserClient, props.userId).then(() => undefined)}
           onDone={() => {
             window.location.href = '/painel/usuarios';
           }}
@@ -93,7 +97,7 @@ function Inner(props: { userId: string; t: Messages }): JSX.Element {
 }
 
 /** Ações administrativas de usuário: redefinir senha e excluir. */
-export function UserAdminActions(props: { userId: string; t: Messages }): JSX.Element {
+export function UserAdminActions(props: { userId: string; t: UserAdminActionsText }): JSX.Element {
   return (
     <IslandProvider>
       <Inner {...props} />

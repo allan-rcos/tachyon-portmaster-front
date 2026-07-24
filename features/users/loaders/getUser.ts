@@ -1,6 +1,7 @@
-import { serverCall, type IncomingHeaders } from '@/services/clients/server';
-import { getUser as codec } from '@/services/codecs/flow/v1/user';
+import { getUser as apiGetUser } from 'tachyon-portmaster-sdk/users';
+
+import { serverClient, type IncomingHeaders } from '@/features/core/api/client';
 
 export function getUser(id: string, headers: IncomingHeaders) {
-  return serverCall(codec, { params: { id } }, headers);
+  return apiGetUser(serverClient(headers), id);
 }

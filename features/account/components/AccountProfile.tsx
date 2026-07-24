@@ -1,15 +1,21 @@
 import { For, type JSX } from 'solid-js';
+import type { AccountProfile as Profile } from 'tachyon-portmaster-sdk/account';
 
 import styles from './AccountProfile.module.scss';
 
-import type { AccountProfile as Profile } from '@/services/gen/flow/v1/account';
-import { Badge } from '@/shared/components/Badge';
-import { Card } from '@/shared/components/Card';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { formatNumber } from '@/shared/utils/formatters';
+import { Badge } from '@/features/core/components/Badge';
+import { Card } from '@/features/core/components/Card';
+import { formatNumber } from '@/features/core/utils/formatters';
+
+/** Texto que este resumo consome (contrato local). */
+export interface AccountProfileText {
+  roles: string;
+  name: string;
+  email: string;
+}
 
 /** Resumo do perfil autenticado: identidade + perfis/permissões (SSR). */
-export function AccountProfile(props: { profile: Profile; t: Messages }): JSX.Element {
+export function AccountProfile(props: { profile: Profile; t: AccountProfileText }): JSX.Element {
   return (
     <Card title={props.t.roles}>
       <dl class={styles.identity}>

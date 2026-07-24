@@ -1,7 +1,6 @@
-services/gen/
 dist/
 out/
 packages/
 node_modules/
 coverage/
-*.po
+paraglide/

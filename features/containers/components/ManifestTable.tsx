@@ -1,14 +1,17 @@
 import { For, Show, type JSX } from 'solid-js';
+import type { CargoManifestItem } from 'tachyon-portmaster-sdk/containers';
 
+import type { ContainerDetailText } from './ContainerSummary';
 import styles from './ManifestTable.module.scss';
 
-import type { CargoManifestItem } from '@/services/gen/flow/v1/container';
-import { EmptyState } from '@/shared/components/EmptyState';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { formatNumber, formatWeight } from '@/shared/utils/formatters';
+import { EmptyState } from '@/features/core/components/EmptyState';
+import { formatNumber, formatWeight } from '@/features/core/utils/formatters';
 
 /** Manifesto de carga (SSR). */
-export function ManifestTable(props: { items: CargoManifestItem[]; t: Messages }): JSX.Element {
+export function ManifestTable(props: {
+  items: CargoManifestItem[];
+  t: ContainerDetailText;
+}): JSX.Element {
   return (
     <Show
       when={props.items.length > 0}

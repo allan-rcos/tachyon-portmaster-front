@@ -1,14 +1,14 @@
 import { For, Show, type JSX } from 'solid-js';
+import type { TelemetryEvent } from 'tachyon-portmaster-sdk/common';
+import type { TelemetryLogItem } from 'tachyon-portmaster-sdk/containers';
 
+import type { ContainerDetailText } from './ContainerSummary';
 import styles from './TelemetryLog.module.scss';
 
-import type { TelemetryEvent } from '@/services/gen/flow/v1/common';
-import type { TelemetryLogItem } from '@/services/gen/flow/v1/container';
-import { Badge } from '@/shared/components/Badge';
-import type { Tone } from '@/shared/i18n/labels';
-import { TELEMETRY_EVENT_LABEL } from '@/shared/i18n/labels';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { formatDateTime } from '@/shared/utils/formatters';
+import { Badge } from '@/features/core/components/Badge';
+import type { Tone } from '@/features/core/i18n/labels';
+import { TELEMETRY_EVENT_LABEL } from '@/features/core/i18n/labels';
+import { formatDateTime } from '@/features/core/utils/formatters';
 
 const EVENT_TONE: Record<TelemetryEvent, Tone> = {
   Create: 'neutral',
@@ -19,7 +19,10 @@ const EVENT_TONE: Record<TelemetryEvent, Tone> = {
 };
 
 /** Linha do tempo de telemetria (SSR). */
-export function TelemetryLog(props: { logs: TelemetryLogItem[]; t: Messages }): JSX.Element {
+export function TelemetryLog(props: {
+  logs: TelemetryLogItem[];
+  t: ContainerDetailText;
+}): JSX.Element {
   return (
     <Show when={props.logs.length > 0} fallback={<p class={styles.empty}>{props.t.empty}</p>}>
       <ol class={styles.list}>

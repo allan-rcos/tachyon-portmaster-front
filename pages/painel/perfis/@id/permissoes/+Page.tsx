@@ -3,10 +3,10 @@ import { useData } from 'vike-solid/useData';
 
 import type { Data } from './+data';
 
+import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
+import { PageHeader } from '@/features/core/components/PageHeader';
+import { FormSkeleton } from '@/features/core/components/Skeleton';
 import { RoleForm } from '@/features/roles/islands/RoleForm.island';
-import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
-import { PageHeader } from '@/shared/components/PageHeader';
-import { FormSkeleton } from '@/shared/components/Skeleton';
 
 export default function RolePermissionsPage() {
   const data = useData<Data>();

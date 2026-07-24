@@ -4,10 +4,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { LoginForm } from './LoginForm.island';
 
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { loginMessages } from '@/pages/entrar/messages';
 import { setInput, stubLocation } from '@/test/utils';
 
-const t = { ...ptBR.common, ...ptBR.auth };
+const t = loginMessages('pt-BR');
 
 let loc: ReturnType<typeof stubLocation>;
 beforeEach(() => {

@@ -1,12 +1,12 @@
-import { serverCall, type IncomingHeaders } from '@/services/clients/server';
-import { listUsers as codec } from '@/services/codecs/flow/v1/user';
+import { listUsers as apiListUsers } from 'tachyon-portmaster-sdk/users';
+
+import { serverClient, type IncomingHeaders } from '@/features/core/api/client';
 
 export function listUsers(headers: IncomingHeaders, query?: URLSearchParams) {
-  const params = new URLSearchParams();
-  params.set('limit', query?.get('limit') ?? '50');
+  const params: Record<string, string> = { limit: query?.get('limit') ?? '50' };
   const cursor = query?.get('cursor');
-  if (cursor) params.set('cursor', cursor);
+  if (cursor) params.cursor = cursor;
   const search = query?.get('search');
-  if (search) params.set('search', search);
-  return serverCall(codec, { query: params }, headers);
+  if (search) params.search = search;
+  return apiListUsers(serverClient(headers), params);
 }

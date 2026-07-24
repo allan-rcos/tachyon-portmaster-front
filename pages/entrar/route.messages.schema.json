@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/entrar.json",
+  "title": "i18n da rota /entrar (loginMessages)",
+  "type": "object",
+  "allOf": [{ "$ref": "https://portmaster.app/i18n/val.json" }],
+  "required": [
+    "auth_title",
+    "auth_subtitle",
+    "auth_script",
+    "auth_email",
+    "auth_password",
+    "auth_submit",
+    "auth_invalid"
+  ],
+  "patternProperties": {
+    "^auth_": { "type": "string", "minLength": 1 }
+  }
+}

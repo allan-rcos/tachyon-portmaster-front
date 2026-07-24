@@ -1,12 +1,12 @@
 import { render } from '@solidjs/testing-library';
+import type { Role } from 'tachyon-portmaster-sdk/roles';
 import { describe, it, expect } from 'vitest';
 
 import { RoleList } from './RoleList';
 
-import type { Role } from '@/services/gen/flow/v1/admin';
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { rolesListMessages } from '@/pages/painel/perfis/messages';
 
-const t = { ...ptBR.common, ...ptBR.roles };
+const t = rolesListMessages('pt-BR');
 const items: Role[] = [
   { id: 'rol_1', name: 'Administrador', user_count: 1, permissions: ['MetricsRead', 'UserList'] },
 ];

@@ -1,17 +1,25 @@
+import type { Role } from 'tachyon-portmaster-sdk/roles';
 import { render } from 'vike/abort';
 import type { PageContextServer } from 'vike/types';
 
+import { rolePermissionsMessages, type RolePermissionsText } from './messages';
+
+import type { IncomingHeaders } from '@/features/core/api/client';
+import { resolveLocale } from '@/features/core/i18n/locale';
 import { listRoles } from '@/features/roles/loaders/listRoles';
-import type { IncomingHeaders } from '@/services/clients/server';
-import { resolveLocale, loadMessages } from '@/shared/i18n/server';
 
-export type Data = Awaited<ReturnType<typeof data>>;
+export interface Data {
+  id: string;
+  role: Role;
+  t: RolePermissionsText;
+  title: string;
+  description: string;
+}
 
-export async function data(pageContext: PageContextServer) {
+export async function data(pageContext: PageContextServer): Promise<Data> {
   const id = pageContext.routeParams.id;
   const headers = pageContext.headers as IncomingHeaders;
-  const locale = resolveLocale(headers);
-  const t = loadMessages(locale, 'roles');
+  const t = rolePermissionsMessages(resolveLocale(headers));
 
   // Não há GET /roles/{id} — busca na listagem (poucos perfis).
   const res = await listRoles(headers);

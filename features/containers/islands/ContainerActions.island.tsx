@@ -1,23 +1,23 @@
 import { Show, type JSX } from 'solid-js';
-
-import styles from './ContainerActions.island.module.scss';
-
-import { browserCall } from '@/services/clients/browser';
+import type { ContainerStatus } from 'tachyon-portmaster-sdk/common';
 import {
   sealContainer,
   dispatchContainer,
   deleteContainer,
-} from '@/services/codecs/flow/v1/container';
-import type { ContainerStatus } from '@/services/gen/flow/v1/common';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
-import { ConfirmDialog } from '@/shared/islands/ConfirmDialog.island';
+} from 'tachyon-portmaster-sdk/containers';
+
+import styles from './ContainerActions.island.module.scss';
+import type { ContainerDetailText } from '../components/ContainerSummary';
+
+import { browserClient } from '@/features/core/api/client';
+import { ConfirmDialog } from '@/features/core/islands/ConfirmDialog.island';
 
 /** Ações de estado do contêiner: lacrar / despachar / excluir.
  *  Cada uma confirma antes e recarrega (novo SSR) ao concluir. */
 export function ContainerActions(props: {
   containerId: string;
   status: ContainerStatus;
-  t: Messages;
+  t: ContainerDetailText;
 }): JSX.Element {
   const canSeal = () => props.status === 'Empty' || props.status === 'Loading';
   const canDispatch = () => props.status === 'Sealed';
@@ -34,11 +34,7 @@ export function ContainerActions(props: {
             message={props.t.sealConfirm}
             confirmLabel={props.t.seal}
             cancelLabel={props.t.cancel}
-            onConfirm={() =>
-              browserCall(sealContainer, { params: { id: props.containerId } }).then(
-                () => undefined,
-              )
-            }
+            onConfirm={() => sealContainer(browserClient, props.containerId).then(() => undefined)}
             onDone={() => window.location.reload()}
           />
         </li>
@@ -55,9 +51,7 @@ export function ContainerActions(props: {
             confirmLabel={props.t.dispatch}
             cancelLabel={props.t.cancel}
             onConfirm={() =>
-              browserCall(dispatchContainer, { params: { id: props.containerId } }).then(
-                () => undefined,
-              )
+              dispatchContainer(browserClient, props.containerId).then(() => undefined)
             }
             onDone={() => window.location.reload()}
           />
@@ -74,11 +68,7 @@ export function ContainerActions(props: {
           message={props.t.deleteConfirm}
           confirmLabel={props.t.delete}
           cancelLabel={props.t.cancel}
-          onConfirm={() =>
-            browserCall(deleteContainer, { params: { id: props.containerId } }).then(
-              () => undefined,
-            )
-          }
+          onConfirm={() => deleteContainer(browserClient, props.containerId).then(() => undefined)}
           onDone={() => {
             window.location.href = '/painel/conteineres';
           }}

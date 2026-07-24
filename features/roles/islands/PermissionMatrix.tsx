@@ -1,9 +1,9 @@
 import { For, type JSX } from 'solid-js';
+import type { Permission } from 'tachyon-portmaster-sdk/common';
 
 import styles from './PermissionMatrix.module.scss';
 
-import type { Permission } from '@/services/gen/flow/v1/common';
-import { PERMISSION_GROUPS, PERMISSION_LABEL } from '@/shared/i18n/labels';
+import { PERMISSION_GROUPS, PERMISSION_LABEL } from '@/features/core/i18n/labels';
 
 /** Grade de permissões (RBAC) agrupada por recurso. Controlada pela
  *  island de perfil (recebe seleção + callback). */

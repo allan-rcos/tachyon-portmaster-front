@@ -5,10 +5,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { AccountForm } from './AccountForm.island';
 import { PasswordChange } from './PasswordChange.island';
 
-import ptBR from '@/shared/i18n/messages/pt-BR';
+import { accountMessages } from '@/pages/painel/conta/messages';
 import { setInput, stubLocation } from '@/test/utils';
 
-const t = { ...ptBR.common, ...ptBR.account };
+const t = accountMessages('pt-BR');
 let loc: ReturnType<typeof stubLocation>;
 beforeEach(() => {
   loc = stubLocation();

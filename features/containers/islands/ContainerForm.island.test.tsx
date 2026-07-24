@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { ContainerForm } from './ContainerForm.island';
+import { containerFormMessages } from './ContainerForm.messages';
 
-import ptBR from '@/shared/i18n/messages/pt-BR';
 import { setInput, stubLocation } from '@/test/utils';
 
-const t = { ...ptBR.common, ...ptBR.containers };
+const t = containerFormMessages('pt-BR');
 let loc: ReturnType<typeof stubLocation>;
 beforeEach(() => {
   loc = stubLocation();

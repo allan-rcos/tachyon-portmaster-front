@@ -1,6 +1,5 @@
-import { lingui } from '@lingui/vite-plugin';
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { fileURLToPath } from 'node:url';
-import { linguiMacroTs } from 'vike-txiki-adapter/vite';
 import solid from 'vite-plugin-solid';
 import { defineConfig } from 'vitest/config';
 
@@ -9,7 +8,18 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   // `hot: false` desliga a injeção do solid-refresh (HMR), que quebra o
   // transform em ambiente de teste (id virtual `/@solid-refresh`).
-  plugins: [linguiMacroTs(), solid({ hot: false }), lingui()],
+  // `paraglideVitePlugin` gera `paraglide/` também nos testes, então os
+  // resolvers de rota (que chamam `m.*`) funcionam sob o Vitest.
+  plugins: [
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './paraglide',
+      strategy: ['baseLocale'],
+      emitTsDeclarations: true,
+      isServer: "typeof window === 'undefined'",
+    }),
+    solid({ hot: false }),
+  ],
   resolve: {
     conditions: ['development', 'browser'],
     alias: {

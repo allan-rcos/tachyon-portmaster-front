@@ -7,10 +7,10 @@ import styles from './ContaPage.module.scss';
 import { AccountProfile } from '@/features/account/components/AccountProfile';
 import { AccountForm } from '@/features/account/islands/AccountForm.island';
 import { PasswordChange } from '@/features/account/islands/PasswordChange.island';
-import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
-import { Card } from '@/shared/components/Card';
-import { PageHeader } from '@/shared/components/PageHeader';
-import { FormSkeleton } from '@/shared/components/Skeleton';
+import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
+import { Card } from '@/features/core/components/Card';
+import { PageHeader } from '@/features/core/components/PageHeader';
+import { FormSkeleton } from '@/features/core/components/Skeleton';
 
 export default function AccountPage() {
   const data = useData<Data>();

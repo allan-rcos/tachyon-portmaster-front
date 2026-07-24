@@ -1,17 +1,33 @@
 import { For, Show, type JSX } from 'solid-js';
+import type { UserAdmin } from 'tachyon-portmaster-sdk/users';
 
 import styles from './UserList.module.scss';
 
-import type { UserAdmin } from '@/services/gen/flow/v1/admin';
-import { Badge } from '@/shared/components/Badge';
-import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
-import { DataTable, type Column } from '@/shared/components/DataTable';
-import { EmptyState } from '@/shared/components/EmptyState';
-import { Icon } from '@/shared/components/Icon';
-import { PageHeader } from '@/shared/components/PageHeader';
-import type { Messages } from '@/shared/i18n/messages/pt-BR';
+import { Badge } from '@/features/core/components/Badge';
+import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
+import { DataTable, type Column } from '@/features/core/components/DataTable';
+import { EmptyState } from '@/features/core/components/EmptyState';
+import { Icon } from '@/features/core/components/Icon';
+import { PageHeader } from '@/features/core/components/PageHeader';
 
-export function UserList(props: { items: UserAdmin[]; total: number; t: Messages }): JSX.Element {
+/** Chaves de texto que esta lista consome (contrato — a página provê). */
+export interface UserListText {
+  title: string;
+  subtitle: string;
+  new: string;
+  name: string;
+  email: string;
+  roles: string;
+  actions: string;
+  edit: string;
+  empty: string;
+}
+
+export function UserList(props: {
+  items: UserAdmin[];
+  total: number;
+  t: UserListText;
+}): JSX.Element {
   const columns = (): Column<UserAdmin>[] => [
     {
       header: props.t.name,

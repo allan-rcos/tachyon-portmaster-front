@@ -1,12 +1,12 @@
-import { serverCall, type IncomingHeaders } from '@/services/clients/server';
-import { listProducts as codec } from '@/services/codecs/flow/v1/product';
+import { listProducts as apiListProducts } from 'tachyon-portmaster-sdk/products';
+
+import { serverClient, type IncomingHeaders } from '@/features/core/api/client';
 
 export function listProducts(headers: IncomingHeaders, query?: URLSearchParams) {
-  const params = new URLSearchParams();
-  params.set('limit', query?.get('limit') ?? '50');
+  const params: Record<string, string> = { limit: query?.get('limit') ?? '50' };
   const cursor = query?.get('cursor');
-  if (cursor) params.set('cursor', cursor);
+  if (cursor) params.cursor = cursor;
   const search = query?.get('search');
-  if (search) params.set('search', search);
-  return serverCall(codec, { query: params }, headers);
+  if (search) params.search = search;
+  return apiListProducts(serverClient(headers), params);
 }

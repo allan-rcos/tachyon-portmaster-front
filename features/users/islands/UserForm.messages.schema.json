@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/form/user.json",
+  "title": "i18n do formulário de usuário (userFormMessages)",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://portmaster.app/i18n/common.json" },
+    { "$ref": "https://portmaster.app/i18n/val.json" }
+  ],
+  "required": ["users_data", "users_name", "users_email", "users_initial_password", "users_roles"],
+  "patternProperties": {
+    "^users_": { "type": "string", "minLength": 1 }
+  }
+}

@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { ProductForm } from './ProductForm.island';
+import { productFormMessages } from './ProductForm.messages';
 
-import ptBR from '@/shared/i18n/messages/pt-BR';
 import { setInput, setSelect, stubLocation } from '@/test/utils';
 
-const t = { ...ptBR.common, ...ptBR.products };
+const t = productFormMessages('pt-BR');
 let loc: ReturnType<typeof stubLocation>;
 beforeEach(() => {
   loc = stubLocation();
