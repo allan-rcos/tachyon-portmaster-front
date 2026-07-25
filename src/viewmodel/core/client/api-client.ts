@@ -1,11 +1,16 @@
 // ============================================================
-//  Clients do SDK configurados para o app. O SDK (tachyon-portmaster-sdk)
-//  é puro; aqui injetamos o que ele não conhece: baseURL vinda do ENV,
-//  o cookie de sessão (SSR) e o formato de wire (JSON dev / FBS prod).
+//  Clients HTTP configurados para o app. O Model é puro; aqui injetamos o que
+//  ele não conhece: baseURL vinda do ENV, o cookie de sessão (SSR) e o formato
+//  de wire (JSON dev / FBS prod).
 //
-//   • browserClient — islands (browser → Nginx → Rust via `/api`).
-//   • serverClient(headers) — loaders (txiki → Rust, loopback), encaminha
-//     o Cookie do request e captura Set-Cookie para relay no SSR.
+//   • browserClient — navegador → Nginx → Rust via `/api`.
+//   • serverClient(headers) — txiki → Rust em loopback; encaminha o Cookie do
+//     request e captura Set-Cookie para relay no SSR.
+//   • resolveClient(headers) — escolhe entre os dois pela PRESENÇA de headers.
+//
+//  `resolveClient` é o que torna as queries indiferentes ao lado em que rodam:
+//  com headers é servidor, sem headers é navegador. Mover uma tela de SSR para
+//  o cliente deixa de tocar a query — só deixa de passar os headers.
 // ============================================================
 import { createClient, type ApiClient } from '@model/core';
 
@@ -40,4 +45,14 @@ export function serverClient(
     headers: cookie ? { cookie } : undefined,
     onSetCookie,
   });
+}
+
+/**
+ * Escolhe o client conforme o contexto de execução.
+ *
+ * @param headers Cabeçalhos do request no SSR; omitir no navegador — onde o
+ *   cookie de sessão já viaja sozinho, via `credentials: 'include'`.
+ */
+export function resolveClient(headers?: IncomingHeaders): ApiClient {
+  return headers === undefined ? browserClient : serverClient(headers);
 }

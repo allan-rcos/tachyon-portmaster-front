@@ -1,10 +1,10 @@
 import { createForm } from '@tanstack/solid-form';
-import { createMutation } from '@tanstack/solid-query';
 import { FormField } from '@view/core/components/FormField';
 import { zodValidator } from '@view/core/forms/zod-adapter';
-import { IslandProvider } from '@view/core/islands/IslandProvider';
+import { bindMutation } from '@view/core/observable/bind-mutation';
 import { cn } from '@view/core/utils/ui';
 import { errText } from '@view/core/utils/ui';
+import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import type { UserFormText } from '@viewmodel/users/i18n/text-contracts';
 import { createUser } from '@viewmodel/users/mutations/create-user.mutation';
 import { updateUser } from '@viewmodel/users/mutations/update-user.mutation';
@@ -40,8 +40,7 @@ function Inner(props: UserFormProps): JSX.Element {
   const schema = () =>
     props.mode === 'create' ? createUserCreateSchema(props.t) : createUserUpdateSchema(props.t);
 
-  const mutation = createMutation(() => ({
-    mutationFn: async (value: FormValues) => {
+  const mutation = bindMutation(createMutationSignal(async (value: FormValues) => {
       if (props.mode === 'create') {
         return createUser({
           name: value.name,
@@ -55,11 +54,9 @@ function Inner(props: UserFormProps): JSX.Element {
         email: value.email,
         role_ids: value.role_ids,
       });
-    },
-    onSuccess: () => {
+    }, { onSuccess: () => {
       window.location.href = '/painel/usuarios';
-    },
-  }));
+    } }));
 
   const form = createForm(() => ({
     defaultValues: {
@@ -81,7 +78,7 @@ function Inner(props: UserFormProps): JSX.Element {
         void form.handleSubmit();
       }}
     >
-      <fieldset class={styles.fields} disabled={mutation.isPending}>
+      <fieldset class={styles.fields} disabled={mutation.isPending()}>
         <legend class="srOnly">{props.t.data}</legend>
 
         <form.Field name="name">
@@ -171,7 +168,7 @@ function Inner(props: UserFormProps): JSX.Element {
         </form.Field>
       </fieldset>
 
-      <p class={styles.error} role="alert" hidden={!mutation.isError}>
+      <p class={styles.error} role="alert" hidden={!mutation.isError()}>
         {props.t.submitError}
       </p>
 
@@ -179,8 +176,8 @@ function Inner(props: UserFormProps): JSX.Element {
         <li>
           <button
             type="submit"
-            class={cn(styles.submit, mutation.isPending && styles.loading)}
-            disabled={mutation.isPending}
+            class={cn(styles.submit, mutation.isPending() && styles.loading)}
+            disabled={mutation.isPending()}
           >
             {props.mode === 'create' ? props.t.create : props.t.save}
           </button>
@@ -198,11 +195,7 @@ function Inner(props: UserFormProps): JSX.Element {
 /** Formulário de usuário (island): cria (com senha inicial) ou edita
  *  dados + perfis (updateUser + updateUserRoles). */
 export function UserForm(props: UserFormProps): JSX.Element {
-  return (
-    <IslandProvider>
-      <Inner {...props} />
-    </IslandProvider>
-  );
+  return <Inner {...props} />;
 }
 
 export type { UserFormText };

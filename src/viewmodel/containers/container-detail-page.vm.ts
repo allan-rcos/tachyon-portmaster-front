@@ -1,44 +1,65 @@
 // ============================================================
-//  Carregador da rota — resolve dados e texto para a página.
-//  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
+//  ViewModel da rota. Observável: a tela assina os sinais e reage.
+//  Roda no navegador (VMContext sem `headers`); passar os headers do request
+//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
 // ============================================================
-import type { ContainerSummary } from '@model/containers';
-
-import { containerDetailMessages, type ContainerDetailPageText } from './i18n/container-detail-page.messages';
+import type { ContainerSummary } from './domain';
+import { containerDetailMessages } from './i18n/container-detail-page.messages';
+import type { ContainerDetailPageText } from './i18n/container-detail-page.messages';
 import { getContainerSummary } from './queries/get-container-summary.query';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
+import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
+import type { PageMeta } from '../core/page/page-request';
+import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';
 import { listProducts } from '../products/queries/list-products.query';
 
-/** Dados que a rota entrega à View. */
-export interface ContainerDetailPageData {
+/** Opção de produto oferecida no editor de manifesto. */
+export interface ProductOption {
+  id: string;
+  name: string;
+}
+
+/** Resumo do contêiner junto do catálogo que o manifesto precisa. */
+export interface ContainerDetailData {
   summary: ContainerSummary;
-  products: { id: string; name: string }[];
+  products: ProductOption[];
+}
+
+/** Superfície observável do detalhe de contêiner. */
+export interface ContainerDetailVM {
   t: ContainerDetailPageText;
-  title: string;
-  description: string;
+  /** Texto da fronteira de carregamento (erro e nova tentativa). */
+  boundary: AsyncBoundaryText;
+  /** Identificador opaco do contêiner. */
+  id: string;
+  data: AsyncSignal<ContainerDetailData, []>;
+  load: () => Promise<void>;
 }
 
 /**
- * Carrega os dados da rota.
+ * Cria o ViewModel do detalhe de contêiner.
  *
- * @param request Requisição de página, adaptada do roteador.
+ * Cruza duas features: o manifesto precisa do catálogo de produtos para
+ * oferecer o que carregar. As duas buscas vão em paralelo.
+ *
+ * @param context Contexto de execução; precisa do parâmetro de rota `id`.
  */
-export async function loadContainerDetailPage(request: PageRequest): Promise<ContainerDetailPageData> {
-  const id = request.routeParams.id; // base62 opaco, sem conversão
-  const headers = request.headers;
-  const t = containerDetailMessages(resolveLocale(headers));
+export function createContainerDetailVM(context: VMContext): ContainerDetailVM {
+  const t = containerDetailMessages(contextLocale(context));
+  const boundary = asyncBoundaryMessages(contextLocale(context));
+  const id = routeParam(context, 'id');
+  const data = createAsyncSignal<ContainerDetailData, []>(async () => {
+    const [summary, products] = await Promise.all([
+      getContainerSummary(id, context.headers),
+      listProducts(context.headers),
+    ]);
+    return { summary, products: products.data.map((p) => ({ id: p.id, name: p.name })) };
+  });
+  return { t, boundary, id, data, load: () => data.run() };
+}
 
-  // Cross-feature: o manifesto precisa do catálogo de produtos.
-  const [summary, prods] = await Promise.all([
-    getContainerSummary(id, headers),
-    listProducts(headers),
-  ]);
-  return {
-    summary,
-    products: prods.data.map((p) => ({ id: p.id, name: p.name })),
-    t,
-    title: summary.container.code,
-    description: `${t.summary} — ${summary.container.code}`,
-  };
+/** Título e descrição da rota, para o `<head>`. */
+export function containerDetailMeta(context: VMContext = {}): PageMeta {
+  const t = containerDetailMessages(contextLocale(context));
+  return { title: t.title, description: t.summary };
 }

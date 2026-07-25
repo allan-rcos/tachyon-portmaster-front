@@ -1,32 +1,43 @@
 // ============================================================
-//  Carregador da rota — resolve dados e texto para a página.
-//  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
+//  ViewModel da rota. Observável: a tela assina os sinais e reage.
+//  Roda no navegador (VMContext sem `headers`); passar os headers do request
+//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
 // ============================================================
-import type { Container } from '@model/containers';
-
-import { containerEditMessages, type ContainerEditText } from './i18n/container-edit-page.messages';
+import type { Container } from './domain';
+import { containerEditMessages } from './i18n/container-edit-page.messages';
+import type { ContainerEditText } from './i18n/container-edit-page.messages';
 import { getContainer } from './queries/get-container.query';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
+import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
+import type { PageMeta } from '../core/page/page-request';
+import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';
 
-/** Dados que a rota entrega à View. */
-export interface ContainerEditPageData {
-  id: string;
-  container: Container;
+/** Superfície observável da edição de contêiner. */
+export interface ContainerEditVM {
   t: ContainerEditText;
-  title: string;
-  description: string;
+  /** Texto da fronteira de carregamento (erro e nova tentativa). */
+  boundary: AsyncBoundaryText;
+  /** Identificador opaco do contêiner em edição. */
+  id: string;
+  container: AsyncSignal<Container, []>;
+  load: () => Promise<void>;
 }
 
 /**
- * Carrega os dados da rota.
+ * Cria o ViewModel da edição de contêiner.
  *
- * @param request Requisição de página, adaptada do roteador.
+ * @param context Contexto de execução; precisa do parâmetro de rota `id`.
  */
-export async function loadContainerEditPage(request: PageRequest): Promise<ContainerEditPageData> {
-  const id = request.routeParams.id;
-  const headers = request.headers;
-  const t = containerEditMessages(resolveLocale(headers));
-  const container = await getContainer(id, headers);
-  return { id, container, t, title: `${t.edit} ${container.code}`, description: t.subtitle };
+export function createContainerEditVM(context: VMContext): ContainerEditVM {
+  const t = containerEditMessages(contextLocale(context));
+  const boundary = asyncBoundaryMessages(contextLocale(context));
+  const id = routeParam(context, 'id');
+  const container = createAsyncSignal<Container, []>(() => getContainer(id, context.headers));
+  return { t, boundary, id, container, load: () => container.run() };
+}
+
+/** Título e descrição da rota, para o `<head>`. */
+export function containerEditMeta(context: VMContext = {}): PageMeta {
+  const t = containerEditMessages(contextLocale(context));
+  return { title: t.edit, description: t.subtitle };
 }

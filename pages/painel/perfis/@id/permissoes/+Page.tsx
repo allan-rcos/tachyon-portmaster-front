@@ -1,31 +1,14 @@
-
-
-import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
-import { PageHeader } from '@view/core/components/PageHeader';
-import { FormSkeleton } from '@view/core/components/Skeleton';
-import { RoleForm } from '@view/roles/islands/RoleForm.island';
+import { RolePermissionsScreen } from '@view/roles/screens/RolePermissionsScreen';
+import { createRolePermissionsVM } from '@viewmodel/roles/role-permissions-page.vm';
 import { ClientOnly } from 'vike-solid/ClientOnly';
-import { useData } from 'vike-solid/useData';
+import { usePageContext } from 'vike-solid/usePageContext';
 
-import type { Data } from './+data';
-
-export default function RolePermissionsPage() {
-  const data = useData<Data>();
+export default function Page() {
+  const pageContext = usePageContext();
+  const vm = createRolePermissionsVM({ url: pageContext.urlOriginal, routeParams: pageContext.routeParams });
   return (
-    <section>
-      <Breadcrumbs
-        items={[{ label: data.t.title, href: '/painel/perfis' }, { label: data.role.name }]}
-      />
-      <PageHeader title={data.role.name} subtitle={data.t.syncPermissions} />
-      <ClientOnly fallback={<FormSkeleton rows={4} />}>
-        <RoleForm
-          mode="permissions"
-          roleId={data.id}
-          defaultName={data.role.name}
-          defaultPermissions={data.role.permissions}
-          t={data.t}
-        />
-      </ClientOnly>
-    </section>
+    <ClientOnly fallback={<div />}>
+      <RolePermissionsScreen vm={vm} />
+    </ClientOnly>
   );
 }

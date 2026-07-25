@@ -1,30 +1,40 @@
 // ============================================================
-//  Carregador da rota — resolve dados e texto para a página.
-//  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
+//  ViewModel da rota. Observável: a tela assina os sinais e reage.
+//  Roda no navegador (VMContext sem `headers`); passar os headers do request
+//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
 // ============================================================
-import type { AccountProfile } from '@model/account';
-
-import { accountMessages, type AccountPageText } from './i18n/account-page.messages';
+import type { AccountProfile } from './domain';
+import { accountMessages } from './i18n/account-page.messages';
+import type { AccountPageText } from './i18n/account-page.messages';
 import { getAccount } from './queries/get-account.query';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
+import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
+import type { PageMeta } from '../core/page/page-request';
+import { contextLocale, type VMContext } from '../core/page/vm-context';
 
-/** Dados que a rota entrega à View. */
-export interface AccountPageData {
-  profile: AccountProfile;
+/** Superfície observável da tela de conta. */
+export interface AccountPageVM {
   t: AccountPageText;
-  title: string;
-  description: string;
+  /** Texto da fronteira de carregamento (erro e nova tentativa). */
+  boundary: AsyncBoundaryText;
+  profile: AsyncSignal<AccountProfile, []>;
+  load: () => Promise<void>;
 }
 
 /**
- * Carrega os dados da rota.
+ * Cria o ViewModel do perfil próprio.
  *
- * @param request Requisição de página, adaptada do roteador.
+ * @param context Contexto de execução — navegador quando omitido.
  */
-export async function loadAccountPage(request: PageRequest): Promise<AccountPageData> {
-  const headers = request.headers;
-  const t = accountMessages(resolveLocale(headers));
-  const profile = await getAccount(headers);
-  return { profile, t, title: t.title, description: t.subtitle };
+export function createAccountPageVM(context: VMContext = {}): AccountPageVM {
+  const t = accountMessages(contextLocale(context));
+  const boundary = asyncBoundaryMessages(contextLocale(context));
+  const profile = createAsyncSignal<AccountProfile, []>(() => getAccount(context.headers));
+  return { t, boundary, profile, load: () => profile.run() };
+}
+
+/** Título e descrição da rota, para o `<head>`. */
+export function accountPageMeta(context: VMContext = {}): PageMeta {
+  const t = accountMessages(contextLocale(context));
+  return { title: t.title, description: t.subtitle };
 }

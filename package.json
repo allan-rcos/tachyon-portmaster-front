@@ -31,11 +31,10 @@
   },
   "dependencies": {
     "@tanstack/solid-form": "^1.33.2",
-    "@tanstack/solid-query": "^5.101.2",
-    "@tanstack/zod-form-adapter": "^0.42.1",
+    "alien-signals": "^3.2.1",
     "chart.js": "^4.5.1",
-    "ofetch": "^1.4.1",
     "flatbuffers": "^25.9.23",
+    "ofetch": "^1.4.1",
     "solid-js": "^1.9.14",
     "tachyon-design": "workspace:*",
     "vike": "^0.4.260",

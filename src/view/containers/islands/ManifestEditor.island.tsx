@@ -1,15 +1,15 @@
 import { createForm } from '@tanstack/solid-form';
-import { createMutation } from '@tanstack/solid-query';
 import { FormField } from '@view/core/components/FormField';
 import { Icon } from '@view/core/components/Icon';
 import { zodValidator } from '@view/core/forms/zod-adapter';
-import { IslandProvider } from '@view/core/islands/IslandProvider';
+import { bindMutation } from '@view/core/observable/bind-mutation';
 import { cn } from '@view/core/utils/ui';
 import { errText } from '@view/core/utils/ui';
 import type { ContainerDetailText } from '@viewmodel/containers/i18n/text-contracts';
 import { loadManifestItem } from '@viewmodel/containers/mutations/load-manifest-item.mutation';
 import { unloadManifestItem } from '@viewmodel/containers/mutations/unload-manifest-item.mutation';
 import { createLoadItemSchema, type LoadItemData } from '@viewmodel/containers/schemas/manifest.schema';
+import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import { createSignal, For, type JSX } from 'solid-js';
 
 import styles from './ManifestEditor.island.module.scss';
@@ -31,16 +31,21 @@ function Inner(props: {
 }): JSX.Element {
   const [target, setTarget] = createSignal<'load' | 'unload'>('load');
 
-  const mkOpts = () => ({ onSuccess: () => window.location.reload() });
-  const loadMut = createMutation(() => ({
-    mutationFn: (v: LoadItemData) => loadManifestItem(props.containerId, v),
-    ...mkOpts(),
-  }));
-  const unloadMut = createMutation(() => ({
-    mutationFn: (v: LoadItemData) => unloadManifestItem(props.containerId, v),
-    ...mkOpts(),
-  }));
-  const pending = () => loadMut.isPending || unloadMut.isPending;
+  // Carregar/descarregar altera o peso e o status do contêiner, exibidos por
+  // outros componentes da mesma tela — recarregar é a forma mais barata de
+  // manter todos consistentes.
+  const reloadOnSuccess = { onSuccess: () => window.location.reload() };
+
+  const loadMut = bindMutation(
+    createMutationSignal((v: LoadItemData) => loadManifestItem(props.containerId, v), reloadOnSuccess),
+  );
+  const unloadMut = bindMutation(
+    createMutationSignal(
+      (v: LoadItemData) => unloadManifestItem(props.containerId, v),
+      reloadOnSuccess,
+    ),
+  );
+  const pending = () => loadMut.isPending() || unloadMut.isPending();
 
   const form = createForm(() => ({
     defaultValues: { product_id: props.products[0]?.id ?? '', quantity: '' } as ManifestFormValues,
@@ -136,9 +141,5 @@ export function ManifestEditor(props: {
   products: ProductOption[];
   t: ContainerDetailText;
 }): JSX.Element {
-  return (
-    <IslandProvider>
-      <Inner {...props} />
-    </IslandProvider>
-  );
+  return <Inner {...props} />;
 }

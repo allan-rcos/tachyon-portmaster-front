@@ -1,8 +1,7 @@
 import { createForm } from '@tanstack/solid-form';
-import { createMutation } from '@tanstack/solid-query';
 import { FormField } from '@view/core/components/FormField';
 import { zodValidator } from '@view/core/forms/zod-adapter';
-import { IslandProvider } from '@view/core/islands/IslandProvider';
+import { bindMutation } from '@view/core/observable/bind-mutation';
 import { cn } from '@view/core/utils/ui';
 import { errText } from '@view/core/utils/ui';
 import type { ContainerFormText } from '@viewmodel/containers/i18n/text-contracts';
@@ -12,6 +11,7 @@ import {
   createContainerCreateSchema,
   createContainerUpdateSchema,
 } from '@viewmodel/containers/schemas/container.schema';
+import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import { Show, type JSX } from 'solid-js';
 
 import styles from './ContainerForm.island.module.scss';
@@ -29,19 +29,16 @@ export interface ContainerFormProps {
 }
 
 function Inner(props: ContainerFormProps): JSX.Element {
-  const mutation = createMutation(() => ({
-    mutationFn: (value: FormValues) => {
+  const mutation = bindMutation(createMutationSignal((value: FormValues) => {
       if (props.mode === 'create') {
         const body = createContainerCreateSchema(props.t).parse(value);
         return createContainer(body);
       }
       const body = createContainerUpdateSchema(props.t).parse(value);
       return updateContainer(props.containerId!, body);
-    },
-    onSuccess: () => {
+    }, { onSuccess: () => {
       window.location.href = '/painel/conteineres';
-    },
-  }));
+    } }));
 
   const form = createForm(() => ({
     defaultValues: {
@@ -68,7 +65,7 @@ function Inner(props: ContainerFormProps): JSX.Element {
         void form.handleSubmit();
       }}
     >
-      <fieldset class={styles.fields} disabled={mutation.isPending}>
+      <fieldset class={styles.fields} disabled={mutation.isPending()}>
         <legend class="srOnly">{props.t.data}</legend>
 
         <Show when={props.mode === 'create'}>
@@ -116,7 +113,7 @@ function Inner(props: ContainerFormProps): JSX.Element {
         </form.Field>
       </fieldset>
 
-      <p class={styles.error} role="alert" hidden={!mutation.isError}>
+      <p class={styles.error} role="alert" hidden={!mutation.isError()}>
         {props.t.submitError}
       </p>
 
@@ -124,8 +121,8 @@ function Inner(props: ContainerFormProps): JSX.Element {
         <li>
           <button
             type="submit"
-            class={cn(styles.submit, mutation.isPending && styles.loading)}
-            disabled={mutation.isPending}
+            class={cn(styles.submit, mutation.isPending() && styles.loading)}
+            disabled={mutation.isPending()}
           >
             {props.mode === 'create' ? props.t.create : props.t.save}
           </button>
@@ -142,11 +139,7 @@ function Inner(props: ContainerFormProps): JSX.Element {
 
 /** Formulário de criação/edição de contêiner (island). */
 export function ContainerForm(props: ContainerFormProps): JSX.Element {
-  return (
-    <IslandProvider>
-      <Inner {...props} />
-    </IslandProvider>
-  );
+  return <Inner {...props} />;
 }
 
 export type { ContainerFormText };

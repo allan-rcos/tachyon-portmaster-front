@@ -1,32 +1,43 @@
 // ============================================================
-//  Carregador da rota — resolve dados e texto para a página.
-//  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
+//  ViewModel da rota. Observável: a tela assina os sinais e reage.
+//  Roda no navegador (VMContext sem `headers`); passar os headers do request
+//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
 // ============================================================
-import type { Product } from '@model/products';
-
-import { productEditMessages, type ProductEditText } from './i18n/product-edit-page.messages';
+import type { Product } from './domain';
+import { productEditMessages } from './i18n/product-edit-page.messages';
+import type { ProductEditText } from './i18n/product-edit-page.messages';
 import { getProduct } from './queries/get-product.query';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
+import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
+import type { PageMeta } from '../core/page/page-request';
+import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';
 
-/** Dados que a rota entrega à View. */
-export interface ProductEditPageData {
-  id: string;
-  product: Product;
+/** Superfície observável da edição de produto. */
+export interface ProductEditVM {
   t: ProductEditText;
-  title: string;
-  description: string;
+  /** Texto da fronteira de carregamento (erro e nova tentativa). */
+  boundary: AsyncBoundaryText;
+  /** Identificador opaco do produto em edição. */
+  id: string;
+  product: AsyncSignal<Product, []>;
+  load: () => Promise<void>;
 }
 
 /**
- * Carrega os dados da rota.
+ * Cria o ViewModel da edição de produto.
  *
- * @param request Requisição de página, adaptada do roteador.
+ * @param context Contexto de execução; precisa do parâmetro de rota `id`.
  */
-export async function loadProductEditPage(request: PageRequest): Promise<ProductEditPageData> {
-  const id = request.routeParams.id;
-  const headers = request.headers;
-  const t = productEditMessages(resolveLocale(headers));
-  const product = await getProduct(id, headers);
-  return { id, product, t, title: `${t.edit} ${product.name}`, description: t.subtitle };
+export function createProductEditVM(context: VMContext): ProductEditVM {
+  const t = productEditMessages(contextLocale(context));
+  const boundary = asyncBoundaryMessages(contextLocale(context));
+  const id = routeParam(context, 'id');
+  const product = createAsyncSignal<Product, []>(() => getProduct(id, context.headers));
+  return { t, boundary, id, product, load: () => product.run() };
+}
+
+/** Título e descrição da rota, para o `<head>`. */
+export function productEditMeta(context: VMContext = {}): PageMeta {
+  const t = productEditMessages(contextLocale(context));
+  return { title: t.edit, description: t.subtitle };
 }

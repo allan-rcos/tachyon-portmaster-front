@@ -1,10 +1,14 @@
-import { ContainerSummary } from '@view/containers/components/ContainerSummary';
-import { useData } from 'vike-solid/useData';
+import { ContainerDetailScreen } from '@view/containers/screens/ContainerDetailScreen';
+import { createContainerDetailVM } from '@viewmodel/containers/container-detail-page.vm';
+import { ClientOnly } from 'vike-solid/ClientOnly';
+import { usePageContext } from 'vike-solid/usePageContext';
 
-import type { Data } from './+data';
-
-
-export default function ContainerDetailPage() {
-  const data = useData<Data>();
-  return <ContainerSummary summary={data.summary} products={data.products} t={data.t} />;
+export default function Page() {
+  const pageContext = usePageContext();
+  const vm = createContainerDetailVM({ url: pageContext.urlOriginal, routeParams: pageContext.routeParams });
+  return (
+    <ClientOnly fallback={<div />}>
+      <ContainerDetailScreen vm={vm} />
+    </ClientOnly>
+  );
 }

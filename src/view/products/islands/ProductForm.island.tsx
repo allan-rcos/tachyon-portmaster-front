@@ -1,13 +1,13 @@
 import { createForm } from '@tanstack/solid-form';
-import { createMutation } from '@tanstack/solid-query';
 import { FormField } from '@view/core/components/FormField';
 import { zodValidator } from '@view/core/forms/zod-adapter';
 import { ConfirmDialog } from '@view/core/islands/ConfirmDialog.island';
-import { IslandProvider } from '@view/core/islands/IslandProvider';
+import { bindMutation } from '@view/core/observable/bind-mutation';
 import { cn } from '@view/core/utils/ui';
 import { errText } from '@view/core/utils/ui';
 import { RISK_CLASS, type RiskClass } from '@viewmodel/core/domain';
 import { RISK_CLASS_LABEL } from '@viewmodel/core/i18n/labels';
+import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import type { ProductFormText } from '@viewmodel/products/i18n/text-contracts';
 import { createProduct } from '@viewmodel/products/mutations/create-product.mutation';
 import { deleteProduct } from '@viewmodel/products/mutations/delete-product.mutation';
@@ -31,17 +31,14 @@ export interface ProductFormProps {
 }
 
 function Inner(props: ProductFormProps): JSX.Element {
-  const mutation = createMutation(() => ({
-    mutationFn: (value: FormValues) => {
+  const mutation = bindMutation(createMutationSignal((value: FormValues) => {
       const body = createProductSchema(props.t).parse(value);
       return props.mode === 'create'
         ? createProduct(body)
         : updateProduct(props.productId!, body);
-    },
-    onSuccess: () => {
+    }, { onSuccess: () => {
       window.location.href = '/painel/produtos';
-    },
-  }));
+    } }));
 
   const form = createForm(() => ({
     defaultValues: {
@@ -62,7 +59,7 @@ function Inner(props: ProductFormProps): JSX.Element {
         void form.handleSubmit();
       }}
     >
-      <fieldset class={styles.fields} disabled={mutation.isPending}>
+      <fieldset class={styles.fields} disabled={mutation.isPending()}>
         <legend class="srOnly">{props.t.data}</legend>
 
         <form.Field name="name">
@@ -120,7 +117,7 @@ function Inner(props: ProductFormProps): JSX.Element {
         </form.Field>
       </fieldset>
 
-      <p class={styles.error} role="alert" hidden={!mutation.isError}>
+      <p class={styles.error} role="alert" hidden={!mutation.isError()}>
         {props.t.submitError}
       </p>
 
@@ -128,8 +125,8 @@ function Inner(props: ProductFormProps): JSX.Element {
         <li>
           <button
             type="submit"
-            class={cn(styles.submit, mutation.isPending && styles.loading)}
-            disabled={mutation.isPending}
+            class={cn(styles.submit, mutation.isPending() && styles.loading)}
+            disabled={mutation.isPending()}
           >
             {props.mode === 'create' ? props.t.create : props.t.save}
           </button>
@@ -164,11 +161,7 @@ function Inner(props: ProductFormProps): JSX.Element {
 
 /** Formulário de produto (island) — cria/edita e, em edição, exclui. */
 export function ProductForm(props: ProductFormProps): JSX.Element {
-  return (
-    <IslandProvider>
-      <Inner {...props} />
-    </IslandProvider>
-  );
+  return <Inner {...props} />;
 }
 
 export type { ProductFormText };

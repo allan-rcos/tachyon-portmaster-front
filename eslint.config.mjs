@@ -189,6 +189,17 @@ export default tseslint.config(
     },
   },
 
+  // As telas recebem um ViewModel instanciado UMA vez pelo `+Page.tsx` e nunca
+  // trocado — ler `props.vm` fora de escopo rastreado é correto aqui, e é o que
+  // permite assinar os sinais na montagem. A regra não tem como saber disso;
+  // desligá-la só neste diretório evita 24 avisos falsos sem afrouxar o resto.
+  {
+    files: ['src/view/**/screens/**/*.{ts,tsx}'],
+    rules: {
+      'solid/reactivity': 'off',
+    },
+  },
+
   // Config e scripts (Vite/Vitest/i18n) rodam em Node — liberam os built-ins.
   {
     files: [

@@ -1,25 +1,31 @@
 // ============================================================
-//  Carregador da rota — resolve dados e texto para a página.
-//  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
+//  ViewModel da rota. Observável: a tela assina os sinais e reage.
+//  Roda no navegador (VMContext sem `headers`); passar os headers do request
+//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
 // ============================================================
+//  Esta rota não busca nada: só resolve texto. O formulário em si é uma island
+//  que fala com o ViewModel de mutação.
+import { productNewMessages } from './i18n/product-create-page.messages';
+import type { ProductNewText } from './i18n/product-create-page.messages';
+import type { PageMeta } from '../core/page/page-request';
+import { contextLocale, type VMContext } from '../core/page/vm-context';
 
-import { productNewMessages, type ProductNewText } from './i18n/product-create-page.messages';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
-
-/** Dados que a rota entrega à View. */
-export interface ProductCreatePageData {
+/** Superfície do formulário de criação. */
+export interface ProductCreateVM {
   t: ProductNewText;
-  title: string;
-  description: string;
 }
 
 /**
- * Carrega os dados da rota.
+ * Cria o ViewModel do formulário de criação.
  *
- * @param request Requisição de página, adaptada do roteador.
+ * @param context Contexto de execução — navegador quando omitido.
  */
-export async function loadProductCreatePage(request: PageRequest): Promise<ProductCreatePageData> {
-  const t = productNewMessages(resolveLocale(request.headers));
-  return { t, title: t.new, description: t.subtitle };
+export function createProductCreateVM(context: VMContext = {}): ProductCreateVM {
+  return { t: productNewMessages(contextLocale(context)) };
+}
+
+/** Título e descrição da rota, para o `<head>`. */
+export function productCreateMeta(context: VMContext = {}): PageMeta {
+  const t = productNewMessages(contextLocale(context));
+  return { title: t.new, description: t.subtitle };
 }

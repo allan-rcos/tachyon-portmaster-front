@@ -1,8 +1,7 @@
 import { createForm } from '@tanstack/solid-form';
-import { createMutation } from '@tanstack/solid-query';
 import { FormField } from '@view/core/components/FormField';
 import { Icon } from '@view/core/components/Icon';
-import { IslandProvider } from '@view/core/islands/IslandProvider';
+import { bindMutation } from '@view/core/observable/bind-mutation';
 import { cn } from '@view/core/utils/ui';
 import { errText } from '@view/core/utils/ui';
 import type { LoginFormText } from '@viewmodel/auth/i18n/text-contracts';
@@ -11,6 +10,7 @@ import {
   createLoginSchema,
   type LoginFormData,
 } from '@viewmodel/auth/schemas/login.schema';
+import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import { type JSX } from 'solid-js';
 
 import styles from './LoginForm.island.module.scss';
@@ -21,19 +21,16 @@ function redirectTarget(): string {
 }
 
 function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
-  const mutation = createMutation(() => ({
-    mutationFn: (v: LoginFormData) => signIn(v),
-    onSuccess: () => {
+  const mutation = bindMutation(createMutationSignal((v: LoginFormData) => signIn(v), { onSuccess: () => {
       window.location.href = redirectTarget();
-    },
-  }));
+    } }));
 
   const form = createForm(() => ({
     defaultValues: { email: '', password: '' } as LoginFormData,
     validators: { onChange: createLoginSchema(props.t) },
     onSubmit: ({ value }) => {
       // `mutate` (não `mutateAsync`) trata o erro internamente
-      // (mutation.isError) e nunca rejeita — evita unhandled rejection.
+      // (mutation.isError()) e nunca rejeita — evita unhandled rejection.
       mutation.mutate(value);
     },
   }));
@@ -85,14 +82,14 @@ function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
         )}
       </form.Field>
 
-      <p class={styles.error} role="alert" hidden={!mutation.isError}>
+      <p class={styles.error} role="alert" hidden={!mutation.isError()}>
         {props.t.invalid}
       </p>
 
       <button
         type="submit"
-        class={cn(styles.submit, mutation.isPending && styles.loading)}
-        disabled={mutation.isPending}
+        class={cn(styles.submit, mutation.isPending() && styles.loading)}
+        disabled={mutation.isPending()}
       >
         <Icon name="login" size={18} />
         {props.t.submit}
@@ -104,11 +101,7 @@ function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
 /** Formulário de login (island). Autentica na API (same-origin token) e grava
  *  o cookie `auth_token`, depois recarrega para a rota destino (novo SSR). */
 export function LoginForm(props: { t: LoginFormText }): JSX.Element {
-  return (
-    <IslandProvider>
-      <LoginFormInner t={props.t} />
-    </IslandProvider>
-  );
+  return <LoginFormInner t={props.t} />;
 }
 
 export type { LoginFormText };

@@ -1,10 +1,10 @@
 import { createForm } from '@tanstack/solid-form';
-import { createMutation } from '@tanstack/solid-query';
 import { FormField } from '@view/core/components/FormField';
 import { ConfirmDialog } from '@view/core/islands/ConfirmDialog.island';
-import { IslandProvider } from '@view/core/islands/IslandProvider';
+import { bindMutation } from '@view/core/observable/bind-mutation';
 import { cn } from '@view/core/utils/ui';
 import { errText } from '@view/core/utils/ui';
+import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import type { UserAdminActionsText } from '@viewmodel/users/i18n/text-contracts';
 import { deleteUser } from '@viewmodel/users/mutations/delete-user.mutation';
 import { resetUserPassword } from '@viewmodel/users/mutations/reset-user-password.mutation';
@@ -14,10 +14,7 @@ import { type JSX } from 'solid-js';
 import styles from './UserAdminActions.island.module.scss';
 
 function Inner(props: { userId: string; t: UserAdminActionsText }): JSX.Element {
-  const reset = createMutation(() => ({
-    mutationFn: (value: string) => resetUserPassword(props.userId, value),
-    onSuccess: () => form.reset(),
-  }));
+  const reset = bindMutation(createMutationSignal((value: string) => resetUserPassword(props.userId, value), { onSuccess: () => form.reset() }));
 
   const form = createForm(() => ({
     defaultValues: { new_password: '' },
@@ -55,11 +52,11 @@ function Inner(props: { userId: string; t: UserAdminActionsText }): JSX.Element 
               </FormField>
             )}
           </form.Field>
-          <button type="submit" class={styles.resetBtn} disabled={reset.isPending}>
+          <button type="submit" class={styles.resetBtn} disabled={reset.isPending()}>
             {props.t.resetPassword}
           </button>
         </form>
-        <p class={styles.ok} role="status" hidden={!reset.isSuccess}>
+        <p class={styles.ok} role="status" hidden={!reset.isSuccess()}>
           {props.t.passwordChanged}
         </p>
       </section>
@@ -87,11 +84,7 @@ function Inner(props: { userId: string; t: UserAdminActionsText }): JSX.Element 
 
 /** Ações administrativas de usuário: redefinir senha e excluir. */
 export function UserAdminActions(props: { userId: string; t: UserAdminActionsText }): JSX.Element {
-  return (
-    <IslandProvider>
-      <Inner {...props} />
-    </IslandProvider>
-  );
+  return <Inner {...props} />;
 }
 
 export type { UserAdminActionsText };

@@ -1,19 +1,14 @@
+import { DashboardScreen } from '@view/metrics/screens/DashboardScreen';
+import { createDashboardVM } from '@viewmodel/metrics/dashboard-page.vm';
+import { ClientOnly } from 'vike-solid/ClientOnly';
+import { usePageContext } from 'vike-solid/usePageContext';
 
-
-import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
-import { PageHeader } from '@view/core/components/PageHeader';
-import { MetricsPanel } from '@view/metrics/components/MetricsPanel';
-import { useData } from 'vike-solid/useData';
-
-import type { Data } from './+data';
-
-export default function PainelPage() {
-  const data = useData<Data>();
+export default function Page() {
+  const pageContext = usePageContext();
+  const vm = createDashboardVM({ url: pageContext.urlOriginal });
   return (
-    <>
-      <Breadcrumbs items={[{ label: data.t.title }]} />
-      <PageHeader title={data.t.title} subtitle={data.t.subtitle} />
-      <MetricsPanel metrics={data.metrics} t={data.t} />
-    </>
+    <ClientOnly fallback={<div />}>
+      <DashboardScreen vm={vm} />
+    </ClientOnly>
   );
 }

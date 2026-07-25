@@ -1,10 +1,14 @@
-import { UserList } from '@view/users/components/UserList';
-import { useData } from 'vike-solid/useData';
+import { UserListScreen } from '@view/users/screens/UserListScreen';
+import { createUserListVM } from '@viewmodel/users/user-list-page.vm';
+import { ClientOnly } from 'vike-solid/ClientOnly';
+import { usePageContext } from 'vike-solid/usePageContext';
 
-import type { Data } from './+data';
-
-
-export default function UsersPage() {
-  const data = useData<Data>();
-  return <UserList items={data.items} total={data.total} t={data.t} />;
+export default function Page() {
+  const pageContext = usePageContext();
+  const vm = createUserListVM({ url: pageContext.urlOriginal });
+  return (
+    <ClientOnly fallback={<div />}>
+      <UserListScreen vm={vm} />
+    </ClientOnly>
+  );
 }

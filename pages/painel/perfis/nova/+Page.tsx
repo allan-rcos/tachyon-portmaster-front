@@ -1,25 +1,14 @@
-
-
-import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
-import { PageHeader } from '@view/core/components/PageHeader';
-import { FormSkeleton } from '@view/core/components/Skeleton';
-import { RoleForm } from '@view/roles/islands/RoleForm.island';
+import { RoleCreateScreen } from '@view/roles/screens/RoleCreateScreen';
+import { createRoleCreateVM } from '@viewmodel/roles/role-create-page.vm';
 import { ClientOnly } from 'vike-solid/ClientOnly';
-import { useData } from 'vike-solid/useData';
+import { usePageContext } from 'vike-solid/usePageContext';
 
-import type { Data } from './+data';
-
-export default function NewRolePage() {
-  const data = useData<Data>();
+export default function Page() {
+  const pageContext = usePageContext();
+  const vm = createRoleCreateVM({ url: pageContext.urlOriginal });
   return (
-    <section>
-      <Breadcrumbs
-        items={[{ label: data.t.title, href: '/painel/perfis' }, { label: data.t.new }]}
-      />
-      <PageHeader title={data.t.new} subtitle={data.t.subtitle} />
-      <ClientOnly fallback={<FormSkeleton rows={4} />}>
-        <RoleForm mode="create" t={data.t} />
-      </ClientOnly>
-    </section>
+    <ClientOnly fallback={<div />}>
+      <RoleCreateScreen vm={vm} />
+    </ClientOnly>
   );
 }

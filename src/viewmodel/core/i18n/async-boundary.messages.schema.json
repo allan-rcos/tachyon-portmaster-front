@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/async-boundary.json",
+  "title": "Fragmento i18n: fronteira de carregamento (asyncBoundaryMessages)",
+  "type": "object",
+  "required": ["common_load_error", "common_retry"],
+  "patternProperties": {
+    "^common_": { "type": "string", "minLength": 1 }
+  }
+}

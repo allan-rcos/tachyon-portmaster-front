@@ -1,41 +1,57 @@
 // ============================================================
-//  Carregador da rota — resolve dados e texto para a página.
-//  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
+//  ViewModel da rota. Observável: a tela assina os sinais e reage.
+//  Roda no navegador (VMContext sem `headers`); passar os headers do request
+//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
 // ============================================================
-import type { UserAdmin } from '@model/users';
-
-import { userEditMessages, type UserEditText } from './i18n/user-edit-page.messages';
+import type { UserAdmin } from './domain';
+import { userEditMessages } from './i18n/user-edit-page.messages';
+import type { UserEditText } from './i18n/user-edit-page.messages';
 import { getUser } from './queries/get-user.query';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
+import type { RoleOption } from './user-create-page.vm';
+import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
+import type { PageMeta } from '../core/page/page-request';
+import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';
 import { listRoles } from '../roles/queries/list-roles.query';
 
-/** Dados que a rota entrega à View. */
-export interface UserEditPageData {
-  id: string;
+/** Usuário em edição, junto dos perfis disponíveis para vincular. */
+export interface UserEditData {
   user: UserAdmin;
-  roles: { id: string; name: string }[];
+  roles: RoleOption[];
+}
+
+/** Superfície observável da edição de usuário. */
+export interface UserEditVM {
   t: UserEditText;
-  title: string;
-  description: string;
+  /** Texto da fronteira de carregamento (erro e nova tentativa). */
+  boundary: AsyncBoundaryText;
+  /** Identificador opaco do usuário em edição. */
+  id: string;
+  data: AsyncSignal<UserEditData, []>;
+  load: () => Promise<void>;
 }
 
 /**
- * Carrega os dados da rota.
+ * Cria o ViewModel da edição de usuário.
  *
- * @param request Requisição de página, adaptada do roteador.
+ * Usuário e perfis são buscados em paralelo: são recursos independentes, e
+ * serializar as chamadas só somaria latência.
+ *
+ * @param context Contexto de execução; precisa do parâmetro de rota `id`.
  */
-export async function loadUserEditPage(request: PageRequest): Promise<UserEditPageData> {
-  const id = request.routeParams.id;
-  const headers = request.headers;
-  const t = userEditMessages(resolveLocale(headers));
-  const [user, roles] = await Promise.all([getUser(id, headers), listRoles(headers)]);
-  return {
-    id,
-    user,
-    roles: roles.data.map((r) => ({ id: r.id, name: r.name })),
-    t,
-    title: `${t.edit} ${user.name}`,
-    description: t.subtitle,
-  };
+export function createUserEditVM(context: VMContext): UserEditVM {
+  const t = userEditMessages(contextLocale(context));
+  const boundary = asyncBoundaryMessages(contextLocale(context));
+  const id = routeParam(context, 'id');
+  const data = createAsyncSignal<UserEditData, []>(async () => {
+    const [user, roles] = await Promise.all([getUser(id, context.headers), listRoles(context.headers)]);
+    return { user, roles: roles.data.map((role) => ({ id: role.id, name: role.name })) };
+  });
+  return { t, boundary, id, data, load: () => data.run() };
+}
+
+/** Título e descrição da rota, para o `<head>`. */
+export function userEditMeta(context: VMContext = {}): PageMeta {
+  const t = userEditMessages(contextLocale(context));
+  return { title: t.edit, description: t.subtitle };
 }

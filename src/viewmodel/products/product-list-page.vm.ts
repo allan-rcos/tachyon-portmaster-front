@@ -1,34 +1,52 @@
 // ============================================================
-//  Carregador da rota — resolve dados e texto para a página.
-//  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
+//  ViewModel da rota /painel/produtos.
+//
+//  Observável: a tela assina `products` e reage. Roda no navegador (o
+//  `VMContext` chega sem `headers`); para devolver a rota ao SSR, basta chamar
+//  este mesmo VM dentro de um `+data.ts` passando os headers do request —
+//  nada aqui muda.
 // ============================================================
-import type { Product } from '@model/products';
-
+import type { ProductList } from './domain';
 import { productsListMessages } from './i18n/product-list-page.messages';
 import type { ProductListText } from './i18n/text-contracts';
 import { listProducts } from './queries/list-products.query';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
-import { searchParams } from '../core/page/page-request';
+import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
+import type { PageMeta } from '../core/page/page-request';
+import { contextLocale, contextParams, type VMContext } from '../core/page/vm-context';
 
-/** Dados que a rota entrega à View. */
-export interface ProductListPageData {
-  items: Product[];
-  total: number;
+/** Superfície observável da listagem de produtos. */
+export interface ProductListVM {
+  /** Texto da tela, resolvido para o locale do contexto. */
   t: ProductListText;
-  title: string;
-  description: string;
+  /** Texto da fronteira de carregamento (erro e nova tentativa). */
+  boundary: AsyncBoundaryText;
+  /** Catálogo de produtos, com estado de carga e erro. */
+  products: AsyncSignal<ProductList, []>;
+  /** Dispara a carga; chamar de novo recarrega. */
+  load: () => Promise<void>;
 }
 
 /**
- * Carrega os dados da rota.
+ * Cria o ViewModel da listagem de produtos.
  *
- * @param request Requisição de página, adaptada do roteador.
+ * @param context Contexto de execução — navegador quando omitido.
  */
-export async function loadProductListPage(request: PageRequest): Promise<ProductListPageData> {
-  const headers = request.headers;
-  const t = productsListMessages(resolveLocale(headers));
-  const query = searchParams(request);
-  const res = await listProducts(headers, query);
-  return { items: res.data, total: res.total, t, title: t.title, description: t.subtitle };
+export function createProductListVM(context: VMContext = {}): ProductListVM {
+  const t = productsListMessages(contextLocale(context));
+  const boundary = asyncBoundaryMessages(contextLocale(context));
+  const params = contextParams(context);
+  const products = createAsyncSignal<ProductList, []>(() => listProducts(context.headers, params));
+
+  return { t, boundary, products, load: () => products.run() };
+}
+
+/**
+ * Título e descrição da rota, para o `<head>`.
+ *
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
+export function productListMeta(context: VMContext = {}): PageMeta {
+  const t = productsListMessages(contextLocale(context));
+  return { title: t.title, description: t.subtitle };
 }

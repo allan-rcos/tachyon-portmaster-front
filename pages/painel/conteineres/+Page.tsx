@@ -1,18 +1,14 @@
-import { ContainerList } from '@view/containers/components/ContainerList';
-import { useData } from 'vike-solid/useData';
+import { ContainerListScreen } from '@view/containers/screens/ContainerListScreen';
+import { createContainerListVM } from '@viewmodel/containers/container-list-page.vm';
+import { ClientOnly } from 'vike-solid/ClientOnly';
+import { usePageContext } from 'vike-solid/usePageContext';
 
-import type { Data } from './+data';
-
-
-export default function ContainersPage() {
-  const data = useData<Data>();
+export default function Page() {
+  const pageContext = usePageContext();
+  const vm = createContainerListVM({ url: pageContext.urlOriginal });
   return (
-    <ContainerList
-      items={data.items}
-      total={data.total}
-      nextCursor={data.nextCursor}
-      filters={data.filters}
-      t={data.t}
-    />
+    <ClientOnly fallback={<div />}>
+      <ContainerListScreen vm={vm} />
+    </ClientOnly>
   );
 }

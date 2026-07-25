@@ -1,32 +1,41 @@
 // ============================================================
-//  Carregador da rota — resolve dados e texto para a página.
-//  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
+//  ViewModel da rota. Observável: a tela assina os sinais e reage.
+//  Roda no navegador (VMContext sem `headers`); passar os headers do request
+//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
 // ============================================================
-import type { Role } from '@model/roles';
-
+import type { RoleList } from './domain';
 import { rolesListMessages } from './i18n/role-list-page.messages';
 import type { RoleListText } from './i18n/text-contracts';
 import { listRoles } from './queries/list-roles.query';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
+import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
+import type { PageMeta } from '../core/page/page-request';
+import { contextLocale, contextParams, type VMContext } from '../core/page/vm-context';
 
-/** Dados que a rota entrega à View. */
-export interface RoleListPageData {
-  items: Role[];
-  total: number;
+/** Superfície observável da listagem de perfis. */
+export interface RoleListVM {
   t: RoleListText;
-  title: string;
-  description: string;
+  /** Texto da fronteira de carregamento (erro e nova tentativa). */
+  boundary: AsyncBoundaryText;
+  roles: AsyncSignal<RoleList, []>;
+  load: () => Promise<void>;
 }
 
 /**
- * Carrega os dados da rota.
+ * Cria o ViewModel da listagem de perfis.
  *
- * @param request Requisição de página, adaptada do roteador.
+ * @param context Contexto de execução — navegador quando omitido.
  */
-export async function loadRoleListPage(request: PageRequest): Promise<RoleListPageData> {
-  const headers = request.headers;
-  const t = rolesListMessages(resolveLocale(headers));
-  const res = await listRoles(headers);
-  return { items: res.data, total: res.total, t, title: t.title, description: t.subtitle };
+export function createRoleListVM(context: VMContext = {}): RoleListVM {
+  const t = rolesListMessages(contextLocale(context));
+  const boundary = asyncBoundaryMessages(contextLocale(context));
+  const params = contextParams(context);
+  const roles = createAsyncSignal<RoleList, []>(() => listRoles(context.headers, params));
+  return { t, boundary, roles, load: () => roles.run() };
+}
+
+/** Título e descrição da rota, para o `<head>`. */
+export function roleListMeta(context: VMContext = {}): PageMeta {
+  const t = rolesListMessages(contextLocale(context));
+  return { title: t.title, description: t.subtitle };
 }

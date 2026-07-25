@@ -1,34 +1,14 @@
-
-
-import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
-import { PageHeader } from '@view/core/components/PageHeader';
-import { FormSkeleton } from '@view/core/components/Skeleton';
-import { ProductForm } from '@view/products/islands/ProductForm.island';
+import { ProductEditScreen } from '@view/products/screens/ProductEditScreen';
+import { createProductEditVM } from '@viewmodel/products/product-edit-page.vm';
 import { ClientOnly } from 'vike-solid/ClientOnly';
-import { useData } from 'vike-solid/useData';
+import { usePageContext } from 'vike-solid/usePageContext';
 
-import type { Data } from './+data';
-
-export default function EditProductPage() {
-  const data = useData<Data>();
+export default function Page() {
+  const pageContext = usePageContext();
+  const vm = createProductEditVM({ url: pageContext.urlOriginal, routeParams: pageContext.routeParams });
   return (
-    <section>
-      <Breadcrumbs
-        items={[{ label: data.t.title, href: '/painel/produtos' }, { label: data.product.name }]}
-      />
-      <PageHeader title={`${data.t.edit} — ${data.product.name}`} />
-      <ClientOnly fallback={<FormSkeleton rows={3} />}>
-        <ProductForm
-          mode="edit"
-          productId={data.id}
-          defaultValues={{
-            name: data.product.name,
-            density: data.product.density,
-            risk_class: data.product.risk_class,
-          }}
-          t={data.t}
-        />
-      </ClientOnly>
-    </section>
+    <ClientOnly fallback={<div />}>
+      <ProductEditScreen vm={vm} />
+    </ClientOnly>
   );
 }

@@ -13,6 +13,16 @@ export default {
     permissions: {
       env: { server: true },
     },
+    // Meta da rota (<title>/<description>). Cada página declara em `+meta.ts`
+    // uma função `(context) => PageMeta` vinda do seu ViewModel — função, e não
+    // string, porque o texto depende do locale, que só se conhece no request.
+    //
+    // `env.client` também, porque as telas de /painel renderizam no navegador:
+    // sem +data, é este config que alimenta o <head>. É um import de verdade no
+    // bundle, não serialização — por isso uma função é aceitável aqui.
+    routeMeta: {
+      env: { server: true, client: true },
+    },
   },
   // Raiz redireciona para o painel operacional.
   redirects: {

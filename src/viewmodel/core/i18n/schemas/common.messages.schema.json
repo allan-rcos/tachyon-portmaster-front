@@ -22,6 +22,9 @@
     "common_next"
   ],
   "patternProperties": {
-    "^common_": { "type": "string", "minLength": 1 }
+    "^common_": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

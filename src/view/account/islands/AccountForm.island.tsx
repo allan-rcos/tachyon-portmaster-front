@@ -1,7 +1,6 @@
 import { createForm } from '@tanstack/solid-form';
-import { createMutation } from '@tanstack/solid-query';
 import { FormField } from '@view/core/components/FormField';
-import { IslandProvider } from '@view/core/islands/IslandProvider';
+import { bindMutation } from '@view/core/observable/bind-mutation';
 import { cn } from '@view/core/utils/ui';
 import { errText } from '@view/core/utils/ui';
 import type { AccountFormText } from '@viewmodel/account/i18n/text-contracts';
@@ -10,15 +9,13 @@ import {
   createAccountSchema,
   type AccountFormData,
 } from '@viewmodel/account/schemas/account.schema';
+import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import { type JSX } from 'solid-js';
 
 import styles from './AccountForm.island.module.scss';
 
 function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.Element {
-  const mutation = createMutation(() => ({
-    mutationFn: (value: AccountFormData) => updateAccountProfile(value),
-    onSuccess: () => window.location.reload(),
-  }));
+  const mutation = bindMutation(createMutationSignal((value: AccountFormData) => updateAccountProfile(value), { onSuccess: () => window.location.reload() }));
 
   const form = createForm(() => ({
     defaultValues: { name: props.name, email: props.email } as AccountFormData,
@@ -35,7 +32,7 @@ function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.
         void form.handleSubmit();
       }}
     >
-      <fieldset class={styles.fields} disabled={mutation.isPending}>
+      <fieldset class={styles.fields} disabled={mutation.isPending()}>
         <legend class="srOnly">{props.t.profile}</legend>
 
         <form.Field name="name">
@@ -76,14 +73,14 @@ function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.
         </form.Field>
       </fieldset>
 
-      <p class={styles.error} role="alert" hidden={!mutation.isError}>
+      <p class={styles.error} role="alert" hidden={!mutation.isError()}>
         {props.t.submitError}
       </p>
 
       <button
         type="submit"
-        class={cn(styles.submit, mutation.isPending && styles.loading)}
-        disabled={mutation.isPending}
+        class={cn(styles.submit, mutation.isPending() && styles.loading)}
+        disabled={mutation.isPending()}
       >
         {props.t.save}
       </button>
@@ -97,11 +94,7 @@ export function AccountForm(props: {
   email: string;
   t: AccountFormText;
 }): JSX.Element {
-  return (
-    <IslandProvider>
-      <Inner {...props} />
-    </IslandProvider>
-  );
+  return <Inner {...props} />;
 }
 
 export type { AccountFormText };

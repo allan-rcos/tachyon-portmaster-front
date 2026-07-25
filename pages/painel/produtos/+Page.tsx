@@ -1,10 +1,14 @@
-import { ProductList } from '@view/products/components/ProductList';
-import { useData } from 'vike-solid/useData';
+import { ProductListScreen } from '@view/products/screens/ProductListScreen';
+import { createProductListVM } from '@viewmodel/products/product-list-page.vm';
+import { ClientOnly } from 'vike-solid/ClientOnly';
+import { usePageContext } from 'vike-solid/usePageContext';
 
-import type { Data } from './+data';
-
-
-export default function ProductsPage() {
-  const data = useData<Data>();
-  return <ProductList items={data.items} total={data.total} t={data.t} />;
+export default function Page() {
+  const pageContext = usePageContext();
+  const vm = createProductListVM({ url: pageContext.urlOriginal });
+  return (
+    <ClientOnly fallback={<div />}>
+      <ProductListScreen vm={vm} />
+    </ClientOnly>
+  );
 }

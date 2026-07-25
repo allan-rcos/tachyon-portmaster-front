@@ -1,38 +1,52 @@
 // ============================================================
-//  Carregador da rota — resolve dados e texto para a página.
-//  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
+//  ViewModel da rota. Observável: a tela assina os sinais e reage.
+//  Roda no navegador (VMContext sem `headers`); passar os headers do request
+//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
 // ============================================================
-import type { Role } from '@model/roles';
-
-import { rolePermissionsMessages, type RolePermissionsText } from './i18n/role-permissions-page.messages';
+import type { Role } from './domain';
+import { rolePermissionsMessages } from './i18n/role-permissions-page.messages';
+import type { RolePermissionsText } from './i18n/role-permissions-page.messages';
 import { listRoles } from './queries/list-roles.query';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
-import { PageNotFoundError } from '../core/page/page-request';
+import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
+import { PageNotFoundError, type PageMeta } from '../core/page/page-request';
+import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';
 
-/** Dados que a rota entrega à View. */
-export interface RolePermissionsPageData {
-  id: string;
-  role: Role;
+/** Superfície observável da matriz de permissões de um perfil. */
+export interface RolePermissionsVM {
   t: RolePermissionsText;
-  title: string;
-  description: string;
+  /** Texto da fronteira de carregamento (erro e nova tentativa). */
+  boundary: AsyncBoundaryText;
+  /** Identificador opaco do perfil. */
+  id: string;
+  role: AsyncSignal<Role, []>;
+  load: () => Promise<void>;
 }
 
 /**
- * Carrega os dados da rota.
+ * Cria o ViewModel da tela de permissões de um perfil.
  *
- * @param request Requisição de página, adaptada do roteador.
+ * A API não expõe `GET /roles/{id}`, então o perfil é localizado na listagem —
+ * aceitável porque são poucos perfis. Se o id não existir, sinaliza com
+ * `PageNotFoundError`; traduzir isso para 404 é papel de quem compõe a rota.
+ *
+ * @param context Contexto de execução; precisa do parâmetro de rota `id`.
  */
-export async function loadRolePermissionsPage(request: PageRequest): Promise<RolePermissionsPageData> {
-  const id = request.routeParams.id;
-  const headers = request.headers;
-  const t = rolePermissionsMessages(resolveLocale(headers));
+export function createRolePermissionsVM(context: VMContext): RolePermissionsVM {
+  const t = rolePermissionsMessages(contextLocale(context));
+  const boundary = asyncBoundaryMessages(contextLocale(context));
+  const id = routeParam(context, 'id');
+  const role = createAsyncSignal<Role, []>(async () => {
+    const res = await listRoles(context.headers);
+    const found = res.data.find((candidate) => candidate.id === id);
+    if (!found) throw new PageNotFoundError(`Perfil inexistente: ${id}`);
+    return found;
+  });
+  return { t, boundary, id, role, load: () => role.run() };
+}
 
-  // Não há GET /roles/{id} — busca na listagem (poucos perfis).
-  const res = await listRoles(headers);
-  const role = res.data.find((r) => r.id === id);
-  if (!role) throw new PageNotFoundError();
-
-  return { id, role, t, title: `${t.syncPermissions} — ${role.name}`, description: t.subtitle };
+/** Título e descrição da rota, para o `<head>`. */
+export function rolePermissionsMeta(context: VMContext = {}): PageMeta {
+  const t = rolePermissionsMessages(contextLocale(context));
+  return { title: t.syncPermissions, description: t.subtitle };
 }
