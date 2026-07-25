@@ -1,17 +1,10 @@
+
+import { toPageRequest } from '@viewmodel/core/page/page-request';
+import { loadRoleCreatePage, type RoleCreatePageData } from '@viewmodel/roles/role-create-page.vm';
 import type { PageContextServer } from 'vike/types';
 
-import { roleNewMessages, type RoleNewText } from './messages';
+export type Data = RoleCreatePageData;
 
-import type { IncomingHeaders } from '@/features/core/api/client';
-import { resolveLocale } from '@/features/core/i18n/locale';
-
-export interface Data {
-  t: RoleNewText;
-  title: string;
-  description: string;
-}
-
-export async function data(pageContext: PageContextServer): Promise<Data> {
-  const t = roleNewMessages(resolveLocale(pageContext.headers as IncomingHeaders));
-  return { t, title: t.new, description: t.subtitle };
-}
+/** Casca do Vike: adapta o PageContext e delega ao ViewModel. */
+export const data = (pageContext: PageContextServer): Promise<Data> =>
+  loadRoleCreatePage(toPageRequest(pageContext));

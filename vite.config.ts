@@ -38,6 +38,12 @@ export default defineConfig({
       // origem (ex.: Bulma), muda só este alias — as importações `@use '@ds/…'`
       // nos módulos continuam iguais.
       '@ds': fileURLToPath(new URL('./packages/tachyon-design/scss', import.meta.url)),
+      // Um alias por camada do MVVM — ver tsconfig.json. Mantenha os três
+      // arquivos (tsconfig/vite/vitest) em sincronia.
+      '@model': fileURLToPath(new URL('./src/model', import.meta.url)),
+      '@viewmodel': fileURLToPath(new URL('./src/viewmodel', import.meta.url)),
+      '@view': fileURLToPath(new URL('./src/view', import.meta.url)),
+      '@testing': fileURLToPath(new URL('./src/testing', import.meta.url)),
       // A saída do Paraglide vive em `dist/`, mas o specifier continua sendo
       // `@/paraglide/*` — trocar o destino do build não toca em nenhum import.
       // Precisa vir antes de `@`, senão o alias mais genérico vence.

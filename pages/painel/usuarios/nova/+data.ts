@@ -1,26 +1,10 @@
+
+import { toPageRequest } from '@viewmodel/core/page/page-request';
+import { loadUserCreatePage, type UserCreatePageData } from '@viewmodel/users/user-create-page.vm';
 import type { PageContextServer } from 'vike/types';
 
-import { userNewMessages, type UserNewText } from './messages';
+export type Data = UserCreatePageData;
 
-import type { IncomingHeaders } from '@/features/core/api/client';
-import { resolveLocale } from '@/features/core/i18n/locale';
-import { listRoles } from '@/features/roles/loaders/listRoles';
-
-export interface Data {
-  t: UserNewText;
-  title: string;
-  description: string;
-  roles: { id: string; name: string }[];
-}
-
-export async function data(pageContext: PageContextServer): Promise<Data> {
-  const headers = pageContext.headers as IncomingHeaders;
-  const t = userNewMessages(resolveLocale(headers));
-  const roles = await listRoles(headers);
-  return {
-    t,
-    title: t.new,
-    description: t.subtitle,
-    roles: roles.data.map((r) => ({ id: r.id, name: r.name })),
-  };
-}
+/** Casca do Vike: adapta o PageContext e delega ao ViewModel. */
+export const data = (pageContext: PageContextServer): Promise<Data> =>
+  loadUserCreatePage(toPageRequest(pageContext));

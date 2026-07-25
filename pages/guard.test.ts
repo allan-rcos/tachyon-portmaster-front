@@ -1,16 +1,20 @@
-import type { AccountProfile } from 'tachyon-portmaster-sdk/account';
+import type { AccountProfile } from '@viewmodel/account/domain';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mocka só o loadAccount (fetch da sessão); mantém hasPermissions real para
 // exercitar a decisão de autorização de ponta a ponta.
-vi.mock('@/features/core/auth/session', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/core/auth/session')>();
+vi.mock('@viewmodel/core/session/session', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@viewmodel/core/session/session')>();
   return { ...actual, loadAccount: vi.fn() };
 });
 
+// Os imports abaixo ficam depois do `vi.mock` de propósito, para deixar visível
+// que ambos observam o módulo já mockado — daí o import/order desligado aqui.
+/* eslint-disable import/order */
 import { guard } from './+guard';
 
-import { loadAccount } from '@/features/core/auth/session';
+import { loadAccount } from '@viewmodel/core/session/session';
+/* eslint-enable import/order */
 
 const mockedLoadAccount = vi.mocked(loadAccount);
 

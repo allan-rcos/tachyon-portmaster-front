@@ -1,17 +1,10 @@
+
+import { toPageRequest } from '@viewmodel/core/page/page-request';
+import { loadProductCreatePage, type ProductCreatePageData } from '@viewmodel/products/product-create-page.vm';
 import type { PageContextServer } from 'vike/types';
 
-import { productNewMessages, type ProductNewText } from './messages';
+export type Data = ProductCreatePageData;
 
-import type { IncomingHeaders } from '@/features/core/api/client';
-import { resolveLocale } from '@/features/core/i18n/locale';
-
-export interface Data {
-  t: ProductNewText;
-  title: string;
-  description: string;
-}
-
-export async function data(pageContext: PageContextServer): Promise<Data> {
-  const t = productNewMessages(resolveLocale(pageContext.headers as IncomingHeaders));
-  return { t, title: t.new, description: t.subtitle };
-}
+/** Casca do Vike: adapta o PageContext e delega ao ViewModel. */
+export const data = (pageContext: PageContextServer): Promise<Data> =>
+  loadProductCreatePage(toPageRequest(pageContext));

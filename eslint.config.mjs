@@ -84,13 +84,104 @@ export default tseslint.config(
               message: 'txiki não suporta protocolo node:. Use Web Standards.',
             },
             {
-              group: ['@/services', '@/services/*'],
+              group: ['@/features', '@/features/*'],
               message:
-                'services/ foi dissolvido: comunicação com a API vive no SDK (tachyon-portmaster-sdk/*) e o client em @/features/core/api/client.',
+                'features/ foi dissolvido no MVVM: interface em @view/*, lógica em @viewmodel/*, dados em @model/*.',
             },
             {
-              group: ['@/shared', '@/shared/*'],
-              message: 'shared/ foi movido para features/core. Use @/features/core/*.',
+              group: ['@/services', '@/services/*', '@/shared', '@/shared/*'],
+              message: 'Diretório extinto. Use @model/*, @viewmodel/* ou @view/*.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // ============================================================
+  //  Regra de dependência do MVVM:  pages → view → viewmodel → model
+  //
+  //  Cada camada só enxerga a de baixo. Isso é o que sustenta as promessas da
+  //  arquitetura: o Model roda sem DOM, o ViewModel é testável sem renderizar,
+  //  e mover uma tela entre servidor e cliente não atravessa camadas.
+  //  Documentar não basta — aqui a regra falha o build.
+  // ============================================================
+  {
+    files: ['src/model/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@viewmodel/*', '@view/*', '@/paraglide/*', 'vike', 'vike/*', 'vike-*'],
+              message:
+                'O Model é a camada mais baixa: dados puros, sem framework, sem i18n, sem UI.',
+            },
+            {
+              group: ['solid-js', 'solid-js/*', '@tanstack/*'],
+              message: 'O Model não conhece a biblioteca de interface.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/viewmodel/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@view/*'],
+              message:
+                'O ViewModel não enxerga a View. Se precisa de um tipo declarado lá (ex.: contrato de texto), mova a declaração para @viewmodel/<feature>/i18n/text-contracts.',
+            },
+            {
+              group: ['solid-js', 'solid-js/*', 'vike-solid', 'vike-solid/*', '@tanstack/solid-*'],
+              message:
+                'O ViewModel é agnóstico de framework de interface — é o que o mantém testável sem DOM.',
+            },
+            {
+              group: ['vike', 'vike/*'],
+              message:
+                'O ViewModel não conhece o Vike. Receba `PageRequest` (@viewmodel/core/page/page-request) e deixe a adaptação para a casca em pages/.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/view/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@model/*'],
+              message:
+                'A View não fala com a camada de dados. Use os tipos de @viewmodel/<feature>/domain e as queries/mutations do ViewModel.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['pages/**/*.{ts,tsx,js}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@model/*'],
+              message:
+                'pages/ é composition root do Vike: compõe View e ViewModel, nunca acessa dados direto.',
             },
           ],
         },

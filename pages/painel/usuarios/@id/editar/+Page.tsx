@@ -1,13 +1,14 @@
+
+
+import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
+import { PageHeader } from '@view/core/components/PageHeader';
+import { FormSkeleton } from '@view/core/components/Skeleton';
+import { UserAdminActions } from '@view/users/islands/UserAdminActions.island';
+import { UserForm } from '@view/users/islands/UserForm.island';
 import { ClientOnly } from 'vike-solid/ClientOnly';
 import { useData } from 'vike-solid/useData';
 
 import type { Data } from './+data';
-
-import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
-import { PageHeader } from '@/features/core/components/PageHeader';
-import { FormSkeleton } from '@/features/core/components/Skeleton';
-import { UserAdminActions } from '@/features/users/islands/UserAdminActions.island';
-import { UserForm } from '@/features/users/islands/UserForm.island';
 
 export default function EditUserPage() {
   const data = useData<Data>();

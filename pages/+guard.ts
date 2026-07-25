@@ -1,8 +1,8 @@
-import type { Permission } from 'tachyon-portmaster-sdk/common';
+import type { Permission } from '@viewmodel/core/domain';
+import { toPageRequest } from '@viewmodel/core/page/page-request';
+import { hasPermissions, loadAccount } from '@viewmodel/core/session/session';
 import { redirect, render } from 'vike/abort';
 import type { GuardAsync } from 'vike/types';
-
-import { hasPermissions, loadAccount } from '@/features/core/auth/session';
 
 // Rotas públicas (sem auth). Todo o resto exige sessão.
 const PUBLIC = ['/entrar'];
@@ -19,13 +19,16 @@ function isPublic(path: string): boolean {
  *
  *   • cookie inválido/ausente (401) → redirect ao login (fluxo preservado);
  *   • falta de permissão            → render(403) Forbidden (página _error).
+ *
+ * A decisão de autorização em si vive no ViewModel (`hasPermissions`); aqui só
+ * traduzimos o resultado para as abortagens do Vike.
  */
 export const guard: GuardAsync = async (pageContext) => {
   if (isPublic(pageContext.urlPathname)) return;
 
   let account;
   try {
-    account = await loadAccount(pageContext);
+    account = await loadAccount(toPageRequest(pageContext));
   } catch {
     throw redirect(`/entrar?redirect=${encodeURIComponent(pageContext.urlPathname)}`);
   }

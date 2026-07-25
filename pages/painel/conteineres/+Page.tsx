@@ -1,8 +1,8 @@
+import { ContainerList } from '@view/containers/components/ContainerList';
 import { useData } from 'vike-solid/useData';
 
 import type { Data } from './+data';
 
-import { ContainerList } from '@/features/containers/components/ContainerList';
 
 export default function ContainersPage() {
   const data = useData<Data>();

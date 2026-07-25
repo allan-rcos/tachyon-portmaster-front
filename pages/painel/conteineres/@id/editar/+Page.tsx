@@ -1,12 +1,13 @@
+
+
+import { ContainerForm } from '@view/containers/islands/ContainerForm.island';
+import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
+import { PageHeader } from '@view/core/components/PageHeader';
+import { FormSkeleton } from '@view/core/components/Skeleton';
 import { ClientOnly } from 'vike-solid/ClientOnly';
 import { useData } from 'vike-solid/useData';
 
 import type { Data } from './+data';
-
-import { ContainerForm } from '@/features/containers/islands/ContainerForm.island';
-import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
-import { PageHeader } from '@/features/core/components/PageHeader';
-import { FormSkeleton } from '@/features/core/components/Skeleton';
 
 export default function EditContainerPage() {
   const data = useData<Data>();

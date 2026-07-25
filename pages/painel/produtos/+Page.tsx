@@ -1,8 +1,8 @@
+import { ProductList } from '@view/products/components/ProductList';
 import { useData } from 'vike-solid/useData';
 
 import type { Data } from './+data';
 
-import { ProductList } from '@/features/products/components/ProductList';
 
 export default function ProductsPage() {
   const data = useData<Data>();

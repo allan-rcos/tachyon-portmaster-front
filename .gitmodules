@@ -1,5 +1,5 @@
 [submodule "swagger"]
-	path = swagger
+	path = src/model/contract/swagger
 	url = git@github.com:allan-rcos/tachyon-swagger.git
 	branch = flatbuffers-openapi
 [submodule "packages/vike-txiki-adapter"]

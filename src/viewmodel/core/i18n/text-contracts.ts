@@ -1,0 +1,16 @@
+// ============================================================
+//  Contratos de texto transversais (chrome autenticado).
+//  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
+//  morar no ViewModel.
+// ============================================================
+
+/** Texto do chrome autenticado — navegação lateral e ação de sair. */
+export interface ShellNavText {
+  painel: string;
+  conteineres: string;
+  produtos: string;
+  usuarios: string;
+  perfis: string;
+  conta: string;
+  logout: string;
+}

@@ -6,8 +6,8 @@
 //  Infra de teste — não faz parte do bundle do app.
 // ============================================================
 
-import type { Paged, Permission, RiskClass } from 'tachyon-portmaster-sdk/common';
-import type { Container } from 'tachyon-portmaster-sdk/containers';
+import type { Paged, Permission, RiskClass } from '@model/common';
+import type { Container } from '@model/containers';
 
 import { db, nextId, recalcWeight, type SeedContainer, type SeedUser } from './db';
 import { MockApiError } from './error';

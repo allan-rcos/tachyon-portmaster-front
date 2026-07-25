@@ -1,8 +1,8 @@
+import { UserList } from '@view/users/components/UserList';
 import { useData } from 'vike-solid/useData';
 
 import type { Data } from './+data';
 
-import { UserList } from '@/features/users/components/UserList';
 
 export default function UsersPage() {
   const data = useData<Data>();

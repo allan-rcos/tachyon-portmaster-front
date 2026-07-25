@@ -1,13 +1,13 @@
+import type { ShellNavText } from '@view/core/components/Sidebar';
+import { AppShell } from '@view/core/layouts/AppShell';
+import type { IncomingHeaders } from '@viewmodel/core/client/api-client';
+import { commonText, navText } from '@viewmodel/core/i18n/common';
+import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import type { JSX } from 'solid-js';
 import { Show } from 'solid-js';
 import { usePageContext } from 'vike-solid/usePageContext';
 
-import type { IncomingHeaders } from '@/features/core/api/client';
-import { AppShell } from '@/features/core/components/AppShell';
-import type { ShellNavText } from '@/features/core/components/Sidebar';
-import { commonText, navText } from '@/features/core/i18n/common';
-import { resolveLocale } from '@/features/core/i18n/locale';
-import '@/pages/global.scss';
+import '@view/core/styles/global.scss';
 
 // Rotas públicas não recebem o chrome autenticado (sidebar/topo).
 const PUBLIC = ['/entrar'];

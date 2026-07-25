@@ -1,12 +1,13 @@
+
+
+import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
+import { PageHeader } from '@view/core/components/PageHeader';
+import { FormSkeleton } from '@view/core/components/Skeleton';
+import { ProductForm } from '@view/products/islands/ProductForm.island';
 import { ClientOnly } from 'vike-solid/ClientOnly';
 import { useData } from 'vike-solid/useData';
 
 import type { Data } from './+data';
-
-import { Breadcrumbs } from '@/features/core/components/Breadcrumbs';
-import { PageHeader } from '@/features/core/components/PageHeader';
-import { FormSkeleton } from '@/features/core/components/Skeleton';
-import { ProductForm } from '@/features/products/islands/ProductForm.island';
 
 export default function EditProductPage() {
   const data = useData<Data>();

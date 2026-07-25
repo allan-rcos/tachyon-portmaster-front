@@ -10,11 +10,17 @@
     "allowJs": true,
     "types": ["bun"],
 
-    // Path alias — @/ aponta para a raiz do projeto. `@/paraglide/*` é um caso
-    // especial: a saída do compilador i18n é build, então mora em `dist/`, mas
-    // o specifier permanece estável. Precisa vir ANTES de `@/*` (mais específico).
+    // Um alias por camada do MVVM: o import declara a camada de destino, então
+    // toda violação da regra de dependência (pages → view → viewmodel → model)
+    // fica visível no próprio specifier — e é barrada pelo eslint.
+    // `@/paraglide/*` é caso à parte: saída de compilador, mora em `dist/`.
+    // Os específicos precisam vir ANTES de `@/*`.
     "baseUrl": ".",
     "paths": {
+      "@model/*": ["./src/model/*"],
+      "@viewmodel/*": ["./src/viewmodel/*"],
+      "@view/*": ["./src/view/*"],
+      "@testing/*": ["./src/testing/*"],
       "@/paraglide/*": ["./dist/paraglide/*"],
       "@/*": ["./*"]
     },
@@ -41,5 +47,8 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "exclude": ["packages", "dist", "node_modules"]
+  // `src/model` deixou de ser um package pré-compilado e passa a ser typechecado
+  // junto do app — é o ganho de dissolver o SDK. Só o submodule de contrato
+  // (JSON/fbs, sem TS) e os packages externos ficam de fora.
+  "exclude": ["packages", "dist", "node_modules", "src/model/contract"]
 }

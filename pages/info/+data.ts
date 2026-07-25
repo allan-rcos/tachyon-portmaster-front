@@ -1,51 +1,8 @@
+import { loadSystemInfoPage, type SystemInfoPageData } from '@viewmodel/system/system-info-page.vm';
 import type { PageContextServer } from 'vike/types';
 
-export interface SystemInfo {
-  name: string;
-  version: string;
-  environment: string;
-  runtime: string;
-  memory_usage_mb: number;
-}
 
-export interface DataProps {
-  frontend: SystemInfo;
-  title: string;
-  description: string;
-}
+export type DataProps = SystemInfoPageData;
 
-export async function data(_pageContext: PageContextServer): Promise<DataProps> {
-  // No futuro, estes dados de infraestrutura e do backend
-  // virão de chamadas HTTP aqui.
-
-  // Detecção do runtime WinterTC que está servindo o SSR.
-  // `globalThis.tjs` só existe no txiki.js; `Bun` só no Bun; etc.
-  const g = globalThis as { tjs?: { version: string }; Bun?: { version: string } };
-  const tjs = g.tjs;
-  const bun = g.Bun;
-  const runtime = tjs
-    ? `txiki.js v${tjs.version}`
-    : typeof process !== 'undefined' && process.versions?.llrt
-      ? 'LLRT'
-      : bun
-        ? `Bun v${bun.version}`
-        : 'Node';
-
-  // Uso de memória residente (Web Standard/edge-compatível, com fallbacks).
-  const memoryUsage =
-    typeof process !== 'undefined' && process.memoryUsage
-      ? Math.round(process.memoryUsage().rss / 1024 / 1024)
-      : 12; // Fallback aproximado para runtimes isolados (~10MB)
-
-  return {
-    frontend: {
-      name: 'Tachyon PortMaster',
-      version: '0.1.0',
-      environment: import.meta.env.PROD ? 'production' : 'development',
-      runtime,
-      memory_usage_mb: memoryUsage,
-    },
-    title: 'Informações do sistema',
-    description: 'Diagnóstico de runtime e telemetria de infraestrutura ativa.',
-  };
-}
+/** Casca do Vike: delega ao ViewModel (esta rota não usa o PageContext). */
+export const data = (_pageContext: PageContextServer): DataProps => loadSystemInfoPage();
