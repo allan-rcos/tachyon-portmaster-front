@@ -1,0 +1,19 @@
+{
+  "name": "tachyon-portmaster-i18n",
+  "version": "0.1.0",
+  "description": "Fonte do i18n do PortMaster: catálogos por locale, projeto inlang/Paraglide e o validador de contrato bilateral (JSON Schema ↔ resolvers).",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "keywords": ["portmaster", "i18n", "inlang", "paraglide"],
+  "bin": {
+    "portmaster-i18n-check": "bin/i18n-check.mjs"
+  },
+  "files": ["bin", "messages", "project.inlang"],
+  "scripts": {
+    "check": "node bin/i18n-check.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1"
+  }
+}

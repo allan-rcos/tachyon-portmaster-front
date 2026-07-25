@@ -7,10 +7,9 @@ dist
 *.tgz
 
 # gerado por comando (codegen) — regenerável no build
-# (o flatc do SDK gera packages/tachyon-portmaster-sdk/src/fbs-gen — COMMITADO)
-# Paraglide: saída do compilador i18n (funções `m.*` tree-shakeable).
-# Também traz seu próprio .gitignore, mas explicitamos aqui.
-paraglide/
+# (o flatc do SDK gera src/fbs-gen — COMMITADO)
+# A saída do Paraglide (funções `m.*` tree-shakeable) vive em dist/paraglide,
+# já coberta por `dist` acima — por ser build, e não fonte.
 
 # code coverage
 coverage
@@ -39,6 +38,7 @@ tmp/*
 
 # IntelliJ based IDEs
 .idea
+*.iml
 
 # Finder (MacOS) folder config
 .DS_Store

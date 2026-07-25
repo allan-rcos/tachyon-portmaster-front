@@ -13,20 +13,36 @@
 //
 //   Órfãs (chave em pt-BR.json exigida por nenhum schema) = WARNING.
 //
-//  Uso: `bun run i18n:check`. Sai != 0 em qualquer FATAL (dados OU resolver).
+//  Uso: `bun run i18n:check` (da raiz do repositório). Aceita as raízes a varrer
+//  como argumentos posicionais — o default cobre `pages/`, `src/` e `features/`,
+//  ignorando as que não existirem. Sai != 0 em qualquer FATAL (dados OU resolver).
 // ============================================================
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import AjvModule from 'ajv/dist/2020.js';
 
 const Ajv2020 = AjvModule.default || AjvModule;
 
-const root = process.cwd();
-const locales = ['pt-BR', 'en', 'es'];
-const base = 'pt-BR';
+// Este script vive em <repo>/packages/tachyon-portmaster-i18n/bin/, então o
+// pacote e a raiz do repositório saem do próprio caminho do módulo — rodar de
+// qualquer cwd funciona.
+const pkgDir = join(fileURLToPath(new URL('.', import.meta.url)), '..');
+const root = join(pkgDir, '..', '..');
 
-// Fragmentos compartilhados (features/core/i18n/schemas) ↔ resolvers de common.ts.
+// Locales vêm do project.inlang (fonte única) em vez de duplicados aqui.
+const settings = JSON.parse(readFileSync(join(pkgDir, 'project.inlang', 'settings.json'), 'utf8'));
+const locales = settings.locales;
+const base = settings.baseLocale;
+
+// Raízes a varrer: argv ou default. Diretórios inexistentes são ignorados, o que
+// mantém o script válido antes e depois da migração features/ → src/.
+const SOURCE_ROOTS = (process.argv.slice(2).length ? process.argv.slice(2) : ['pages', 'src', 'features'])
+  .map((r) => join(root, r))
+  .filter((dir) => existsSync(dir));
+
+// Fragmentos compartilhados (core/i18n/schemas) ↔ resolvers de common.ts.
 const FRAGMENT_RESOLVER = { common: 'commonText', val: 'valText', nav: 'navText' };
 
 // ---------------------------------------------------------------- coleta de arquivos
@@ -35,8 +51,7 @@ const resolverFiles = [];
 
 function walk(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === 'node_modules' || entry.name === 'paraglide' || entry.name === 'dist')
-      continue;
+    if (entry.name === 'node_modules' || entry.name === 'dist') continue;
     const full = join(dir, entry.name);
     if (entry.isDirectory()) walk(full);
     else if (entry.name.endsWith('.messages.schema.json')) schemaFiles.push(full);
@@ -44,9 +59,18 @@ function walk(dir) {
       resolverFiles.push(full);
   }
 }
-for (const r of ['pages', 'features']) walk(join(root, r));
-// common.ts hospeda os resolvers-base (commonText/valText/navText).
-resolverFiles.push(join(root, 'features', 'core', 'i18n', 'common.ts'));
+for (const dir of SOURCE_ROOTS) walk(dir);
+
+// `common.ts` hospeda os resolvers-base (commonText/valText/navText) e não casa
+// com o padrão `*.messages.ts` do walk, então entra por caminho explícito.
+for (const dir of SOURCE_ROOTS) {
+  for (const candidate of [
+    join(dir, 'viewmodel', 'core', 'i18n', 'common.ts'),
+    join(dir, 'core', 'i18n', 'common.ts'),
+  ]) {
+    if (existsSync(candidate)) resolverFiles.push(candidate);
+  }
+}
 
 // ---------------------------------------------------------------- parse dos resolvers
 // nome-do-resolver → { direct: Set<chave>, spreads: Set<nome>, file }
@@ -119,7 +143,7 @@ function schemaKeys(id) {
 
 // ---------------------------------------------------------------- catálogos
 function loadCatalog(locale) {
-  const json = JSON.parse(readFileSync(join(root, 'messages', `${locale}.json`), 'utf8'));
+  const json = JSON.parse(readFileSync(join(pkgDir, 'messages', `${locale}.json`), 'utf8'));
   delete json['$schema'];
   return json;
 }

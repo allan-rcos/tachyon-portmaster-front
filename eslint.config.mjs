@@ -9,13 +9,17 @@ export default tseslint.config(
     ignores: [
       'dist/**',
       'out/**',
-      'packages/**',
+      // Submodules e código de terceiros têm lint próprio no repositório de
+      // origem. `packages/tachyon-portmaster-i18n` é NOSSO — fica lintável.
+      'packages/tachyon-design/**',
+      'packages/vike-txiki-adapter/**',
+      'packages/tachyon-portmaster-sdk/**',
       'node_modules/**',
       '.claude/**',
-      'prototype/**',
+      'docs/prototype/**',
       'swagger/**',
-      // Saída do compilador Paraglide (funções `m.*` geradas) — não lintar.
-      'paraglide/**',
+      // A saída do compilador Paraglide agora vive em `dist/paraglide`, já
+      // coberta por `dist/**` acima.
     ],
   },
 
@@ -94,9 +98,14 @@ export default tseslint.config(
     },
   },
 
-  // Config e scripts (Vite/Vitest/tools) rodam em Node — liberam os built-ins.
+  // Config e scripts (Vite/Vitest/i18n) rodam em Node — liberam os built-ins.
   {
-    files: ['*.{js,mjs,cjs,ts}', 'vite.config.ts', 'vitest.config.ts', 'tools/**/*.mjs'],
+    files: [
+      '*.{js,mjs,cjs,ts}',
+      'vite.config.ts',
+      'vitest.config.ts',
+      'packages/tachyon-portmaster-i18n/bin/**/*.mjs',
+    ],
     rules: {
       'no-restricted-imports': 'off',
     },

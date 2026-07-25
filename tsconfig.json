@@ -10,9 +10,12 @@
     "allowJs": true,
     "types": ["bun"],
 
-    // Path alias — @/ aponta para a raiz do projeto
+    // Path alias — @/ aponta para a raiz do projeto. `@/paraglide/*` é um caso
+    // especial: a saída do compilador i18n é build, então mora em `dist/`, mas
+    // o specifier permanece estável. Precisa vir ANTES de `@/*` (mais específico).
     "baseUrl": ".",
     "paths": {
+      "@/paraglide/*": ["./dist/paraglide/*"],
       "@/*": ["./*"]
     },
 

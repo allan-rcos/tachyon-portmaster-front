@@ -13,14 +13,15 @@ export default defineConfig({
   // `txiki()` engata no `vite build` e gera `dist/txiki/server.mjs` ao final —
   // um único build já produz o servidor pronto para o `tjs`.
   //
-  // `paraglideVitePlugin` compila `messages/{locale}.json` (via `project.inlang`)
-  // para funções `m.*()` tree-shakeable em `paraglide/` (auto-gitignorado). O
-  // locale é sempre passado explicitamente (`m.foo({}, { locale })`) no `+data`,
-  // então `strategy` é só fallback — nada de estado global/AsyncLocalStorage.
+  // `paraglideVitePlugin` compila os catálogos de `packages/tachyon-portmaster-i18n`
+  // para funções `m.*()` tree-shakeable em `dist/paraglide/`. A saída é build,
+  // então mora no `dist` (já gitignorado) e é alcançada pelo alias `@/paraglide`.
+  // O locale é sempre passado explicitamente (`m.foo({}, { locale })`), então
+  // `strategy` é só fallback — nada de estado global/AsyncLocalStorage.
   plugins: [
     paraglideVitePlugin({
-      project: './project.inlang',
-      outdir: './paraglide',
+      project: './packages/tachyon-portmaster-i18n/project.inlang',
+      outdir: './dist/paraglide',
       strategy: ['baseLocale'],
       emitTsDeclarations: true,
       // `isServer` sem `import.meta.env` (bare) — o bundle do txiki (rolldown)
@@ -37,6 +38,10 @@ export default defineConfig({
       // origem (ex.: Bulma), muda só este alias — as importações `@use '@ds/…'`
       // nos módulos continuam iguais.
       '@ds': fileURLToPath(new URL('./packages/tachyon-design/scss', import.meta.url)),
+      // A saída do Paraglide vive em `dist/`, mas o specifier continua sendo
+      // `@/paraglide/*` — trocar o destino do build não toca em nenhum import.
+      // Precisa vir antes de `@`, senão o alias mais genérico vence.
+      '@/paraglide': fileURLToPath(new URL('./dist/paraglide', import.meta.url)),
       '@': fileURLToPath(new URL('.', import.meta.url)),
     },
   },

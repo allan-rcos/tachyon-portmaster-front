@@ -1,6 +1,12 @@
 dist/
 out/
-packages/
 node_modules/
 coverage/
-paraglide/
+
+# Submodules e código de terceiros — formatação é do repositório de origem.
+packages/tachyon-design/
+packages/vike-txiki-adapter/
+packages/tachyon-portmaster-sdk/
+
+# Protótipo estático importado (HTML/CSS gerados fora do projeto).
+docs/prototype/

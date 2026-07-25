@@ -8,12 +8,12 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   // `hot: false` desliga a injeção do solid-refresh (HMR), que quebra o
   // transform em ambiente de teste (id virtual `/@solid-refresh`).
-  // `paraglideVitePlugin` gera `paraglide/` também nos testes, então os
+  // `paraglideVitePlugin` gera `dist/paraglide/` também nos testes, então os
   // resolvers de rota (que chamam `m.*`) funcionam sob o Vitest.
   plugins: [
     paraglideVitePlugin({
-      project: './project.inlang',
-      outdir: './paraglide',
+      project: './packages/tachyon-portmaster-i18n/project.inlang',
+      outdir: './dist/paraglide',
       strategy: ['baseLocale'],
       emitTsDeclarations: true,
       isServer: "typeof window === 'undefined'",
@@ -26,6 +26,8 @@ export default defineConfig({
       // Fonte única do design system — ver vite.config.ts. Trocar aqui e no
       // vite.config muda a origem dos estilos (ex.: Bulma) sem tocar módulos.
       '@ds': fileURLToPath(new URL('./packages/tachyon-design/scss', import.meta.url)),
+      // Ver vite.config.ts: precisa vir antes de `@`.
+      '@/paraglide': fileURLToPath(new URL('./dist/paraglide', import.meta.url)),
       '@': fileURLToPath(new URL('.', import.meta.url)),
     },
   },
