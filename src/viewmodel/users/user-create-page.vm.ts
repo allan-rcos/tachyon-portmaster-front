@@ -42,7 +42,10 @@ export function createUserCreateVM(context: VMContext = {}): UserCreateVM {
   return { t, boundary, roles, load: () => roles.run() };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function userCreateMeta(context: VMContext = {}): PageMeta {
   const t = userNewMessages(contextLocale(context));
   return { title: t.new, description: t.subtitle };

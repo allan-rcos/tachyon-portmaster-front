@@ -23,7 +23,7 @@ export interface ScreenBinding<T> {
  * SSR o componente é avaliado, mas nunca montado — é o que mantém o servidor
  * sem trabalho de dados nestas rotas.
  *
- * @typeParam T Tipo do dado carregado.
+ * @template T Tipo do dado carregado.
  * @param resource Recurso observável exposto pelo ViewModel.
  * @param load     Ação que dispara a carga.
  */

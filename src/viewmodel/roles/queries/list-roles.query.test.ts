@@ -26,7 +26,8 @@ describe('listRoles', () => {
 
   it('devolve os perfis com contagem de usuários e permissões', async () => {
     const res = await listRoles(HEADERS);
-    expect(res.data[0]).toHaveProperty('user_count');
-    expect(res.data[0].permissions.length).toBeGreaterThan(0);
+    const [first] = res.data;
+    expect(first).toHaveProperty('user_count');
+    expect(first?.permissions.length).toBeGreaterThan(0);
   });
 });

@@ -12,6 +12,7 @@ import { ofetch, type $Fetch } from 'ofetch';
 /** Formato de serialização no fio. */
 export type WireFormat = 'json' | 'fbs';
 
+/** Cliente HTTP configurado: instância de fetch mais o formato de wire ativo. */
 export interface ApiClient {
   /** Instância ofetch configurada (baseURL/headers/credenciais). */
   fetch: $Fetch;
@@ -19,6 +20,7 @@ export interface ApiClient {
   wire: WireFormat;
 }
 
+/** Configuração de um cliente — tudo o que o Model não descobre sozinho. */
 export interface CreateClientConfig {
   /** Base das chamadas: `/api` (browser) ou loopback do Rust (server). */
   baseURL: string;
@@ -32,6 +34,11 @@ export interface CreateClientConfig {
   onSetCookie?: (cookies: string[]) => void;
 }
 
+/**
+ * Monta um cliente HTTP com baseURL, cabeçalhos e credenciais dados.
+ *
+ * @param config Origem, formato de wire e política de cookies.
+ */
 export function createClient(config: CreateClientConfig): ApiClient {
   const fetch = ofetch.create({
     baseURL: config.baseURL,

@@ -6,6 +6,14 @@ export interface LoadItemSchemaText {
   quantityPositive: string;
 }
 
+/**
+ * Schema de carga/descarga de item no manifesto.
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createLoadItemSchema(t?: LoadItemSchemaText) {
   return z.object({
     product_id: z.string().min(1, t?.productRequired ?? 'Selecione um produto'),

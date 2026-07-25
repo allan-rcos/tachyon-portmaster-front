@@ -15,7 +15,7 @@ import { createSignal, onCleanup, type Accessor } from 'solid-js';
  * O efeito é descartado junto do componente (`onCleanup`), então não há
  * assinatura vazada quando a tela é desmontada.
  *
- * @typeParam T Tipo do valor observado.
+ * @template T Tipo do valor observado.
  * @param source Getter vindo do ViewModel.
  * @returns Accessor do Solid com o mesmo valor, reativo às mudanças.
  *

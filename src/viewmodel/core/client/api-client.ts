@@ -25,6 +25,15 @@ export const browserClient: ApiClient = createClient({
 
 export type IncomingHeaders = Headers | Record<string, string | string[] | undefined> | undefined;
 
+/**
+ * Lê um cabeçalho independentemente do formato em que ele chega.
+ *
+ * O SSR entrega ora um `Headers`, ora um objeto simples cujo valor pode ser
+ * array; esta função normaliza os dois casos.
+ *
+ * @param headers Cabeçalhos do request.
+ * @param name    Nome do cabeçalho, sem diferenciar maiúsculas.
+ */
 export function readHeader(headers: IncomingHeaders, name: string): string | undefined {
   if (!headers) return undefined;
   if (headers instanceof Headers) return headers.get(name) ?? undefined;
@@ -33,6 +42,8 @@ export function readHeader(headers: IncomingHeaders, name: string): string | und
 }
 
 /** Client server-side para um request. Encaminha o Cookie ao Rust e,
+ * @param headers Cabeçalhos do request no SSR; omitir no navegador.
+ * @param onSetCookie Recebe os `Set-Cookie` da resposta, para relay no SSR.
  *  se `onSetCookie` for dado, captura o Set-Cookie para relay no SSR. */
 export function serverClient(
   headers?: IncomingHeaders,

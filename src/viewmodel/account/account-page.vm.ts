@@ -33,7 +33,10 @@ export function createAccountPageVM(context: VMContext = {}): AccountPageVM {
   return { t, boundary, profile, load: () => profile.run() };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function accountPageMeta(context: VMContext = {}): PageMeta {
   const t = accountMessages(contextLocale(context));
   return { title: t.title, description: t.subtitle };

@@ -8,6 +8,14 @@ export interface ContainerSchemaText {
   capacityPositive: string;
 }
 
+/**
+ * Schema do registro de contêiner (código e capacidade).
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createContainerCreateSchema(t?: ContainerSchemaText) {
   return z.object({
     code: z
@@ -22,6 +30,14 @@ export function createContainerCreateSchema(t?: ContainerSchemaText) {
   });
 }
 
+/**
+ * Schema da edição de contêiner — só a capacidade é editável.
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createContainerUpdateSchema(t?: Pick<ContainerSchemaText, 'capacityPositive'>) {
   return z.object({
     max_capacity: z.coerce

@@ -33,7 +33,10 @@ export function createDashboardVM(context: VMContext = {}): DashboardVM {
   return { t, boundary, metrics, load: () => metrics.run() };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function dashboardMeta(context: VMContext = {}): PageMeta {
   const t = painelMessages(contextLocale(context));
   return { title: t.title, description: t.subtitle };

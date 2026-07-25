@@ -36,7 +36,10 @@ export function createProductEditVM(context: VMContext): ProductEditVM {
   return { t, boundary, id, product, load: () => product.run() };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function productEditMeta(context: VMContext = {}): PageMeta {
   const t = productEditMessages(contextLocale(context));
   return { title: t.edit, description: t.subtitle };

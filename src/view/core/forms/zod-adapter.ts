@@ -22,9 +22,9 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 /**
  * Adapta um schema Zod ao slot de validador do TanStack Form.
  *
- * @typeParam TValues Formato dos valores do formulário que o schema valida.
- * @typeParam TInput  Entrada do schema — inferida do argumento.
- * @typeParam TOutput Saída do schema — inferida do argumento.
+ * @template TValues Formato dos valores do formulário que o schema valida.
+ * @template TInput  Entrada do schema — inferida do argumento.
+ * @template TOutput Saída do schema — inferida do argumento.
  * @param schema Schema Zod vindo do ViewModel (já resolvido com o texto i18n).
  * @returns O mesmo schema, tipado como validador de `TValues`.
  *

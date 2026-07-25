@@ -28,7 +28,7 @@ export interface AsyncBoundaryProps<T> {
  * carregando, erro (com nova tentativa) e sucesso — para que os componentes de
  * apresentação permaneçam puros, recebendo só o dado pronto.
  *
- * @typeParam T Tipo do dado carregado.
+ * @template T Tipo do dado carregado.
  */
 export function AsyncBoundary<T>(props: AsyncBoundaryProps<T>): JSX.Element {
   return (

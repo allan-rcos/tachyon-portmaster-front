@@ -58,7 +58,10 @@ export function createContainerDetailVM(context: VMContext): ContainerDetailVM {
   return { t, boundary, id, data, load: () => data.run() };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function containerDetailMeta(context: VMContext = {}): PageMeta {
   const t = containerDetailMessages(contextLocale(context));
   return { title: t.title, description: t.summary };

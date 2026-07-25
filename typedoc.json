@@ -1,0 +1,33 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+
+  // Um entry point por camada do MVVM: o índice gerado espelha a arquitetura,
+  // então navegar a documentação é navegar as camadas.
+  "entryPoints": ["src/model", "src/viewmodel", "src/view"],
+  "entryPointStrategy": "expand",
+
+  "out": "docs/api",
+  "name": "Tachyon PortMaster",
+  "readme": "docs/architecture/mvvm.md",
+
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    // Saída do flatc: 40 arquivos de serialização que ninguém lê à mão.
+    "src/model/generated/**",
+    "src/model/contract/**"
+  ],
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+
+  "categorizeByGroup": true,
+  "navigationLinks": {
+    "Repositório": "https://github.com/allan-rcos/portmaster"
+  },
+  "validation": {
+    "notExported": false,
+    "invalidLink": true,
+    "notDocumented": false
+  }
+}

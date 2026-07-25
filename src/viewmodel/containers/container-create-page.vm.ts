@@ -24,7 +24,10 @@ export function createContainerCreateVM(context: VMContext = {}): ContainerCreat
   return { t: containerNewMessages(contextLocale(context)) };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function containerCreateMeta(context: VMContext = {}): PageMeta {
   const t = containerNewMessages(contextLocale(context));
   return { title: t.new, description: t.subtitle };

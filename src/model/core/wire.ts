@@ -8,8 +8,17 @@
 // ============================================================
 import type { ApiClient } from './http';
 
+/** Verbos HTTP usados pela API. */
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+/**
+ * Descrição de uma chamada, independente do formato do fio.
+ *
+ * Os codecs FlatBuffers são opcionais: sem eles a chamada usa JSON. É isso que
+ * permite a mesma função de API servir desenvolvimento e produção.
+ *
+ * @template Res Tipo da resposta desserializada.
+ */
 export interface WireSpec<Res> {
   method: HttpMethod;
   /** Path relativo ao baseURL, ex.: `/v1/containers` ou `/v1/containers/${id}`. */
@@ -26,6 +35,13 @@ export interface WireSpec<Res> {
 const WIRE_JSON = 'application/json';
 const WIRE_FBS = 'application/x-flatbuffers';
 
+/**
+ * Executa uma chamada, escolhendo JSON ou FlatBuffers conforme o cliente.
+ *
+ * @template Res Tipo da resposta desserializada.
+ * @param client Cliente HTTP configurado.
+ * @param spec   Descrição da chamada.
+ */
 export async function wire<Res>(client: ApiClient, spec: WireSpec<Res>): Promise<Res> {
   const useFbsBody = client.wire === 'fbs' && spec.body !== undefined && !!spec.encode;
   const useFbsResp = client.wire === 'fbs' && !!spec.decode;

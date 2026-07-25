@@ -8,6 +8,14 @@ export interface ProductSchemaText {
   densityPositive: string;
 }
 
+/**
+ * Schema do cadastro/edição de produto.
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createProductSchema(t?: ProductSchemaText) {
   return z.object({
     name: z

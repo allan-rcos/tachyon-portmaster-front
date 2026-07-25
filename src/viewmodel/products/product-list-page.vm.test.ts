@@ -57,7 +57,7 @@ describe('createProductListVM', () => {
   it('repassa a query string da rota para a busca', async () => {
     await createProductListVM({ url: '/painel/produtos?search=diesel' }).load();
 
-    const [, params] = mockedList.mock.calls[0];
+    const [, params] = mockedList.mock.calls[0] ?? [];
     expect(params?.get('search')).toBe('diesel');
   });
 

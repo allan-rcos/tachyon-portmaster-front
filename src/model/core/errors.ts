@@ -5,12 +5,18 @@
 // ============================================================
 export { FetchError } from 'ofetch';
 
-/** True para qualquer erro de transporte com um status HTTP. */
+/**
+ * True para qualquer erro de transporte com um status HTTP.
+ * @param e Valor capturado num `catch`.
+ */
 export function isApiError(e: unknown): e is { status?: number; statusCode?: number; data?: unknown } {
   return typeof e === 'object' && e !== null && ('status' in e || 'statusCode' in e);
 }
 
-/** Extrai o status HTTP de um erro do ofetch (ou undefined). */
+/**
+ * Extrai o status HTTP de um erro do ofetch (ou undefined).
+ * @param e Valor capturado num `catch`.
+ */
 export function errorStatus(e: unknown): number | undefined {
   if (!isApiError(e)) return undefined;
   return e.status ?? e.statusCode;

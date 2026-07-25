@@ -21,8 +21,8 @@ export interface BoundMutation<TInput, TResult> {
 /**
  * Liga uma mutação do ViewModel à reatividade do Solid.
  *
- * @typeParam TInput  Entrada da mutação.
- * @typeParam TResult Retorno da mutação.
+ * @template TInput  Entrada da mutação.
+ * @template TResult Retorno da mutação.
  * @param mutation Mutação observável criada pelo ViewModel.
  */
 export function bindMutation<TInput, TResult>(

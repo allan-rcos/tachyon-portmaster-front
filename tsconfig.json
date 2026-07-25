@@ -36,10 +36,11 @@
     "strict": true,
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
-    // Desligado: o catálogo i18n (`Messages = Record<string,string>`) e os
-    // acessos indexados seguros do app tornam `t.foo`/`arr[0]` em
-    // `T | undefined` sob esta flag, gerando ruído em massa sem valor real.
-    "noUncheckedIndexedAccess": false,
+    // Ligado: com os catálogos i18n tipados por interface (e não mais
+    // `Record<string,string>`), a flag deixou de gerar ruído e passou a pegar
+    // coisa real — entre elas `getContainerSummary` devolvendo `undefined`
+    // tipado como `ContainerSummary` quando o contêiner não existe.
+    "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
     // Some stricter flags (disabled by default)

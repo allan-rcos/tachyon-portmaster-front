@@ -40,8 +40,8 @@ export interface MutationOptions<TResult> {
 /**
  * Cria o estado observável de uma mutação.
  *
- * @typeParam TInput  Entrada da mutação (valores do formulário).
- * @typeParam TResult Retorno da mutação.
+ * @template TInput  Entrada da mutação (valores do formulário).
+ * @template TResult Retorno da mutação.
  * @param mutation Função de mutação do ViewModel.
  * @param options  Callbacks de ciclo de vida.
  *

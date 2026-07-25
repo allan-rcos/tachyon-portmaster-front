@@ -24,7 +24,10 @@ export function createProductCreateVM(context: VMContext = {}): ProductCreateVM 
   return { t: productNewMessages(contextLocale(context)) };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function productCreateMeta(context: VMContext = {}): PageMeta {
   const t = productNewMessages(contextLocale(context));
   return { title: t.new, description: t.subtitle };

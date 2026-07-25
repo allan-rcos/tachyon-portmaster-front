@@ -8,5 +8,6 @@ packages/tachyon-design/
 packages/vike-txiki-adapter/
 packages/tachyon-portmaster-sdk/
 
-# Protótipo estático importado (HTML/CSS gerados fora do projeto).
+# Protótipo estático importado e referência de API gerada.
 docs/prototype/
+docs/api/

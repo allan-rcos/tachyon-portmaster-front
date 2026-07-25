@@ -59,7 +59,11 @@ export const sealContainer = (c: ApiClient, id: string): Promise<Container> =>
 export const dispatchContainer = (c: ApiClient, id: string): Promise<Container> =>
   wire(c, { method: 'POST', path: `/v1/containers/${id}/dispatch`, decode: decContainer });
 
-/** Lista de resumos; passe `query={ id }` para obter um único resumo. */
+/**
+ * Lista de resumos; passe `query={ id }` para obter um único resumo.
+ * @param c Cliente HTTP configurado.
+ * @param query Filtros e paginação.
+ */
 export const listContainerSummaries = (
   c: ApiClient,
   query?: Record<string, string>,

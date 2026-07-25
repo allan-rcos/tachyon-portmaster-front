@@ -32,8 +32,8 @@ export interface AsyncSignal<T, TArgs extends unknown[]> {
 /**
  * Cria um recurso assíncrono observável a partir de uma função de busca.
  *
- * @typeParam T     Tipo do dado carregado.
- * @typeParam TArgs Argumentos aceitos por `run`.
+ * @template T     Tipo do dado carregado.
+ * @template TArgs Argumentos aceitos por `run`.
  * @param fetcher Função que busca o dado (uma query do ViewModel).
  * @param initial Valor inicial, quando existe um sensato (ex.: lista vazia).
  *

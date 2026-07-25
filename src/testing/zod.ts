@@ -30,7 +30,7 @@ setFaker(faker);
 /**
  * Gera um valor válido segundo o schema.
  *
- * @typeParam T Tipo inferido do schema.
+ * @template T Tipo inferido do schema.
  * @param schema Schema Zod do ViewModel (sem `z.coerce`).
  */
 export function fakeFromSchema<T>(schema: ZodType<T>): T {

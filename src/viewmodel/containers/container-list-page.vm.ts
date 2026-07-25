@@ -47,7 +47,10 @@ export function createContainerListVM(context: VMContext = {}): ContainerListVM 
   return { t, boundary, filters, containers, load: () => containers.run() };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function containerListMeta(context: VMContext = {}): PageMeta {
   const t = containersListMessages(contextLocale(context));
   return { title: t.title, description: t.subtitle };

@@ -18,7 +18,10 @@ const LOCALES: readonly Locale[] = ['pt-BR', 'en', 'es'];
 /** Locale base, usado quando o cookie está ausente ou é desconhecido. */
 export const DEFAULT_LOCALE: Locale = 'pt-BR';
 
-/** Converte uma string de cookies no locale correspondente. */
+/**
+ * Converte uma string de cookies no locale correspondente.
+ * @param cookie Conteúdo do cabeçalho `Cookie`, ou `document.cookie`.
+ */
 function fromCookieHeader(cookie: string | undefined): Locale {
   const wanted = parseCookies(cookie)['flow-locale'] as Locale | undefined;
   return wanted && LOCALES.includes(wanted) ? wanted : DEFAULT_LOCALE;

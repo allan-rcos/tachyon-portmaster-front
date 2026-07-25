@@ -1,3 +1,4 @@
+import type { Tone } from '@viewmodel/core/i18n/labels';
 import { formatNumber } from '@viewmodel/core/utils/formatters';
 import type { OccupancyDivision } from '@viewmodel/metrics/domain';
 import { Chart } from 'chart.js/auto';
@@ -8,10 +9,15 @@ import type { MetricsPanelText } from '../components/MetricsPanel';
 import { segmentsOf } from '../components/OccupancyBreakdown';
 
 
-const TONE_VAR: Record<string, string> = {
+// Tipado pela união `Tone` (e não `Record<string, string>`) para que o
+// compilador cobre uma entrada por tom: acrescentar um tom ao domínio passa a
+// quebrar aqui, em vez de render uma fatia sem cor.
+const TONE_VAR: Record<Tone, string> = {
   gold: '--gold-500',
   sage: '--sage-400',
   teal: '--teal-500',
+  orange: '--orange-500',
+  danger: '--danger-500',
   neutral: '--ink-600',
 };
 

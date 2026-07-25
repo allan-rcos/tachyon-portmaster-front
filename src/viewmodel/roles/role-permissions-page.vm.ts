@@ -45,7 +45,10 @@ export function createRolePermissionsVM(context: VMContext): RolePermissionsVM {
   return { t, boundary, id, role, load: () => role.run() };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function rolePermissionsMeta(context: VMContext = {}): PageMeta {
   const t = rolePermissionsMessages(contextLocale(context));
   return { title: t.syncPermissions, description: t.subtitle };

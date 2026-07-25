@@ -16,7 +16,10 @@ export type CommonText = { [K in keyof ReturnType<typeof commonText>]: string };
 export type ValText = { [K in keyof ReturnType<typeof valText>]: string };
 export type NavText = { [K in keyof ReturnType<typeof navText>]: string };
 
-/** Termos de UI compartilhados — as páginas espalham no seu `t`. */
+/**
+ * Termos de UI compartilhados — as páginas espalham no seu `t`.
+ * @param locale Locale já resolvido pelo contexto.
+ */
 export function commonText(locale: Locale) {
   return {
     new: m.common_new({}, { locale }),
@@ -42,6 +45,7 @@ export function commonText(locale: Locale) {
  * Mensagens de validação (Zod) compartilhadas pelos formulários. Cada schema
  * declara seu contrato local com o subconjunto que usa; a página/form espalha
  * `valText(locale)` no `t` que entrega ao schema.
+ * @param locale Locale já resolvido pelo contexto.
  */
 export function valText(locale: Locale) {
   return {
@@ -64,7 +68,10 @@ export function valText(locale: Locale) {
   };
 }
 
-/** Rótulos de navegação (sidebar/breadcrumbs) — compostos pelas páginas. */
+/**
+ * Rótulos de navegação (sidebar/breadcrumbs) — compostos pelas páginas.
+ * @param locale Locale já resolvido pelo contexto.
+ */
 export function navText(locale: Locale) {
   return {
     painel: m.nav_painel({}, { locale }),

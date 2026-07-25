@@ -28,7 +28,7 @@ describe('listUsers', () => {
 
     const res = await listUsers(HEADERS);
     expect(res.data).toHaveLength(2);
-    expect(res.data[0].roles.length).toBeGreaterThan(0);
+    expect(res.data[0]?.roles.length).toBeGreaterThan(0);
   });
 });
 

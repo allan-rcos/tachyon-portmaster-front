@@ -11,6 +11,9 @@ dist
 # A saída do Paraglide (funções `m.*` tree-shakeable) vive em dist/paraglide,
 # já coberta por `dist` acima — por ser build, e não fonte.
 
+# API reference gerada pelo TypeDoc (regenerável: bun run docs:api)
+docs/api
+
 # code coverage
 coverage
 *.lcov

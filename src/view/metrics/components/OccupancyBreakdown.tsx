@@ -1,3 +1,4 @@
+import type { Tone } from '@viewmodel/core/i18n/labels';
 import { formatNumber } from '@viewmodel/core/utils/formatters';
 import type { OccupancyDivision } from '@viewmodel/metrics/domain';
 import { For, type JSX } from 'solid-js';
@@ -6,11 +7,13 @@ import type { MetricsPanelText } from './MetricsPanel';
 import styles from './OccupancyBreakdown.module.scss';
 
 
+/** Fatia da divisão de ocupação: um status, sua contagem e o tom da barra. */
 export interface Segment {
   key: string;
   label: string;
   count: number;
-  tone: string;
+  /** Tom do design system — tipado pela união para casar com o mapa de cores. */
+  tone: Tone;
 }
 
 export function segmentsOf(div: OccupancyDivision, t: MetricsPanelText): Segment[] {

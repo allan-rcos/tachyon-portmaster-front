@@ -59,7 +59,10 @@ export interface Paged<T> {
   total: number;
 }
 
-/** Garante id opaco como string (o backend pode devolver integer). */
+/**
+ * Garante id opaco como string (o backend pode devolver integer).
+ * @param v Valor cru vindo do fio.
+ */
 export function toId(v: unknown): string {
   return String(v);
 }

@@ -7,6 +7,14 @@ export interface LoginSchemaText {
   passwordRequired: string;
 }
 
+/**
+ * Schema das credenciais de login.
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createLoginSchema(t?: LoginSchemaText) {
   return z.object({
     email: z

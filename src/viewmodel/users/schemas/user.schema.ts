@@ -10,6 +10,7 @@ export interface UserSchemaText {
   rolesRequired: string;
 }
 
+/** Chaves de erro que o schema de reset de senha consome. */
 export interface PasswordResetSchemaText {
   passwordMin: string;
 }
@@ -26,6 +27,14 @@ function msgs(t?: UserSchemaText) {
   };
 }
 
+/**
+ * Schema da criação de usuário, com senha inicial e perfis.
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createUserCreateSchema(t?: UserSchemaText) {
   const m = msgs(t);
   return z.object({
@@ -36,6 +45,14 @@ export function createUserCreateSchema(t?: UserSchemaText) {
   });
 }
 
+/**
+ * Schema da edição de usuário (sem senha).
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createUserUpdateSchema(t?: UserSchemaText) {
   const m = msgs(t);
   return z.object({
@@ -45,6 +62,14 @@ export function createUserUpdateSchema(t?: UserSchemaText) {
   });
 }
 
+/**
+ * Schema do reset administrativo de senha.
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createPasswordResetSchema(t?: PasswordResetSchemaText) {
   return z.object({
     new_password: z.string().min(6, t?.passwordMin ?? 'Mínimo de 6 caracteres'),

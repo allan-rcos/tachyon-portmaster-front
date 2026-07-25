@@ -1,6 +1,7 @@
 import tseslint from 'typescript-eslint';
 import solid from 'eslint-plugin-solid';
 import importPlugin from 'eslint-plugin-import';
+import jsdoc from 'eslint-plugin-jsdoc';
 import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
@@ -17,6 +18,8 @@ export default tseslint.config(
       'node_modules/**',
       '.claude/**',
       'docs/prototype/**',
+      // Referência de API gerada pelo TypeDoc (bun run docs:api).
+      'docs/api/**',
       'swagger/**',
       // A saída do compilador Paraglide agora vive em `dist/paraglide`, já
       // coberta por `dist/**` acima.
@@ -95,6 +98,63 @@ export default tseslint.config(
           ],
         },
       ],
+    },
+  },
+
+  // ============================================================
+  //  JSDoc no que é EXPORTADO por Model e ViewModel — as camadas cujo
+  //  consumidor é outro arquivo, e não uma tela. É o que alimenta o TypeDoc e
+  //  o que faz o autocomplete explicar a função sem abrir o fonte.
+  //
+  //  As regras aqui pedem DESCRIÇÃO, não cerimônia: tipo de parâmetro e de
+  //  retorno já vivem no TypeScript, e repeti-los na tag só cria duplicação que
+  //  envelhece mal. `@param` sem texto é pior que nenhum `@param` — por isso
+  //  `require-param-description` é erro, e o autofix (que insere tags vazias)
+  //  não deve ser usado para satisfazer estas regras.
+  //
+  //  Na View o JSDoc é opcional: um componente Solid se documenta pela
+  //  assinatura de props. Ali as regras só garantem que o que EXISTE está
+  //  correto e completo.
+  // ============================================================
+  {
+    files: ['src/model/**/*.ts', 'src/viewmodel/**/*.ts'],
+    ignores: ['src/model/generated/**', '**/*.test.ts'],
+    extends: [jsdoc.configs['flat/recommended-typescript-error']],
+    rules: {
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          publicOnly: true,
+          require: { FunctionDeclaration: true, ClassDeclaration: true },
+          contexts: ['TSInterfaceDeclaration'],
+        },
+      ],
+      'jsdoc/require-param': ['error', { checkDestructuredRoots: false }],
+      'jsdoc/require-param-description': 'error',
+      'jsdoc/require-param-type': 'off',
+      'jsdoc/require-returns': 'off',
+      'jsdoc/require-returns-type': 'off',
+      'jsdoc/require-throws-type': 'off',
+      'jsdoc/tag-lines': 'off',
+      // Estilo, não conteúdo — o TypeDoc renderiza igual nos dois casos.
+      'jsdoc/multiline-blocks': 'off',
+    },
+  },
+  {
+    files: ['src/view/**/*.{ts,tsx}'],
+    ignores: ['**/*.test.{ts,tsx}'],
+    extends: [jsdoc.configs['flat/recommended-typescript']],
+    rules: {
+      'jsdoc/require-jsdoc': 'off',
+      'jsdoc/require-param': 'off',
+      'jsdoc/require-param-type': 'off',
+      'jsdoc/require-returns': 'off',
+      'jsdoc/require-returns-type': 'off',
+      'jsdoc/tag-lines': 'off',
+      'jsdoc/multiline-blocks': 'off',
+      // Componentes documentam props como `@param props.foo` — forma que o
+      // plugin não reconhece, mas que é a única legível para JSX.
+      'jsdoc/check-param-names': 'off',
     },
   },
 

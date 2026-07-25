@@ -8,11 +8,20 @@ export interface AccountSchemaText {
   emailInvalid: string;
 }
 
+/** Chaves de erro que o schema de troca de senha consome. */
 export interface PasswordChangeSchemaText {
   currentPasswordRequired: string;
   passwordMin: string;
 }
 
+/**
+ * Schema dos próprios dados da conta (nome e e-mail).
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createAccountSchema(t?: AccountSchemaText) {
   return z.object({
     name: z
@@ -28,6 +37,14 @@ export function createAccountSchema(t?: AccountSchemaText) {
   });
 }
 
+/**
+ * Schema da troca da própria senha.
+ *
+ * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
+ * a mesma regra de validação falar o idioma da requisição.
+ *
+ * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ */
 export function createPasswordChangeSchema(t?: PasswordChangeSchemaText) {
   return z.object({
     current_password: z.string().min(1, t?.currentPasswordRequired ?? 'Informe a senha atual'),

@@ -36,7 +36,10 @@ export function createContainerEditVM(context: VMContext): ContainerEditVM {
   return { t, boundary, id, container, load: () => container.run() };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function containerEditMeta(context: VMContext = {}): PageMeta {
   const t = containerEditMessages(contextLocale(context));
   return { title: t.edit, description: t.subtitle };

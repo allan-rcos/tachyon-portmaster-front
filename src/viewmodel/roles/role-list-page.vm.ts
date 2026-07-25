@@ -34,7 +34,10 @@ export function createRoleListVM(context: VMContext = {}): RoleListVM {
   return { t, boundary, roles, load: () => roles.run() };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function roleListMeta(context: VMContext = {}): PageMeta {
   const t = rolesListMessages(contextLocale(context));
   return { title: t.title, description: t.subtitle };

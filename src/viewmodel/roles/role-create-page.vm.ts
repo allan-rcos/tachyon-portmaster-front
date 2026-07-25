@@ -24,7 +24,10 @@ export function createRoleCreateVM(context: VMContext = {}): RoleCreateVM {
   return { t: roleNewMessages(contextLocale(context)) };
 }
 
-/** Título e descrição da rota, para o `<head>`. */
+/**
+ * Título e descrição da rota, para o `<head>`.
+ * @param context Contexto de execução — só o locale importa aqui.
+ */
 export function roleCreateMeta(context: VMContext = {}): PageMeta {
   const t = roleNewMessages(contextLocale(context));
   return { title: t.new, description: t.subtitle };
