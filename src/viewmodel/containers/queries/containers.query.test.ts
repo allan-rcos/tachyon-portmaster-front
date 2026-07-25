@@ -1,36 +1,72 @@
-import { describe, it, expect } from 'vitest';
+// ============================================================
+//  O que estas queries fazem de fato é traduzir a query string da rota nos
+//  parâmetros que a API espera. É isso que os testes verificam.
+//
+//  A versão anterior batia num MSW que reimplementava filtro e paginação, e
+//  portanto media o mock, não a query: passava mesmo com o mapeamento errado,
+//  desde que o clone da API concordasse com o erro.
+// ============================================================
+import { listContainerSummaries, listContainers as apiListContainers } from '@model/containers';
+import { containerFactory, containerSummaryFactory, paged } from '@testing/factories/model.factory';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getContainerSummary } from './get-container-summary.query';
 import { listContainers } from './list-containers.query';
 
-const AUTH = { cookie: 'auth_token=mock_usr_ana' };
+vi.mock('@model/containers');
 
-describe('containers loaders', () => {
-  it('lista com paginação por cursor', async () => {
-    const res = await listContainers(AUTH, new URLSearchParams({ limit: '3' }));
-    expect(res.data).toHaveLength(3);
-    expect(res.next_cursor).toBe('3');
+const mockedList = vi.mocked(apiListContainers);
+const mockedSummaries = vi.mocked(listContainerSummaries);
+
+const HEADERS = { cookie: 'auth_token=abc' };
+
+beforeEach(() => {
+  mockedList.mockResolvedValue(paged(containerFactory.buildList(3)));
+  mockedSummaries.mockResolvedValue(paged([containerSummaryFactory.build()]));
+});
+
+describe('listContainers', () => {
+  it('aplica o tamanho de página padrão quando a rota não pede outro', async () => {
+    await listContainers(HEADERS);
+    expect(mockedList).toHaveBeenCalledWith(expect.anything(), { limit: '8' });
   });
 
-  it('filtra por status', async () => {
-    const res = await listContainers(AUTH, new URLSearchParams({ status: 'Sealed' }));
-    expect(res.data.every((c) => c.status === 'Sealed')).toBe(true);
-    expect(res.data.length).toBeGreaterThan(0);
+  it('repassa limite, cursor, busca e status vindos da query string', async () => {
+    await listContainers(
+      HEADERS,
+      new URLSearchParams({ limit: '3', cursor: '12', search: 'msku', status: 'Sealed' }),
+    );
+    expect(mockedList).toHaveBeenCalledWith(expect.anything(), {
+      limit: '3',
+      cursor: '12',
+      search: 'msku',
+      status: 'Sealed',
+    });
   });
 
-  it('filtra por busca de código', async () => {
-    const res = await listContainers(AUTH, new URLSearchParams({ search: 'msku' }));
-    expect(res.data.every((c) => c.code.toLowerCase().includes('msku'))).toBe(true);
+  it('omite filtros vazios em vez de enviá-los em branco', async () => {
+    await listContainers(HEADERS, new URLSearchParams({ search: '', status: '' }));
+    expect(mockedList).toHaveBeenCalledWith(expect.anything(), { limit: '8' });
   });
 
-  it('resumo traz container + manifesto + logs', async () => {
-    const s = await getContainerSummary('ctr_msku4410', AUTH);
-    expect(s.container.code).toBe('MSKU-4410');
-    expect(s.manifest.length).toBeGreaterThan(0);
-    expect(s.recent_logs.length).toBeGreaterThan(0);
+  it('devolve a página como o Model entregou', async () => {
+    const page = paged(containerFactory.buildList(2), '2');
+    mockedList.mockResolvedValueOnce(page);
+    await expect(listContainers(HEADERS)).resolves.toEqual(page);
+  });
+});
+
+describe('getContainerSummary', () => {
+  it('consulta pelo id e desembrulha o único item da página', async () => {
+    const summary = containerSummaryFactory.build();
+    mockedSummaries.mockResolvedValueOnce(paged([summary]));
+
+    await expect(getContainerSummary('ctr_1', HEADERS)).resolves.toEqual(summary);
+    expect(mockedSummaries).toHaveBeenCalledWith(expect.anything(), { id: 'ctr_1' });
   });
 
-  it('resumo de id inexistente → 404', async () => {
-    await expect(getContainerSummary('ctr_nope', AUTH)).rejects.toMatchObject({ status: 404 });
+  it('propaga a falha do Model quando o contêiner não existe', async () => {
+    mockedSummaries.mockRejectedValueOnce(Object.assign(new Error('Not Found'), { status: 404 }));
+    await expect(getContainerSummary('ctr_nope', HEADERS)).rejects.toMatchObject({ status: 404 });
   });
 });

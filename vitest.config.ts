@@ -39,15 +39,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./test/setup.ts'],
-    // URLs absolutas para os clients: o fetch do Node (undici) não aceita URL
-    // relativa (/api). MSW intercepta qualquer host, então localhost serve.
-    env: {
-      PUBLIC_ENV__API_BASE_URL: 'http://localhost/api',
-      PUBLIC_ENV__API_SERVER_URL: 'http://localhost:8080',
-    },
+    setupFiles: ['./src/testing/setup.ts'],
     include: ['**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['node_modules', 'dist', 'packages/**'],
+    exclude: ['node_modules', 'dist', 'packages/**', 'src/model/contract/**'],
     server: {
       deps: {
         inline: [/solid-js/, /@solidjs\/testing-library/, /@tanstack/],

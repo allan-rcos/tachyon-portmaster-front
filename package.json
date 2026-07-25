@@ -8,6 +8,7 @@
   "devDependencies": {
     "@babel/preset-typescript": "^8.0.1",
     "@eslint/js": "^9.17.0",
+    "@faker-js/faker": "^10.5.0",
     "@inlang/paraglide-js": "^2.22.0",
     "@solidjs/testing-library": "^0.8.10",
     "@testing-library/jest-dom": "^6.9.1",
@@ -18,13 +19,15 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-solid": "^0.14.5",
+    "fishery": "^2.4.0",
     "jsdom": "^29.1.1",
-    "msw": "^2.15.0",
     "prettier": "^3.9.5",
     "sass": "^1.101.0",
     "typescript-eslint": "^8.64.0",
     "vite-plugin-solid": "^2.11.12",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "vitest-mock-extended": "^5.1.0",
+    "zod-schema-faker": "^2.1.1"
   },
   "peerDependencies": {
     "typescript": "^5"

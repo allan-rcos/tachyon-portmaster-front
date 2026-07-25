@@ -1,17 +1,23 @@
-import { describe, it, expect } from 'vitest';
+import { getAccount as apiGetAccount } from '@model/account';
+import { accountProfileFactory } from '@testing/factories/model.factory';
+import { describe, expect, it, vi } from 'vitest';
 
 import { getAccount } from './get-account.query';
 
-const AUTH = { cookie: 'auth_token=mock_usr_ana' };
+vi.mock('@model/account');
 
-describe('getAccount loader', () => {
-  it('retorna o perfil do usuário autenticado', async () => {
-    const p = await getAccount(AUTH);
-    expect(p.email).toBe('ana@portmaster.test');
-    expect(p.roles.length).toBeGreaterThan(0);
+const mockedGet = vi.mocked(apiGetAccount);
+
+describe('getAccount', () => {
+  it('devolve o perfil da sessão', async () => {
+    const profile = accountProfileFactory.build();
+    mockedGet.mockResolvedValueOnce(profile);
+
+    await expect(getAccount({ cookie: 'auth_token=abc' })).resolves.toEqual(profile);
   });
 
-  it('sem sessão → 401', async () => {
-    await expect(getAccount(undefined)).rejects.toMatchObject({ status: 401 });
+  it('propaga o 401 quando o cookie é inválido — quem redireciona é o guard', async () => {
+    mockedGet.mockRejectedValueOnce(Object.assign(new Error('Unauthorized'), { status: 401 }));
+    await expect(getAccount({ cookie: 'auth_token=ruim' })).rejects.toMatchObject({ status: 401 });
   });
 });
