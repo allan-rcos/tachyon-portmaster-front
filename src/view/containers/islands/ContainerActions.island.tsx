@@ -8,7 +8,6 @@ import { Show, type JSX } from 'solid-js';
 
 import styles from './ContainerActions.island.module.scss';
 
-
 /** Ações de estado do contêiner: lacrar / despachar / excluir.
  *  Cada uma confirma antes e recarrega (novo SSR) ao concluir. */
 export function ContainerActions(props: {
@@ -47,9 +46,7 @@ export function ContainerActions(props: {
             message={props.t.dispatchConfirm}
             confirmLabel={props.t.dispatch}
             cancelLabel={props.t.cancel}
-            onConfirm={() =>
-              dispatchContainer(props.containerId)
-            }
+            onConfirm={() => dispatchContainer(props.containerId)}
             onDone={() => window.location.reload()}
           />
         </li>

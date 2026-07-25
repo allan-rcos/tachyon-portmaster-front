@@ -5,7 +5,10 @@
 // ============================================================
 import { userNewMessages } from './i18n/user-create-page.messages';
 import type { UserNewText } from './i18n/user-create-page.messages';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import type { PageMeta } from '../core/page/page-request';
 import { contextLocale, type VMContext } from '../core/page/vm-context';

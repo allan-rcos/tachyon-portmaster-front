@@ -3,7 +3,6 @@ import { encLogin, decLoginResponse } from './fbs';
 import type { ApiClient } from '../core/http';
 import { wire } from '../core/wire';
 
-
 /**
  * POST /v1/auth/login — o slug do tenant vai no corpo do LoginRequest.
  * @param c Cliente HTTP configurado.

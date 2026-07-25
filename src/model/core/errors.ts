@@ -9,7 +9,9 @@ export { FetchError } from 'ofetch';
  * True para qualquer erro de transporte com um status HTTP.
  * @param e Valor capturado num `catch`.
  */
-export function isApiError(e: unknown): e is { status?: number; statusCode?: number; data?: unknown } {
+export function isApiError(
+  e: unknown,
+): e is { status?: number; statusCode?: number; data?: unknown } {
   return typeof e === 'object' && e !== null && ('status' in e || 'statusCode' in e);
 }
 

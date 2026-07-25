@@ -6,7 +6,6 @@ import { For, type JSX } from 'solid-js';
 import type { MetricsPanelText } from './MetricsPanel';
 import styles from './OccupancyBreakdown.module.scss';
 
-
 /** Fatia da divisão de ocupação: um status, sua contagem e o tom da barra. */
 export interface Segment {
   key: string;

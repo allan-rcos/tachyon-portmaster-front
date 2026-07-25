@@ -5,7 +5,6 @@ import type { LoginPageText } from '@viewmodel/auth/i18n/login-page.messages';
 import type { JSX } from 'solid-js';
 import { ClientOnly } from 'vike-solid/ClientOnly';
 
-
 import styles from '../styles/LoginPage.module.scss';
 
 /**

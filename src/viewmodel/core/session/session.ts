@@ -36,7 +36,8 @@ export function readCookie(request: PageRequest): string | undefined {
  *   fazer — o redirect ao login é decisão do composition root.
  */
 export function loadAccount(request: PageRequest): Promise<AccountProfile> {
-  const key = typeof request.headers === 'object' && request.headers !== null ? request.headers : undefined;
+  const key =
+    typeof request.headers === 'object' && request.headers !== null ? request.headers : undefined;
   const cached = key && cache.get(key);
   if (cached) return cached;
 

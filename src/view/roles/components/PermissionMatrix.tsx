@@ -4,7 +4,6 @@ import { For, type JSX } from 'solid-js';
 
 import styles from './PermissionMatrix.module.scss';
 
-
 /** Grade de permissões (RBAC) agrupada por recurso. Controlada pela
  *  island de perfil (recebe seleção + callback). */
 export function PermissionMatrix(props: {

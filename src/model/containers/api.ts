@@ -21,8 +21,10 @@ import {
 import type { ApiClient } from '../core/http';
 import { wire } from '../core/wire';
 
-
-export const listContainers = (c: ApiClient, query?: Record<string, string>): Promise<ContainerList> =>
+export const listContainers = (
+  c: ApiClient,
+  query?: Record<string, string>,
+): Promise<ContainerList> =>
   wire(c, { method: 'GET', path: '/v1/containers', query, decode: decContainerList });
 
 export const getContainer = (c: ApiClient, id: string): Promise<Container> =>
@@ -68,7 +70,12 @@ export const listContainerSummaries = (
   c: ApiClient,
   query?: Record<string, string>,
 ): Promise<ContainerSummaryList> =>
-  wire(c, { method: 'GET', path: '/v1/containers/summary', query, decode: decContainerSummaryList });
+  wire(c, {
+    method: 'GET',
+    path: '/v1/containers/summary',
+    query,
+    decode: decContainerSummaryList,
+  });
 
 export const loadItem = (c: ApiClient, body: LoadItemRequest): Promise<ManifestResponse> =>
   wire(c, {

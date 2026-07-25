@@ -1,5 +1,3 @@
-
-
 import { Badge } from '@view/core/components/Badge';
 import { Card } from '@view/core/components/Card';
 import type { AccountProfile as Profile } from '@viewmodel/account/domain';

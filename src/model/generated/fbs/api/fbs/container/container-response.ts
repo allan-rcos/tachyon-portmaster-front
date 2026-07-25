@@ -6,133 +6,144 @@ import * as flatbuffers from 'flatbuffers';
 
 import { ContainerStatus } from '../../../api/fbs/common/container-status.js';
 
-
 export class ContainerResponse implements flatbuffers.IUnpackableObject<ContainerResponseT> {
-  bb: flatbuffers.ByteBuffer|null = null;
+  bb: flatbuffers.ByteBuffer | null = null;
   bb_pos = 0;
-  __init(i:number, bb:flatbuffers.ByteBuffer):ContainerResponse {
-  this.bb_pos = i;
-  this.bb = bb;
-  return this;
-}
+  __init(i: number, bb: flatbuffers.ByteBuffer): ContainerResponse {
+    this.bb_pos = i;
+    this.bb = bb;
+    return this;
+  }
 
-static getRootAsContainerResponse(bb:flatbuffers.ByteBuffer, obj?:ContainerResponse):ContainerResponse {
-  return (obj || new ContainerResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-}
+  static getRootAsContainerResponse(
+    bb: flatbuffers.ByteBuffer,
+    obj?: ContainerResponse,
+  ): ContainerResponse {
+    return (obj || new ContainerResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+  }
 
-static getSizePrefixedRootAsContainerResponse(bb:flatbuffers.ByteBuffer, obj?:ContainerResponse):ContainerResponse {
-  bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
-  return (obj || new ContainerResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-}
+  static getSizePrefixedRootAsContainerResponse(
+    bb: flatbuffers.ByteBuffer,
+    obj?: ContainerResponse,
+  ): ContainerResponse {
+    bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
+    return (obj || new ContainerResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+  }
 
-id():string|null
-id(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-id(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
+  id(): string | null;
+  id(optionalEncoding: flatbuffers.Encoding): string | Uint8Array | null;
+  id(optionalEncoding?: any): string | Uint8Array | null {
+    const offset = this.bb!.__offset(this.bb_pos, 4);
+    return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  }
 
-code():string|null
-code(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-code(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
+  code(): string | null;
+  code(optionalEncoding: flatbuffers.Encoding): string | Uint8Array | null;
+  code(optionalEncoding?: any): string | Uint8Array | null {
+    const offset = this.bb!.__offset(this.bb_pos, 6);
+    return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  }
 
-currentWeight():number {
-  const offset = this.bb!.__offset(this.bb_pos, 8);
-  return offset ? this.bb!.readFloat64(this.bb_pos + offset) : 0.0;
-}
+  currentWeight(): number {
+    const offset = this.bb!.__offset(this.bb_pos, 8);
+    return offset ? this.bb!.readFloat64(this.bb_pos + offset) : 0.0;
+  }
 
-maxCapacity():number {
-  const offset = this.bb!.__offset(this.bb_pos, 10);
-  return offset ? this.bb!.readFloat64(this.bb_pos + offset) : 0.0;
-}
+  maxCapacity(): number {
+    const offset = this.bb!.__offset(this.bb_pos, 10);
+    return offset ? this.bb!.readFloat64(this.bb_pos + offset) : 0.0;
+  }
 
-status():ContainerStatus {
-  const offset = this.bb!.__offset(this.bb_pos, 12);
-  return offset ? this.bb!.readUint8(this.bb_pos + offset) : ContainerStatus.Empty;
-}
+  status(): ContainerStatus {
+    const offset = this.bb!.__offset(this.bb_pos, 12);
+    return offset ? this.bb!.readUint8(this.bb_pos + offset) : ContainerStatus.Empty;
+  }
 
-static startContainerResponse(builder:flatbuffers.Builder) {
-  builder.startObject(5);
-}
+  static startContainerResponse(builder: flatbuffers.Builder) {
+    builder.startObject(5);
+  }
 
-static addId(builder:flatbuffers.Builder, idOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(0, idOffset, 0);
-}
+  static addId(builder: flatbuffers.Builder, idOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(0, idOffset, 0);
+  }
 
-static addCode(builder:flatbuffers.Builder, codeOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, codeOffset, 0);
-}
+  static addCode(builder: flatbuffers.Builder, codeOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(1, codeOffset, 0);
+  }
 
-static addCurrentWeight(builder:flatbuffers.Builder, currentWeight:number) {
-  builder.addFieldFloat64(2, currentWeight, 0.0);
-}
+  static addCurrentWeight(builder: flatbuffers.Builder, currentWeight: number) {
+    builder.addFieldFloat64(2, currentWeight, 0.0);
+  }
 
-static addMaxCapacity(builder:flatbuffers.Builder, maxCapacity:number) {
-  builder.addFieldFloat64(3, maxCapacity, 0.0);
-}
+  static addMaxCapacity(builder: flatbuffers.Builder, maxCapacity: number) {
+    builder.addFieldFloat64(3, maxCapacity, 0.0);
+  }
 
-static addStatus(builder:flatbuffers.Builder, status:ContainerStatus) {
-  builder.addFieldInt8(4, status, ContainerStatus.Empty);
-}
+  static addStatus(builder: flatbuffers.Builder, status: ContainerStatus) {
+    builder.addFieldInt8(4, status, ContainerStatus.Empty);
+  }
 
-static endContainerResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
-  const offset = builder.endObject();
-  return offset;
-}
+  static endContainerResponse(builder: flatbuffers.Builder): flatbuffers.Offset {
+    const offset = builder.endObject();
+    return offset;
+  }
 
-static createContainerResponse(builder:flatbuffers.Builder, idOffset:flatbuffers.Offset, codeOffset:flatbuffers.Offset, currentWeight:number, maxCapacity:number, status:ContainerStatus):flatbuffers.Offset {
-  ContainerResponse.startContainerResponse(builder);
-  ContainerResponse.addId(builder, idOffset);
-  ContainerResponse.addCode(builder, codeOffset);
-  ContainerResponse.addCurrentWeight(builder, currentWeight);
-  ContainerResponse.addMaxCapacity(builder, maxCapacity);
-  ContainerResponse.addStatus(builder, status);
-  return ContainerResponse.endContainerResponse(builder);
-}
+  static createContainerResponse(
+    builder: flatbuffers.Builder,
+    idOffset: flatbuffers.Offset,
+    codeOffset: flatbuffers.Offset,
+    currentWeight: number,
+    maxCapacity: number,
+    status: ContainerStatus,
+  ): flatbuffers.Offset {
+    ContainerResponse.startContainerResponse(builder);
+    ContainerResponse.addId(builder, idOffset);
+    ContainerResponse.addCode(builder, codeOffset);
+    ContainerResponse.addCurrentWeight(builder, currentWeight);
+    ContainerResponse.addMaxCapacity(builder, maxCapacity);
+    ContainerResponse.addStatus(builder, status);
+    return ContainerResponse.endContainerResponse(builder);
+  }
 
-unpack(): ContainerResponseT {
-  return new ContainerResponseT(
-    this.id(),
-    this.code(),
-    this.currentWeight(),
-    this.maxCapacity(),
-    this.status()
-  );
-}
+  unpack(): ContainerResponseT {
+    return new ContainerResponseT(
+      this.id(),
+      this.code(),
+      this.currentWeight(),
+      this.maxCapacity(),
+      this.status(),
+    );
+  }
 
-
-unpackTo(_o: ContainerResponseT): void {
-  _o.id = this.id();
-  _o.code = this.code();
-  _o.currentWeight = this.currentWeight();
-  _o.maxCapacity = this.maxCapacity();
-  _o.status = this.status();
-}
+  unpackTo(_o: ContainerResponseT): void {
+    _o.id = this.id();
+    _o.code = this.code();
+    _o.currentWeight = this.currentWeight();
+    _o.maxCapacity = this.maxCapacity();
+    _o.status = this.status();
+  }
 }
 
 export class ContainerResponseT implements flatbuffers.IGeneratedObject {
-constructor(
-  public id: string|Uint8Array|null = null,
-  public code: string|Uint8Array|null = null,
-  public currentWeight: number = 0.0,
-  public maxCapacity: number = 0.0,
-  public status: ContainerStatus = ContainerStatus.Empty
-){}
+  constructor(
+    public id: string | Uint8Array | null = null,
+    public code: string | Uint8Array | null = null,
+    public currentWeight: number = 0.0,
+    public maxCapacity: number = 0.0,
+    public status: ContainerStatus = ContainerStatus.Empty,
+  ) {}
 
+  pack(builder: flatbuffers.Builder): flatbuffers.Offset {
+    const id = this.id !== null ? builder.createString(this.id!) : 0;
+    const code = this.code !== null ? builder.createString(this.code!) : 0;
 
-pack(builder:flatbuffers.Builder): flatbuffers.Offset {
-  const id = (this.id !== null ? builder.createString(this.id!) : 0);
-  const code = (this.code !== null ? builder.createString(this.code!) : 0);
-
-  return ContainerResponse.createContainerResponse(builder,
-    id,
-    code,
-    this.currentWeight,
-    this.maxCapacity,
-    this.status
-  );
-}
+    return ContainerResponse.createContainerResponse(
+      builder,
+      id,
+      code,
+      this.currentWeight,
+      this.maxCapacity,
+      this.status,
+    );
+  }
 }

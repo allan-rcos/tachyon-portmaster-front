@@ -7,7 +7,10 @@ import type { RoleList } from './domain';
 import { rolesListMessages } from './i18n/role-list-page.messages';
 import type { RoleListText } from './i18n/text-contracts';
 import { listRoles } from './queries/list-roles.query';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import type { PageMeta } from '../core/page/page-request';
 import { contextLocale, contextParams, type VMContext } from '../core/page/vm-context';

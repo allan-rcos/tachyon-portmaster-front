@@ -6,10 +6,7 @@ import { cn } from '@view/core/utils/ui';
 import { errText } from '@view/core/utils/ui';
 import type { LoginFormText } from '@viewmodel/auth/i18n/text-contracts';
 import { signIn } from '@viewmodel/auth/mutations/sign-in.mutation';
-import {
-  createLoginSchema,
-  type LoginFormData,
-} from '@viewmodel/auth/schemas/login.schema';
+import { createLoginSchema, type LoginFormData } from '@viewmodel/auth/schemas/login.schema';
 import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import { type JSX } from 'solid-js';
 
@@ -21,9 +18,13 @@ function redirectTarget(): string {
 }
 
 function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
-  const mutation = bindMutation(createMutationSignal((v: LoginFormData) => signIn(v), { onSuccess: () => {
-      window.location.href = redirectTarget();
-    } }));
+  const mutation = bindMutation(
+    createMutationSignal((v: LoginFormData) => signIn(v), {
+      onSuccess: () => {
+        window.location.href = redirectTarget();
+      },
+    }),
+  );
 
   const form = createForm(() => ({
     defaultValues: { email: '', password: '' } as LoginFormData,

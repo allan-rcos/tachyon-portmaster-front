@@ -1,10 +1,14 @@
-import type { UserAdmin, UserCreateRequest, UserUpdateRequest, UserAdminPasswordResetRequest } from './dto';
+import type {
+  UserAdmin,
+  UserCreateRequest,
+  UserUpdateRequest,
+  UserAdminPasswordResetRequest,
+} from './dto';
 import { toBytes, buf, fromT } from '../core/fbs-runtime';
 import { UserAdminPasswordResetRequestT } from '../generated/fbs/api/fbs/admin/user-admin-password-reset-request';
 import { UserAdminResponse as FbUserAdminResponse } from '../generated/fbs/api/fbs/admin/user-admin-response';
 import { UserCreateRequestT } from '../generated/fbs/api/fbs/admin/user-create-request';
 import { UserUpdateRequestT } from '../generated/fbs/api/fbs/admin/user-update-request';
-
 
 export const encUserCreate = (v: UserCreateRequest): Uint8Array =>
   toBytes(new UserCreateRequestT(v.name, v.email, v.initial_password, v.role_ids));

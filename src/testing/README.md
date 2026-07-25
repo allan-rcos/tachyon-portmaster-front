@@ -31,13 +31,13 @@ Hoje cada teste mocka **a fronteira logo abaixo** do que está exercitando.
 
 ## Como testar cada camada
 
-| Camada | Mocka | Verifica |
-|---|---|---|
-| **Model** | `fetch` | codificação do wire, mapeamento de erro |
-| **ViewModel** (query) | `@model/<recurso>` | tradução de parâmetros, formato do retorno |
-| **ViewModel** (tela) | as queries/mutations | transições de sinal, montagem do texto |
-| **View** (island) | as mutations do ViewModel | a chamada feita, e a validação que a impede |
-| **View** (componente) | nada | o que é renderizado, a partir de props |
+| Camada                | Mocka                     | Verifica                                    |
+| --------------------- | ------------------------- | ------------------------------------------- |
+| **Model**             | `fetch`                   | codificação do wire, mapeamento de erro     |
+| **ViewModel** (query) | `@model/<recurso>`        | tradução de parâmetros, formato do retorno  |
+| **ViewModel** (tela)  | as queries/mutations      | transições de sinal, montagem do texto      |
+| **View** (island)     | as mutations do ViewModel | a chamada feita, e a validação que a impede |
+| **View** (componente) | nada                      | o que é renderizado, a partir de props      |
 
 ### Query — o que ela faz é traduzir parâmetros
 
@@ -84,7 +84,7 @@ de determinismo real (ex.: snapshot).
 
 ```ts
 const page = paged(productFactory.buildList(3));
-const admin = roleFactory.build({ name: 'Admin' });   // sobrescreve o que importa
+const admin = roleFactory.build({ name: 'Admin' }); // sobrescreve o que importa
 ```
 
 **`fakeFromSchema`** (`zod.ts`) para entrada válida de formulário a partir de um
@@ -96,5 +96,5 @@ Duas ressalvas, ambas descobertas na prática:
   Zod 4. Daí `zod-schema-faker`, importado do subpath **`/v4`** — a entrada raiz
   fala Zod 3 e quebra num `z.object` trivial.
 - Schemas com **`z.coerce`** (produto, contêiner, manifesto) não são suportados:
-  o gerador não sabe produzir a entrada *antes* da coerção. Para esses, monte o
+  o gerador não sabe produzir a entrada _antes_ da coerção. Para esses, monte o
   objeto do formulário à mão — é o valor que o usuário de fato digita.

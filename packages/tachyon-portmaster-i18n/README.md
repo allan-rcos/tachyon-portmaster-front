@@ -2,7 +2,7 @@
 
 Fonte única do i18n do PortMaster. Este pacote guarda **os dados** (catálogos por
 locale) e **as regras** (projeto inlang + validador de contrato). Ele não exporta
-código de runtime: o que a aplicação importa é a *saída compilada* do Paraglide.
+código de runtime: o que a aplicação importa é a _saída compilada_ do Paraglide.
 
 ```
 packages/tachyon-portmaster-i18n/
@@ -38,11 +38,11 @@ componente em locales diferentes na mesma requisição.
 Cada catálogo de rota/formulário tem um `*.messages.schema.json` irmão que é a
 **fonte da verdade** e valida os dois lados:
 
-| lado | o que é verificado | falha |
-|---|---|---|
-| **Dados** | todo locale tem todas as chaves exigidas, com string não-vazia | fatal |
+| lado         | o que é verificado                                               | falha |
+| ------------ | ---------------------------------------------------------------- | ----- |
+| **Dados**    | todo locale tem todas as chaves exigidas, com string não-vazia   | fatal |
 | **Resolver** | o `messages.ts` irmão referencia exatamente as chaves declaradas | fatal |
-| **Órfãs** | chave no catálogo base que nenhum schema exige | aviso |
+| **Órfãs**    | chave no catálogo base que nenhum schema exige                   | aviso |
 
 Chave usada mas não declarada **e** declarada mas não usada são ambas fatais —
 é o que impede o catálogo de acumular lixo ou de silenciosamente perder tradução.

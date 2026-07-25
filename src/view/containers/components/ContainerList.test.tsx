@@ -5,7 +5,6 @@ import { describe, it, expect } from 'vitest';
 
 import { ContainerList } from './ContainerList';
 
-
 const t = containersListMessages('pt-BR');
 const items: Container[] = [
   { id: 'ctr_1', code: 'MSKU-4410', current_weight: 12000, max_capacity: 28000, status: 'Loading' },

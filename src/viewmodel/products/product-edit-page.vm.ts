@@ -7,7 +7,10 @@ import type { Product } from './domain';
 import { productEditMessages } from './i18n/product-edit-page.messages';
 import type { ProductEditText } from './i18n/product-edit-page.messages';
 import { getProduct } from './queries/get-product.query';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import type { PageMeta } from '../core/page/page-request';
 import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';

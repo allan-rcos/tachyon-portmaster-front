@@ -4,7 +4,6 @@ import { RoleResponse as FbRoleResponse } from '../generated/fbs/api/fbs/account
 import { RoleCreateRequestT } from '../generated/fbs/api/fbs/admin/role-create-request';
 import { RoleListResponse as FbRoleListResponse } from '../generated/fbs/api/fbs/admin/role-list-response';
 
-
 export const encRoleCreate = (v: RoleCreateRequest): Uint8Array =>
   toBytes(new RoleCreateRequestT(v.name, permIndexes(v.permissions)));
 

@@ -7,7 +7,10 @@ import type { AccountProfile } from './domain';
 import { accountMessages } from './i18n/account-page.messages';
 import type { AccountPageText } from './i18n/account-page.messages';
 import { getAccount } from './queries/get-account.query';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import type { PageMeta } from '../core/page/page-request';
 import { contextLocale, type VMContext } from '../core/page/vm-context';

@@ -7,7 +7,10 @@ import type { Metrics } from './domain';
 import { painelMessages } from './i18n/dashboard-page.messages';
 import type { PainelPageText } from './i18n/dashboard-page.messages';
 import { getMetrics } from './queries/get-metrics.query';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import type { PageMeta } from '../core/page/page-request';
 import { contextLocale, type VMContext } from '../core/page/vm-context';

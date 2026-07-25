@@ -1,5 +1,3 @@
-
-
 import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { DataTable, type Column } from '@view/core/components/DataTable';
 import { EmptyState } from '@view/core/components/EmptyState';

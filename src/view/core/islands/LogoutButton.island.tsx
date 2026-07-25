@@ -4,7 +4,6 @@ import type { JSX } from 'solid-js';
 
 import styles from './LogoutButton.island.module.scss';
 
-
 /** Encerra a sessão: limpa o cookie de auth (same-origin token) e volta ao
  *  login. O guard revalida a sessão no próximo SSR. */
 export function LogoutButton(props: { label: string }): JSX.Element {

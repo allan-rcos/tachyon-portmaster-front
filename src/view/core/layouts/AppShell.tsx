@@ -6,7 +6,6 @@ import styles from './AppShell.module.scss';
 import { Navbar } from '../components/Navbar';
 import { Sidebar, type ShellNavText } from '../components/Sidebar';
 
-
 /** Chrome autenticado: sidebar + topo + conteúdo, sobre o backdrop
  *  "deep water". Sidebar vira drawer no mobile (html[data-drawer]). */
 export function AppShell(props: {

@@ -1,7 +1,6 @@
 import type { SystemInfo } from '@viewmodel/system/system-info-page.vm';
 import type { JSX } from 'solid-js';
 
-
 // Folha global (não é CSS Module): as classes desta tela são nomes globais,
 // usados como strings no JSX abaixo. Mantida assim de propósito — convertê-la
 // em módulo trocaria os nomes por hashes e a tela perderia o estilo.

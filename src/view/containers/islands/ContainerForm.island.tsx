@@ -29,16 +29,23 @@ export interface ContainerFormProps {
 }
 
 function Inner(props: ContainerFormProps): JSX.Element {
-  const mutation = bindMutation(createMutationSignal((value: FormValues) => {
-      if (props.mode === 'create') {
-        const body = createContainerCreateSchema(props.t).parse(value);
-        return createContainer(body);
-      }
-      const body = createContainerUpdateSchema(props.t).parse(value);
-      return updateContainer(props.containerId!, body);
-    }, { onSuccess: () => {
-      window.location.href = '/painel/conteineres';
-    } }));
+  const mutation = bindMutation(
+    createMutationSignal(
+      (value: FormValues) => {
+        if (props.mode === 'create') {
+          const body = createContainerCreateSchema(props.t).parse(value);
+          return createContainer(body);
+        }
+        const body = createContainerUpdateSchema(props.t).parse(value);
+        return updateContainer(props.containerId!, body);
+      },
+      {
+        onSuccess: () => {
+          window.location.href = '/painel/conteineres';
+        },
+      },
+    ),
+  );
 
   const form = createForm(() => ({
     defaultValues: {

@@ -1,0 +1,65 @@
+# ============================================================
+#  Integração contínua: roda em todo push e pull request.
+#
+#  A ordem é deliberada — as verificações baratas e mais específicas primeiro,
+#  para que um erro de lint não custe um build inteiro para aparecer.
+# ============================================================
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, tipos, testes e build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # O `.gitmodules` do projeto usa URLs SSH (git@github.com:), que não
+      # funcionam com o token do Actions. Reescrever para HTTPS antes do
+      # checkout é o que permite `submodules: recursive` num runner sem chave.
+      # Isso vale para submodule público; se algum virar privado, será preciso
+      # um PAT com acesso de leitura no lugar do GITHUB_TOKEN.
+      - name: Usar HTTPS para submodules
+        run: git config --global url."https://github.com/".insteadOf "git@github.com:"
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Instalar dependências
+        run: bun install --frozen-lockfile
+
+      # O Paraglide precisa rodar antes de tudo: lint, tipos e testes importam
+      # `@/paraglide/messages`, que é saída de compilador e não existe no repo.
+      - name: Compilar i18n
+        run: bun run i18n:compile
+
+      - name: Contrato de i18n
+        run: bun run i18n:check
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Tipos
+        run: bun run typecheck
+
+      - name: Testes
+        run: bun run test
+
+      - name: Build
+        run: bun run build
+
+      - name: Referência de API (TypeDoc)
+        run: bun run docs:api

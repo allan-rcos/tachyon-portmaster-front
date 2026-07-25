@@ -1,8 +1,12 @@
 # PortMaster — Sitemap do frontend (FLOW SSR + Islands)
 
-App single-tenant (sem segmento `@slug`). Auth por cookie `auth_token` + `pages/+guard.ts`
-(GET /v1/account; 401 → `/entrar`). Estado de dados **mocado** na camada de transporte
-(`services/mocks/`, flag `VITE_USE_MOCKS`, ligado por padrão) — sem backend por ora.
+App single-tenant (sem segmento `@slug`). Auth por cookie `auth_token` +
+`pages/+guard.ts` (GET /v1/account; 401 → `/entrar`), executado **no servidor**
+mesmo nas rotas que renderizam no navegador.
+
+As telas de `/painel` buscam dados no cliente, via ViewModel — o servidor só
+roda o guard. As rotas públicas (`/entrar`, `/info`, `/_error`) seguem em SSR com
+dados. Ver [a arquitetura](../architecture/mvvm.md).
 
 ## Público
 
@@ -33,9 +37,13 @@ App single-tenant (sem segmento `@slug`). Auth por cookie `auth_token` + `pages/
 
 ## Convenções
 
-- Component (SSR) vs island: ver `.island.tsx`. Islands entram via `ClientOnly` de `vike-solid`
-  com `fallback`.
-- Título por rota: cada `+data.ts` devolve `title`; único `pages/+Head.tsx` o renderiza (evita a
-  acumulação de `<title>` do Vike pela árvore).
-- IDs base62 opacos ponta-a-ponta (URL/mocks), sem conversão numérica.
+- **Camadas:** componente (puro) × island (`*.island.tsx`, interativo) × screen
+  (liga o ViewModel aos dois). Islands e screens entram via `ClientOnly` do
+  `vike-solid`, com `fallback`.
+- **Título por rota:** as rotas de `/painel` declaram `+routeMeta.ts`, que
+  reexporta a função de meta do ViewModel; as públicas devolvem `title` no
+  `+data.ts`. Um único `pages/+Head.tsx` renderiza os dois casos — o Vike
+  acumularia `<title>` se houvesse mais de um `+Head` na árvore.
+- **Permissões por rota:** `+permissions.js`, lido pelo guard.
+- IDs base62 opacos ponta a ponta, sem conversão numérica.
 - Rotas ↔ CSVs: `frontend-routes.csv` e `backend-routes.csv` neste diretório.

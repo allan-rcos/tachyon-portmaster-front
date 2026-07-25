@@ -14,7 +14,6 @@ import { TelemetryLog } from './TelemetryLog';
 import { ContainerActions } from '../islands/ContainerActions.island';
 import { ManifestEditor, type ProductOption } from '../islands/ManifestEditor.island';
 
-
 function occupancy(weight: number, capacity: number): number {
   return capacity ? Math.round((weight / capacity) * 1000) / 10 : 0;
 }

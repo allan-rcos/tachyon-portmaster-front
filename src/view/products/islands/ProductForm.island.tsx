@@ -31,14 +31,21 @@ export interface ProductFormProps {
 }
 
 function Inner(props: ProductFormProps): JSX.Element {
-  const mutation = bindMutation(createMutationSignal((value: FormValues) => {
-      const body = createProductSchema(props.t).parse(value);
-      return props.mode === 'create'
-        ? createProduct(body)
-        : updateProduct(props.productId!, body);
-    }, { onSuccess: () => {
-      window.location.href = '/painel/produtos';
-    } }));
+  const mutation = bindMutation(
+    createMutationSignal(
+      (value: FormValues) => {
+        const body = createProductSchema(props.t).parse(value);
+        return props.mode === 'create'
+          ? createProduct(body)
+          : updateProduct(props.productId!, body);
+      },
+      {
+        onSuccess: () => {
+          window.location.href = '/painel/produtos';
+        },
+      },
+    ),
+  );
 
   const form = createForm(() => ({
     defaultValues: {

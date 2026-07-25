@@ -6,120 +6,147 @@ import * as flatbuffers from 'flatbuffers';
 
 import { ProductResponse, ProductResponseT } from '../../../api/fbs/product/product-response.js';
 
-
 export class ProductListResponse implements flatbuffers.IUnpackableObject<ProductListResponseT> {
-  bb: flatbuffers.ByteBuffer|null = null;
+  bb: flatbuffers.ByteBuffer | null = null;
   bb_pos = 0;
-  __init(i:number, bb:flatbuffers.ByteBuffer):ProductListResponse {
-  this.bb_pos = i;
-  this.bb = bb;
-  return this;
-}
-
-static getRootAsProductListResponse(bb:flatbuffers.ByteBuffer, obj?:ProductListResponse):ProductListResponse {
-  return (obj || new ProductListResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-}
-
-static getSizePrefixedRootAsProductListResponse(bb:flatbuffers.ByteBuffer, obj?:ProductListResponse):ProductListResponse {
-  bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
-  return (obj || new ProductListResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-}
-
-data(index: number, obj?:ProductResponse):ProductResponse|null {
-  const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? (obj || new ProductResponse()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
-}
-
-dataLength():number {
-  const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
-}
-
-nextCursor():string|null
-nextCursor(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-nextCursor(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
-
-total():number {
-  const offset = this.bb!.__offset(this.bb_pos, 8);
-  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
-}
-
-static startProductListResponse(builder:flatbuffers.Builder) {
-  builder.startObject(3);
-}
-
-static addData(builder:flatbuffers.Builder, dataOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(0, dataOffset, 0);
-}
-
-static createDataVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
-  builder.startVector(4, data.length, 4);
-  for (let i = data.length - 1; i >= 0; i--) {
-    builder.addOffset(data[i]!);
+  __init(i: number, bb: flatbuffers.ByteBuffer): ProductListResponse {
+    this.bb_pos = i;
+    this.bb = bb;
+    return this;
   }
-  return builder.endVector();
-}
 
-static startDataVector(builder:flatbuffers.Builder, numElems:number) {
-  builder.startVector(4, numElems, 4);
-}
+  static getRootAsProductListResponse(
+    bb: flatbuffers.ByteBuffer,
+    obj?: ProductListResponse,
+  ): ProductListResponse {
+    return (obj || new ProductListResponse()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb,
+    );
+  }
 
-static addNextCursor(builder:flatbuffers.Builder, nextCursorOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, nextCursorOffset, 0);
-}
+  static getSizePrefixedRootAsProductListResponse(
+    bb: flatbuffers.ByteBuffer,
+    obj?: ProductListResponse,
+  ): ProductListResponse {
+    bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
+    return (obj || new ProductListResponse()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb,
+    );
+  }
 
-static addTotal(builder:flatbuffers.Builder, total:number) {
-  builder.addFieldInt32(2, total, 0);
-}
+  data(index: number, obj?: ProductResponse): ProductResponse | null {
+    const offset = this.bb!.__offset(this.bb_pos, 4);
+    return offset
+      ? (obj || new ProductResponse()).__init(
+          this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4),
+          this.bb!,
+        )
+      : null;
+  }
 
-static endProductListResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
-  const offset = builder.endObject();
-  return offset;
-}
+  dataLength(): number {
+    const offset = this.bb!.__offset(this.bb_pos, 4);
+    return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+  }
 
-static createProductListResponse(builder:flatbuffers.Builder, dataOffset:flatbuffers.Offset, nextCursorOffset:flatbuffers.Offset, total:number):flatbuffers.Offset {
-  ProductListResponse.startProductListResponse(builder);
-  ProductListResponse.addData(builder, dataOffset);
-  ProductListResponse.addNextCursor(builder, nextCursorOffset);
-  ProductListResponse.addTotal(builder, total);
-  return ProductListResponse.endProductListResponse(builder);
-}
+  nextCursor(): string | null;
+  nextCursor(optionalEncoding: flatbuffers.Encoding): string | Uint8Array | null;
+  nextCursor(optionalEncoding?: any): string | Uint8Array | null {
+    const offset = this.bb!.__offset(this.bb_pos, 6);
+    return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  }
 
-unpack(): ProductListResponseT {
-  return new ProductListResponseT(
-    this.bb!.createObjList<ProductResponse, ProductResponseT>(this.data.bind(this), this.dataLength()),
-    this.nextCursor(),
-    this.total()
-  );
-}
+  total(): number {
+    const offset = this.bb!.__offset(this.bb_pos, 8);
+    return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
+  }
 
+  static startProductListResponse(builder: flatbuffers.Builder) {
+    builder.startObject(3);
+  }
 
-unpackTo(_o: ProductListResponseT): void {
-  _o.data = this.bb!.createObjList<ProductResponse, ProductResponseT>(this.data.bind(this), this.dataLength());
-  _o.nextCursor = this.nextCursor();
-  _o.total = this.total();
-}
+  static addData(builder: flatbuffers.Builder, dataOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(0, dataOffset, 0);
+  }
+
+  static createDataVector(
+    builder: flatbuffers.Builder,
+    data: flatbuffers.Offset[],
+  ): flatbuffers.Offset {
+    builder.startVector(4, data.length, 4);
+    for (let i = data.length - 1; i >= 0; i--) {
+      builder.addOffset(data[i]!);
+    }
+    return builder.endVector();
+  }
+
+  static startDataVector(builder: flatbuffers.Builder, numElems: number) {
+    builder.startVector(4, numElems, 4);
+  }
+
+  static addNextCursor(builder: flatbuffers.Builder, nextCursorOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(1, nextCursorOffset, 0);
+  }
+
+  static addTotal(builder: flatbuffers.Builder, total: number) {
+    builder.addFieldInt32(2, total, 0);
+  }
+
+  static endProductListResponse(builder: flatbuffers.Builder): flatbuffers.Offset {
+    const offset = builder.endObject();
+    return offset;
+  }
+
+  static createProductListResponse(
+    builder: flatbuffers.Builder,
+    dataOffset: flatbuffers.Offset,
+    nextCursorOffset: flatbuffers.Offset,
+    total: number,
+  ): flatbuffers.Offset {
+    ProductListResponse.startProductListResponse(builder);
+    ProductListResponse.addData(builder, dataOffset);
+    ProductListResponse.addNextCursor(builder, nextCursorOffset);
+    ProductListResponse.addTotal(builder, total);
+    return ProductListResponse.endProductListResponse(builder);
+  }
+
+  unpack(): ProductListResponseT {
+    return new ProductListResponseT(
+      this.bb!.createObjList<ProductResponse, ProductResponseT>(
+        this.data.bind(this),
+        this.dataLength(),
+      ),
+      this.nextCursor(),
+      this.total(),
+    );
+  }
+
+  unpackTo(_o: ProductListResponseT): void {
+    _o.data = this.bb!.createObjList<ProductResponse, ProductResponseT>(
+      this.data.bind(this),
+      this.dataLength(),
+    );
+    _o.nextCursor = this.nextCursor();
+    _o.total = this.total();
+  }
 }
 
 export class ProductListResponseT implements flatbuffers.IGeneratedObject {
-constructor(
-  public data: (ProductResponseT)[] = [],
-  public nextCursor: string|Uint8Array|null = null,
-  public total: number = 0
-){}
+  constructor(
+    public data: ProductResponseT[] = [],
+    public nextCursor: string | Uint8Array | null = null,
+    public total: number = 0,
+  ) {}
 
+  pack(builder: flatbuffers.Builder): flatbuffers.Offset {
+    const data = ProductListResponse.createDataVector(
+      builder,
+      builder.createObjectOffsetList(this.data),
+    );
+    const nextCursor = this.nextCursor !== null ? builder.createString(this.nextCursor!) : 0;
 
-pack(builder:flatbuffers.Builder): flatbuffers.Offset {
-  const data = ProductListResponse.createDataVector(builder, builder.createObjectOffsetList(this.data));
-  const nextCursor = (this.nextCursor !== null ? builder.createString(this.nextCursor!) : 0);
-
-  return ProductListResponse.createProductListResponse(builder,
-    data,
-    nextCursor,
-    this.total
-  );
-}
+    return ProductListResponse.createProductListResponse(builder, data, nextCursor, this.total);
+  }
 }

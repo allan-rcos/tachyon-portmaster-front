@@ -1,0 +1,34 @@
+# Reinstalados/reconstruídos dentro da imagem.
+node_modules
+**/node_modules
+
+# O Dockerfile (build completo) gera o próprio dist; o Dockerfile.dist precisa
+# do dist do host, então ele NÃO pode entrar aqui — a exclusão fica por conta
+# do estágio, não do contexto.
+
+# Histórico e metadados de VCS.
+.git
+.gitmodules
+
+# Documentação e protótipo: nada disso vai para a imagem.
+docs
+*.md
+!README.md
+
+# Ferramentas de desenvolvimento e IDE.
+.claude
+.idea
+*.iml
+.vscode
+
+# Ambiente local — as variáveis vêm do orquestrador em produção.
+.env
+.env.*
+!.env.example
+
+# Artefatos diversos.
+coverage
+*.log
+*.tmp
+tmp
+.DS_Store

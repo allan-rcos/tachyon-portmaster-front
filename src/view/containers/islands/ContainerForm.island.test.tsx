@@ -54,6 +54,8 @@ describe('ContainerForm island', () => {
     setInput(getByLabelText(t.maxCapacity), '32000');
     await user.click(getByRole('button', { name: t.save }));
 
-    await waitFor(() => expect(mockedUpdate).toHaveBeenCalledWith('ctr_1', { max_capacity: 32000 }));
+    await waitFor(() =>
+      expect(mockedUpdate).toHaveBeenCalledWith('ctr_1', { max_capacity: 32000 }),
+    );
   });
 });

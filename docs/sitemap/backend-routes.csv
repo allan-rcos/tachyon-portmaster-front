@@ -1,31 +1,31 @@
 metodo,rota,operacao,codec,usado_por
-POST,/v1/auth/login,Autenticar,services/codecs/flow/v1/auth.ts::login,LoginForm.island
-GET,/v1/account,Perfil próprio,account.ts::getAccount,+guard.ts / features/account/loaders/getAccount
-PUT,/v1/account,Atualizar conta,account.ts::updateAccount,AccountForm.island
-PUT,/v1/account/password,Trocar senha,account.ts::changePassword,PasswordChange.island
-GET,/v1/metrics,Métricas,metrics.ts::getMetrics,features/metrics/loaders/getMetrics
-GET,/v1/containers,Listar contêineres,container.ts::listContainers,features/containers/loaders/listContainers
-POST,/v1/containers,Criar contêiner,container.ts::createContainer,ContainerForm.island
-GET,/v1/containers/{id},Obter contêiner,container.ts::getContainer,features/containers/loaders/getContainer
-PUT,/v1/containers/{id},Atualizar contêiner,container.ts::updateContainer,ContainerForm.island
-DELETE,/v1/containers/{id},Remover contêiner,container.ts::deleteContainer,ContainerActions.island
-POST,/v1/containers/{id}/seal,Lacrar,container.ts::sealContainer,ContainerActions.island
-POST,/v1/containers/{id}/dispatch,Despachar,container.ts::dispatchContainer,ContainerActions.island
-GET,/v1/containers/summary,Resumos,container.ts::listContainerSummaries,features/containers/loaders/getContainerSummary
-POST,/v1/manifests/load-item,Carregar item,manifest.ts::loadItem,ManifestEditor.island
-POST,/v1/manifests/unload-item,Descarregar item,manifest.ts::unloadItem,ManifestEditor.island
-GET,/v1/products,Listar produtos,product.ts::listProducts,features/products/loaders/listProducts
-POST,/v1/products,Criar produto,product.ts::createProduct,ProductForm.island
-GET,/v1/products/{id},Obter produto,product.ts::getProduct,features/products/loaders/getProduct
-PUT,/v1/products/{id},Atualizar produto,product.ts::updateProduct,ProductForm.island
-DELETE,/v1/products/{id},Remover produto,product.ts::deleteProduct,ProductForm.island
-GET,/v1/users,Listar usuários,user.ts::listUsers,features/users/loaders/listUsers
-POST,/v1/users,Criar usuário,user.ts::createUser,UserForm.island
-GET,/v1/users/{id},Obter usuário,user.ts::getUser,features/users/loaders/getUser
-PUT,/v1/users/{id},Atualizar usuário,user.ts::updateUser,UserForm.island
-DELETE,/v1/users/{id},Remover usuário,user.ts::deleteUser,UserAdminActions.island
-PUT,/v1/users/{id}/password,Reset de senha,user.ts::resetUserPassword,UserAdminActions.island
-PUT,/v1/users/{id}/roles,Atualizar perfis,user.ts::updateUserRoles,UserForm.island
-GET,/v1/roles,Listar perfis,role.ts::listRoles,features/roles/loaders/listRoles
-POST,/v1/roles,Criar perfil,role.ts::createRole,RoleForm.island
-PUT,/v1/roles/{id}/permissions,Sincronizar permissões,role.ts::updateRolePermissions,RoleForm.island
+POST,/v1/auth/login,Autenticar,model/auth/api.ts::login,LoginForm.island
+GET,/v1/account,Perfil próprio,model/account/api.ts::getAccount,+guard.ts / viewmodel/account/queries/get-account.query
+PUT,/v1/account,Atualizar conta,model/account/api.ts::updateAccount,AccountForm.island
+PUT,/v1/account/password,Trocar senha,model/account/api.ts::changePassword,PasswordChange.island
+GET,/v1/metrics,Métricas,model/metrics/api.ts::getMetrics,viewmodel/metrics/queries/get-metrics.query
+GET,/v1/containers,Listar contêineres,model/containers/api.ts::listContainers,viewmodel/containers/queries/list-containers.query
+POST,/v1/containers,Criar contêiner,model/containers/api.ts::createContainer,ContainerForm.island
+GET,/v1/containers/{id},Obter contêiner,model/containers/api.ts::getContainer,viewmodel/containers/queries/get-container.query
+PUT,/v1/containers/{id},Atualizar contêiner,model/containers/api.ts::updateContainer,ContainerForm.island
+DELETE,/v1/containers/{id},Remover contêiner,model/containers/api.ts::deleteContainer,ContainerActions.island
+POST,/v1/containers/{id}/seal,Lacrar,model/containers/api.ts::sealContainer,ContainerActions.island
+POST,/v1/containers/{id}/dispatch,Despachar,model/containers/api.ts::dispatchContainer,ContainerActions.island
+GET,/v1/containers/summary,Resumos,model/containers/api.ts::listContainerSummaries,viewmodel/containers/queries/get-container-summary.query
+POST,/v1/manifests/load-item,Carregar item,model/containers/api.ts::loadItem,ManifestEditor.island
+POST,/v1/manifests/unload-item,Descarregar item,model/containers/api.ts::unloadItem,ManifestEditor.island
+GET,/v1/products,Listar produtos,model/products/api.ts::listProducts,viewmodel/products/queries/list-products.query
+POST,/v1/products,Criar produto,model/products/api.ts::createProduct,ProductForm.island
+GET,/v1/products/{id},Obter produto,model/products/api.ts::getProduct,viewmodel/products/queries/get-product.query
+PUT,/v1/products/{id},Atualizar produto,model/products/api.ts::updateProduct,ProductForm.island
+DELETE,/v1/products/{id},Remover produto,model/products/api.ts::deleteProduct,ProductForm.island
+GET,/v1/users,Listar usuários,model/users/api.ts::listUsers,viewmodel/users/queries/list-users.query
+POST,/v1/users,Criar usuário,model/users/api.ts::createUser,UserForm.island
+GET,/v1/users/{id},Obter usuário,model/users/api.ts::getUser,viewmodel/users/queries/get-user.query
+PUT,/v1/users/{id},Atualizar usuário,model/users/api.ts::updateUser,UserForm.island
+DELETE,/v1/users/{id},Remover usuário,model/users/api.ts::deleteUser,UserAdminActions.island
+PUT,/v1/users/{id}/password,Reset de senha,model/users/api.ts::resetUserPassword,UserAdminActions.island
+PUT,/v1/users/{id}/roles,Atualizar perfis,model/users/api.ts::updateUserRoles,UserForm.island
+GET,/v1/roles,Listar perfis,model/roles/api.ts::listRoles,viewmodel/roles/queries/list-roles.query
+POST,/v1/roles,Criar perfil,model/roles/api.ts::createRole,RoleForm.island
+PUT,/v1/roles/{id}/permissions,Sincronizar permissões,model/roles/api.ts::updateRolePermissions,RoleForm.island

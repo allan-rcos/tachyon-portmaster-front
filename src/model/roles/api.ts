@@ -3,7 +3,6 @@ import { encRoleCreate, decRole, decRoleList } from './fbs';
 import type { ApiClient } from '../core/http';
 import { wire } from '../core/wire';
 
-
 export const listRoles = (c: ApiClient, query?: Record<string, string>): Promise<RoleList> =>
   wire(c, { method: 'GET', path: '/v1/roles', query, decode: decRoleList });
 

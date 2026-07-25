@@ -3,7 +3,6 @@ import type { JSX } from 'solid-js';
 
 import styles from './Badge.module.scss';
 
-
 export interface BadgeProps {
   tone?: Tone;
   children: JSX.Element;

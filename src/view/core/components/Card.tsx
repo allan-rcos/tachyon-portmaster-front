@@ -4,7 +4,6 @@ import { Dynamic } from 'solid-js/web';
 
 import styles from './Card.module.scss';
 
-
 export interface CardProps {
   children: JSX.Element;
   title?: string;

@@ -1,4 +1,3 @@
-
 import { loadErrorPage, type ErrorPageData } from '@viewmodel/core/error-page.vm';
 import { toPageRequest } from '@viewmodel/core/page/page-request';
 import type { PageContextServer } from 'vike/types';

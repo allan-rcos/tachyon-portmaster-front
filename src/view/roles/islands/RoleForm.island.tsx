@@ -32,14 +32,21 @@ interface FormValues {
 }
 
 function Inner(props: RoleFormProps): JSX.Element {
-  const mutation = bindMutation(createMutationSignal((value: FormValues) => {
-      if (props.mode === 'create') {
-        return createRole({ name: value.name, permissions: value.permissions });
-      }
-      return updateRolePermissions(props.roleId!, value.permissions);
-    }, { onSuccess: () => {
-      window.location.href = '/painel/perfis';
-    } }));
+  const mutation = bindMutation(
+    createMutationSignal(
+      (value: FormValues) => {
+        if (props.mode === 'create') {
+          return createRole({ name: value.name, permissions: value.permissions });
+        }
+        return updateRolePermissions(props.roleId!, value.permissions);
+      },
+      {
+        onSuccess: () => {
+          window.location.href = '/painel/perfis';
+        },
+      },
+    ),
+  );
 
   const form = createForm(() => ({
     defaultValues: {

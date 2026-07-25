@@ -10,7 +10,10 @@ import type { ProductList } from './domain';
 import { productsListMessages } from './i18n/product-list-page.messages';
 import type { ProductListText } from './i18n/text-contracts';
 import { listProducts } from './queries/list-products.query';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import type { PageMeta } from '../core/page/page-request';
 import { contextLocale, contextParams, type VMContext } from '../core/page/vm-context';

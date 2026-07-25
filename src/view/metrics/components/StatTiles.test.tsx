@@ -5,7 +5,6 @@ import { describe, it, expect } from 'vitest';
 
 import { StatTiles } from './StatTiles';
 
-
 const t = painelMessages('pt-BR');
 const metrics: Metrics = {
   active_containers: 6,

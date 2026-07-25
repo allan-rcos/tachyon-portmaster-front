@@ -7,7 +7,10 @@ import type { Role } from './domain';
 import { rolePermissionsMessages } from './i18n/role-permissions-page.messages';
 import type { RolePermissionsText } from './i18n/role-permissions-page.messages';
 import { listRoles } from './queries/list-roles.query';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import { PageNotFoundError, type PageMeta } from '../core/page/page-request';
 import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';

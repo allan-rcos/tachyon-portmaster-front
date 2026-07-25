@@ -5,7 +5,10 @@ import { usePageContext } from 'vike-solid/usePageContext';
 
 export default function Page() {
   const pageContext = usePageContext();
-  const vm = createUserEditVM({ url: pageContext.urlOriginal, routeParams: pageContext.routeParams });
+  const vm = createUserEditVM({
+    url: pageContext.urlOriginal,
+    routeParams: pageContext.routeParams,
+  });
   return (
     <ClientOnly fallback={<div />}>
       <UserEditScreen vm={vm} />

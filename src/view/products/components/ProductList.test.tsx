@@ -5,7 +5,6 @@ import { describe, it, expect } from 'vitest';
 
 import { ProductList } from './ProductList';
 
-
 const t = productsListMessages('pt-BR');
 const items: Product[] = [
   { id: 'prd_1', name: 'Farelo de soja', density: 0.58, risk_class: 'None' },

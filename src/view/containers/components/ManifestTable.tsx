@@ -6,7 +6,6 @@ import { For, Show, type JSX } from 'solid-js';
 import type { ContainerDetailText } from './ContainerSummary';
 import styles from './ManifestTable.module.scss';
 
-
 /** Manifesto de carga (SSR). */
 export function ManifestTable(props: {
   items: CargoManifestItem[];

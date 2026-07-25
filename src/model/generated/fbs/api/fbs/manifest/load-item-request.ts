@@ -4,106 +4,105 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-
-
 export class LoadItemRequest implements flatbuffers.IUnpackableObject<LoadItemRequestT> {
-  bb: flatbuffers.ByteBuffer|null = null;
+  bb: flatbuffers.ByteBuffer | null = null;
   bb_pos = 0;
-  __init(i:number, bb:flatbuffers.ByteBuffer):LoadItemRequest {
-  this.bb_pos = i;
-  this.bb = bb;
-  return this;
-}
+  __init(i: number, bb: flatbuffers.ByteBuffer): LoadItemRequest {
+    this.bb_pos = i;
+    this.bb = bb;
+    return this;
+  }
 
-static getRootAsLoadItemRequest(bb:flatbuffers.ByteBuffer, obj?:LoadItemRequest):LoadItemRequest {
-  return (obj || new LoadItemRequest()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-}
+  static getRootAsLoadItemRequest(
+    bb: flatbuffers.ByteBuffer,
+    obj?: LoadItemRequest,
+  ): LoadItemRequest {
+    return (obj || new LoadItemRequest()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+  }
 
-static getSizePrefixedRootAsLoadItemRequest(bb:flatbuffers.ByteBuffer, obj?:LoadItemRequest):LoadItemRequest {
-  bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
-  return (obj || new LoadItemRequest()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-}
+  static getSizePrefixedRootAsLoadItemRequest(
+    bb: flatbuffers.ByteBuffer,
+    obj?: LoadItemRequest,
+  ): LoadItemRequest {
+    bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
+    return (obj || new LoadItemRequest()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+  }
 
-containerId():string|null
-containerId(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-containerId(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
+  containerId(): string | null;
+  containerId(optionalEncoding: flatbuffers.Encoding): string | Uint8Array | null;
+  containerId(optionalEncoding?: any): string | Uint8Array | null {
+    const offset = this.bb!.__offset(this.bb_pos, 4);
+    return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  }
 
-productId():string|null
-productId(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-productId(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
+  productId(): string | null;
+  productId(optionalEncoding: flatbuffers.Encoding): string | Uint8Array | null;
+  productId(optionalEncoding?: any): string | Uint8Array | null {
+    const offset = this.bb!.__offset(this.bb_pos, 6);
+    return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  }
 
-quantity():number {
-  const offset = this.bb!.__offset(this.bb_pos, 8);
-  return offset ? this.bb!.readFloat64(this.bb_pos + offset) : 0.0;
-}
+  quantity(): number {
+    const offset = this.bb!.__offset(this.bb_pos, 8);
+    return offset ? this.bb!.readFloat64(this.bb_pos + offset) : 0.0;
+  }
 
-static startLoadItemRequest(builder:flatbuffers.Builder) {
-  builder.startObject(3);
-}
+  static startLoadItemRequest(builder: flatbuffers.Builder) {
+    builder.startObject(3);
+  }
 
-static addContainerId(builder:flatbuffers.Builder, containerIdOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(0, containerIdOffset, 0);
-}
+  static addContainerId(builder: flatbuffers.Builder, containerIdOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(0, containerIdOffset, 0);
+  }
 
-static addProductId(builder:flatbuffers.Builder, productIdOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, productIdOffset, 0);
-}
+  static addProductId(builder: flatbuffers.Builder, productIdOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(1, productIdOffset, 0);
+  }
 
-static addQuantity(builder:flatbuffers.Builder, quantity:number) {
-  builder.addFieldFloat64(2, quantity, 0.0);
-}
+  static addQuantity(builder: flatbuffers.Builder, quantity: number) {
+    builder.addFieldFloat64(2, quantity, 0.0);
+  }
 
-static endLoadItemRequest(builder:flatbuffers.Builder):flatbuffers.Offset {
-  const offset = builder.endObject();
-  return offset;
-}
+  static endLoadItemRequest(builder: flatbuffers.Builder): flatbuffers.Offset {
+    const offset = builder.endObject();
+    return offset;
+  }
 
-static createLoadItemRequest(builder:flatbuffers.Builder, containerIdOffset:flatbuffers.Offset, productIdOffset:flatbuffers.Offset, quantity:number):flatbuffers.Offset {
-  LoadItemRequest.startLoadItemRequest(builder);
-  LoadItemRequest.addContainerId(builder, containerIdOffset);
-  LoadItemRequest.addProductId(builder, productIdOffset);
-  LoadItemRequest.addQuantity(builder, quantity);
-  return LoadItemRequest.endLoadItemRequest(builder);
-}
+  static createLoadItemRequest(
+    builder: flatbuffers.Builder,
+    containerIdOffset: flatbuffers.Offset,
+    productIdOffset: flatbuffers.Offset,
+    quantity: number,
+  ): flatbuffers.Offset {
+    LoadItemRequest.startLoadItemRequest(builder);
+    LoadItemRequest.addContainerId(builder, containerIdOffset);
+    LoadItemRequest.addProductId(builder, productIdOffset);
+    LoadItemRequest.addQuantity(builder, quantity);
+    return LoadItemRequest.endLoadItemRequest(builder);
+  }
 
-unpack(): LoadItemRequestT {
-  return new LoadItemRequestT(
-    this.containerId(),
-    this.productId(),
-    this.quantity()
-  );
-}
+  unpack(): LoadItemRequestT {
+    return new LoadItemRequestT(this.containerId(), this.productId(), this.quantity());
+  }
 
-
-unpackTo(_o: LoadItemRequestT): void {
-  _o.containerId = this.containerId();
-  _o.productId = this.productId();
-  _o.quantity = this.quantity();
-}
+  unpackTo(_o: LoadItemRequestT): void {
+    _o.containerId = this.containerId();
+    _o.productId = this.productId();
+    _o.quantity = this.quantity();
+  }
 }
 
 export class LoadItemRequestT implements flatbuffers.IGeneratedObject {
-constructor(
-  public containerId: string|Uint8Array|null = null,
-  public productId: string|Uint8Array|null = null,
-  public quantity: number = 0.0
-){}
+  constructor(
+    public containerId: string | Uint8Array | null = null,
+    public productId: string | Uint8Array | null = null,
+    public quantity: number = 0.0,
+  ) {}
 
+  pack(builder: flatbuffers.Builder): flatbuffers.Offset {
+    const containerId = this.containerId !== null ? builder.createString(this.containerId!) : 0;
+    const productId = this.productId !== null ? builder.createString(this.productId!) : 0;
 
-pack(builder:flatbuffers.Builder): flatbuffers.Offset {
-  const containerId = (this.containerId !== null ? builder.createString(this.containerId!) : 0);
-  const productId = (this.productId !== null ? builder.createString(this.productId!) : 0);
-
-  return LoadItemRequest.createLoadItemRequest(builder,
-    containerId,
-    productId,
-    this.quantity
-  );
-}
+    return LoadItemRequest.createLoadItemRequest(builder, containerId, productId, this.quantity);
+  }
 }

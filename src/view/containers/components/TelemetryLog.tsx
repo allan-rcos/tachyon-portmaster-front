@@ -1,5 +1,3 @@
-
-
 import { Badge } from '@view/core/components/Badge';
 import type { TelemetryLogItem } from '@viewmodel/containers/domain';
 import type { TelemetryEvent } from '@viewmodel/core/domain';

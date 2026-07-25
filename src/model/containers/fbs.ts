@@ -18,7 +18,6 @@ import { LoadItemRequestT } from '../generated/fbs/api/fbs/manifest/load-item-re
 import { ManifestResponse as FbManifestResponse } from '../generated/fbs/api/fbs/manifest/manifest-response';
 import { UnloadItemRequestT } from '../generated/fbs/api/fbs/manifest/unload-item-request';
 
-
 export const encContainerCreate = (v: ContainerCreateRequest): Uint8Array =>
   toBytes(new ContainerCreateRequestT(v.code, v.max_capacity));
 

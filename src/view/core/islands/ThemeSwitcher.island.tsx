@@ -5,7 +5,6 @@ import { createSignal, type JSX } from 'solid-js';
 
 import styles from './ThemeSwitcher.island.module.scss';
 
-
 type Theme = 'light' | 'dark';
 
 /** Alterna tema claro/escuro; grava cookie `flow-theme` e o atributo

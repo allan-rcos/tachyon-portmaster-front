@@ -8,7 +8,6 @@ import styles from './OccupancyChart.island.module.scss';
 import type { MetricsPanelText } from '../components/MetricsPanel';
 import { segmentsOf } from '../components/OccupancyBreakdown';
 
-
 // Tipado pela união `Tone` (e não `Record<string, string>`) para que o
 // compilador cobre uma entrada por tom: acrescentar um tom ao domínio passa a
 // quebrar aqui, em vez de render uma fatia sem cor.

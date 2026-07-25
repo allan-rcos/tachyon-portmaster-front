@@ -38,7 +38,9 @@ const base = settings.baseLocale;
 
 // Raízes a varrer: argv ou default. Diretórios inexistentes são ignorados, o que
 // mantém o script válido antes e depois da migração features/ → src/.
-const SOURCE_ROOTS = (process.argv.slice(2).length ? process.argv.slice(2) : ['pages', 'src', 'features'])
+const SOURCE_ROOTS = (
+  process.argv.slice(2).length ? process.argv.slice(2) : ['pages', 'src', 'features']
+)
   .map((r) => join(root, r))
   .filter((dir) => existsSync(dir));
 

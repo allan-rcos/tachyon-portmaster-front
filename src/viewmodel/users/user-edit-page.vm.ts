@@ -8,7 +8,10 @@ import { userEditMessages } from './i18n/user-edit-page.messages';
 import type { UserEditText } from './i18n/user-edit-page.messages';
 import { getUser } from './queries/get-user.query';
 import type { RoleOption } from './user-create-page.vm';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import type { PageMeta } from '../core/page/page-request';
 import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';
@@ -44,7 +47,10 @@ export function createUserEditVM(context: VMContext): UserEditVM {
   const boundary = asyncBoundaryMessages(contextLocale(context));
   const id = routeParam(context, 'id');
   const data = createAsyncSignal<UserEditData, []>(async () => {
-    const [user, roles] = await Promise.all([getUser(id, context.headers), listRoles(context.headers)]);
+    const [user, roles] = await Promise.all([
+      getUser(id, context.headers),
+      listRoles(context.headers),
+    ]);
     return { user, roles: roles.data.map((role) => ({ id: role.id, name: role.name })) };
   });
   return { t, boundary, id, data, load: () => data.run() };

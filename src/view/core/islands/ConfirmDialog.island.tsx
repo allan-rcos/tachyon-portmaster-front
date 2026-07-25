@@ -4,7 +4,6 @@ import { createSignal, Show, type JSX } from 'solid-js';
 
 import styles from './ConfirmDialog.island.module.scss';
 
-
 export interface ConfirmDialogProps {
   triggerLabel: string;
   triggerIcon?: IconName;

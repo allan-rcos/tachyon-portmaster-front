@@ -15,7 +15,11 @@ import { type JSX } from 'solid-js';
 import styles from './PasswordChange.island.module.scss';
 
 function Inner(props: { t: PasswordChangeText }): JSX.Element {
-  const mutation = bindMutation(createMutationSignal((value: PasswordChangeData) => changeAccountPassword(value), { onSuccess: () => form.reset() }));
+  const mutation = bindMutation(
+    createMutationSignal((value: PasswordChangeData) => changeAccountPassword(value), {
+      onSuccess: () => form.reset(),
+    }),
+  );
 
   const form = createForm(() => ({
     defaultValues: { current_password: '', new_password: '' } as PasswordChangeData,

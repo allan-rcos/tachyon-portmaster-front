@@ -5,7 +5,6 @@ import { describe, it, expect } from 'vitest';
 
 import { AccountProfile } from './AccountProfile';
 
-
 const t = accountMessages('pt-BR');
 const profile: Profile = {
   id: 'usr_1',

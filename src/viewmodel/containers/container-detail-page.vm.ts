@@ -7,7 +7,10 @@ import type { ContainerSummary } from './domain';
 import { containerDetailMessages } from './i18n/container-detail-page.messages';
 import type { ContainerDetailPageText } from './i18n/container-detail-page.messages';
 import { getContainerSummary } from './queries/get-container-summary.query';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import type { PageMeta } from '../core/page/page-request';
 import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';

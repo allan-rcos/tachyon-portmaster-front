@@ -8,7 +8,10 @@ import { errText } from '@view/core/utils/ui';
 import type { ContainerDetailText } from '@viewmodel/containers/i18n/text-contracts';
 import { loadManifestItem } from '@viewmodel/containers/mutations/load-manifest-item.mutation';
 import { unloadManifestItem } from '@viewmodel/containers/mutations/unload-manifest-item.mutation';
-import { createLoadItemSchema, type LoadItemData } from '@viewmodel/containers/schemas/manifest.schema';
+import {
+  createLoadItemSchema,
+  type LoadItemData,
+} from '@viewmodel/containers/schemas/manifest.schema';
 import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import { createSignal, For, type JSX } from 'solid-js';
 
@@ -37,7 +40,10 @@ function Inner(props: {
   const reloadOnSuccess = { onSuccess: () => window.location.reload() };
 
   const loadMut = bindMutation(
-    createMutationSignal((v: LoadItemData) => loadManifestItem(props.containerId, v), reloadOnSuccess),
+    createMutationSignal(
+      (v: LoadItemData) => loadManifestItem(props.containerId, v),
+      reloadOnSuccess,
+    ),
   );
   const unloadMut = bindMutation(
     createMutationSignal(

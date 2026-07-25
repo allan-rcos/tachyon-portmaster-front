@@ -7,7 +7,10 @@ import type { UserList } from './domain';
 import type { UserListText } from './i18n/text-contracts';
 import { usersListMessages } from './i18n/user-list-page.messages';
 import { listUsers } from './queries/list-users.query';
-import { asyncBoundaryMessages, type AsyncBoundaryText } from '../core/i18n/async-boundary.messages';
+import {
+  asyncBoundaryMessages,
+  type AsyncBoundaryText,
+} from '../core/i18n/async-boundary.messages';
 import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
 import type { PageMeta } from '../core/page/page-request';
 import { contextLocale, contextParams, type VMContext } from '../core/page/vm-context';

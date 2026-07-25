@@ -5,7 +5,6 @@ import { describe, it, expect } from 'vitest';
 
 import { RoleList } from './RoleList';
 
-
 const t = rolesListMessages('pt-BR');
 const items: Role[] = [
   { id: 'rol_1', name: 'Administrador', user_count: 1, permissions: ['MetricsRead', 'UserList'] },

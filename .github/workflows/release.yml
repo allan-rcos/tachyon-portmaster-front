@@ -1,0 +1,123 @@
+# ============================================================
+#  Release: dispara quando a versão do package.json MUDA na main.
+#
+#  O gatilho é a mudança de versão, e não uma tag empurrada à mão, porque a
+#  versão no package.json é a fonte da verdade — publicar passa a ser um efeito
+#  de um commit revisado, não um passo manual que alguém pode esquecer ou fazer
+#  fora de ordem.
+#
+#  Publica dois artefatos do MESMO build:
+#   • portmaster-dist-vX.Y.Z.zip — o `dist` pronto para rodar com `tjs`;
+#   • ghcr.io/<owner>/portmaster:X.Y.Z — imagem montada a partir desse zip,
+#     via Dockerfile.dist. Buildar a aplicação uma vez só é o que garante que
+#     imagem e zip contêm exatamente o mesmo código.
+# ============================================================
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
+
+permissions:
+  contents: write # criar a release e anexar o zip
+  packages: write # publicar a imagem no GHCR
+
+jobs:
+  check-version:
+    name: A versão mudou?
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # o commit anterior, para comparar
+
+      - id: check
+        name: Comparar com o commit anterior
+        run: |
+          current="$(jq -r .version package.json)"
+          previous="$(git show HEAD~1:package.json 2>/dev/null | jq -r .version || echo 'none')"
+          echo "version=$current" >> "$GITHUB_OUTPUT"
+          if [ "$current" != "$previous" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Versão: $previous → $current"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Versão inalterada ($current) — nada a publicar."
+          fi
+
+  release:
+    name: Publicar zip e imagem
+    needs: check-version
+    if: needs.check-version.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45 # o estágio do txiki compila do fonte
+    env:
+      VERSION: ${{ needs.check-version.outputs.version }}
+
+    steps:
+      - name: Usar HTTPS para submodules
+        run: git config --global url."https://github.com/".insteadOf "git@github.com:"
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Instalar dependências
+        run: bun install --frozen-lockfile
+
+      # Rede de segurança: uma versão nunca deve ser publicada sem a suíte
+      # verde, mesmo que o commit de bump tenha vindo por um caminho que pulou o CI.
+      - name: Verificar antes de publicar
+        run: |
+          bun run i18n:compile
+          bun run i18n:check
+          bun run lint
+          bun run typecheck
+          bun run test
+
+      - name: Build
+        run: bun run build
+
+      - name: Empacotar o dist
+        run: zip -r "portmaster-dist-v${VERSION}.zip" dist
+
+      - name: Criar a release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v${VERSION}" \
+            "portmaster-dist-v${VERSION}.zip" \
+            --title "v${VERSION}" \
+            --generate-notes
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Autenticar no GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Usa o Dockerfile.dist: a imagem empacota o `dist` que acabou de ser
+      # publicado, em vez de rebuildar a aplicação e arriscar divergência.
+      - name: Construir e publicar a imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.dist
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/portmaster:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/portmaster:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

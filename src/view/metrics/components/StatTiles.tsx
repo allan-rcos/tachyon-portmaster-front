@@ -6,7 +6,6 @@ import { For, type JSX } from 'solid-js';
 import type { MetricsPanelText } from './MetricsPanel';
 import styles from './StatTiles.module.scss';
 
-
 interface Tile {
   label: string;
   value: string;

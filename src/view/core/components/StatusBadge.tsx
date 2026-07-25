@@ -4,7 +4,6 @@ import type { JSX } from 'solid-js';
 
 import { Badge } from './Badge';
 
-
 /** Selo de status de contêiner (rótulo + tom pt-BR). */
 export function StatusBadge(props: { status: ContainerStatus }): JSX.Element {
   return (

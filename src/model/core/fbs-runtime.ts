@@ -53,7 +53,6 @@ function camelToSnake(k: string): string {
   return k.replace(/[A-Z]/g, (m) => '_' + m.toLowerCase());
 }
 
- 
 /**
  * Converte um objeto FlatBuffers no DTO de domínio equivalente.
  *

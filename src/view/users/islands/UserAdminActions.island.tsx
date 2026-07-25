@@ -14,7 +14,11 @@ import { type JSX } from 'solid-js';
 import styles from './UserAdminActions.island.module.scss';
 
 function Inner(props: { userId: string; t: UserAdminActionsText }): JSX.Element {
-  const reset = bindMutation(createMutationSignal((value: string) => resetUserPassword(props.userId, value), { onSuccess: () => form.reset() }));
+  const reset = bindMutation(
+    createMutationSignal((value: string) => resetUserPassword(props.userId, value), {
+      onSuccess: () => form.reset(),
+    }),
+  );
 
   const form = createForm(() => ({
     defaultValues: { new_password: '' },

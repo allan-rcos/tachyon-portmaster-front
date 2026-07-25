@@ -5,11 +5,20 @@
   "type": "module",
   "private": true,
   "license": "MIT",
-  "keywords": ["portmaster", "i18n", "inlang", "paraglide"],
+  "keywords": [
+    "portmaster",
+    "i18n",
+    "inlang",
+    "paraglide"
+  ],
   "bin": {
     "portmaster-i18n-check": "bin/i18n-check.mjs"
   },
-  "files": ["bin", "messages", "project.inlang"],
+  "files": [
+    "bin",
+    "messages",
+    "project.inlang"
+  ],
   "scripts": {
     "check": "node bin/i18n-check.mjs"
   },

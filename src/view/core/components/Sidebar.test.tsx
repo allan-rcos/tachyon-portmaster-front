@@ -4,7 +4,6 @@ import { describe, it, expect } from 'vitest';
 
 import { Sidebar, type ShellNavText } from './Sidebar';
 
-
 const nav: ShellNavText = { ...navText('pt-BR'), logout: commonText('pt-BR').logout };
 
 describe('Sidebar', () => {

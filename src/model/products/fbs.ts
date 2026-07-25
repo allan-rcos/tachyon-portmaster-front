@@ -5,7 +5,6 @@ import { ProductListResponse as FbProductListResponse } from '../generated/fbs/a
 import { ProductResponse as FbProductResponse } from '../generated/fbs/api/fbs/product/product-response';
 import { ProductUpdateRequestT } from '../generated/fbs/api/fbs/product/product-update-request';
 
-
 export const encProductCreate = (v: ProductCreateRequest): Uint8Array =>
   toBytes(new ProductCreateRequestT(v.name, v.density, riskIndex(v.risk_class)));
 

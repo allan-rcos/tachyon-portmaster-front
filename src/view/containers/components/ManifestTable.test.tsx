@@ -5,7 +5,6 @@ import { describe, it, expect } from 'vitest';
 import { ManifestTable } from './ManifestTable';
 import { TelemetryLog } from './TelemetryLog';
 
-
 const t = containerDetailMessages('pt-BR');
 
 describe('ManifestTable', () => {

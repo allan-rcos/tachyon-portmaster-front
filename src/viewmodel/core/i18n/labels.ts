@@ -1,12 +1,7 @@
 // ============================================================
 //  Rótulos pt-BR e "tom" (cor de badge) dos enums do domínio.
 // ============================================================
-import type {
-  ContainerStatus,
-  RiskClass,
-  TelemetryEvent,
-  Permission,
-} from '@model/common';
+import type { ContainerStatus, RiskClass, TelemetryEvent, Permission } from '@model/common';
 
 export type Tone = 'gold' | 'sage' | 'teal' | 'orange' | 'danger' | 'neutral';
 

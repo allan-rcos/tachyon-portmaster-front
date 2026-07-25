@@ -15,7 +15,11 @@ import { type JSX } from 'solid-js';
 import styles from './AccountForm.island.module.scss';
 
 function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.Element {
-  const mutation = bindMutation(createMutationSignal((value: AccountFormData) => updateAccountProfile(value), { onSuccess: () => window.location.reload() }));
+  const mutation = bindMutation(
+    createMutationSignal((value: AccountFormData) => updateAccountProfile(value), {
+      onSuccess: () => window.location.reload(),
+    }),
+  );
 
   const form = createForm(() => ({
     defaultValues: { name: props.name, email: props.email } as AccountFormData,

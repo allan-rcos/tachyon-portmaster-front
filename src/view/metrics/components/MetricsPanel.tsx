@@ -8,7 +8,6 @@ import { OccupancyBreakdown } from './OccupancyBreakdown';
 import { StatTiles } from './StatTiles';
 import { OccupancyChart } from '../islands/OccupancyChart.island';
 
-
 /** Painel operacional (SSR): KPIs + divisão por status (donut island
  *  com a barra SSR como fallback). */
 export function MetricsPanel(props: { metrics: Metrics; t: MetricsPanelText }): JSX.Element {

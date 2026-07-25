@@ -10,7 +10,6 @@ import type { AccountPageText } from '@viewmodel/account/i18n/account-page.messa
 import type { JSX } from 'solid-js';
 import { ClientOnly } from 'vike-solid/ClientOnly';
 
-
 import styles from '../styles/AccountPage.module.scss';
 
 /**

@@ -27,10 +27,7 @@ export function ProductEditScreen(props: { vm: ProductEditVM }): JSX.Element {
       {(product) => (
         <section>
           <Breadcrumbs
-            items={[
-              { label: props.vm.t.title, href: '/painel/produtos' },
-              { label: product.name },
-            ]}
+            items={[{ label: props.vm.t.title, href: '/painel/produtos' }, { label: product.name }]}
           />
           <PageHeader title={`${props.vm.t.edit} — ${product.name}`} />
           <ProductForm

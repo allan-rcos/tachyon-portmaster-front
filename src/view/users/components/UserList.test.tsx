@@ -5,7 +5,6 @@ import { describe, it, expect } from 'vitest';
 
 import { UserList } from './UserList';
 
-
 const t = usersListMessages('pt-BR');
 const items: UserAdmin[] = [
   {

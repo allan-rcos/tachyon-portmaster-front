@@ -6,140 +6,167 @@ import * as flatbuffers from 'flatbuffers';
 
 import { RoleResponse, RoleResponseT } from '../../../api/fbs/account/role-response.js';
 
-
 export class AccountProfileResponse implements flatbuffers.IUnpackableObject<AccountProfileResponseT> {
-  bb: flatbuffers.ByteBuffer|null = null;
+  bb: flatbuffers.ByteBuffer | null = null;
   bb_pos = 0;
-  __init(i:number, bb:flatbuffers.ByteBuffer):AccountProfileResponse {
-  this.bb_pos = i;
-  this.bb = bb;
-  return this;
-}
-
-static getRootAsAccountProfileResponse(bb:flatbuffers.ByteBuffer, obj?:AccountProfileResponse):AccountProfileResponse {
-  return (obj || new AccountProfileResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-}
-
-static getSizePrefixedRootAsAccountProfileResponse(bb:flatbuffers.ByteBuffer, obj?:AccountProfileResponse):AccountProfileResponse {
-  bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
-  return (obj || new AccountProfileResponse()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
-}
-
-id():string|null
-id(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-id(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
-
-name():string|null
-name(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-name(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
-
-email():string|null
-email(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
-email(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 8);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
-
-roles(index: number, obj?:RoleResponse):RoleResponse|null {
-  const offset = this.bb!.__offset(this.bb_pos, 10);
-  return offset ? (obj || new RoleResponse()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
-}
-
-rolesLength():number {
-  const offset = this.bb!.__offset(this.bb_pos, 10);
-  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
-}
-
-static startAccountProfileResponse(builder:flatbuffers.Builder) {
-  builder.startObject(4);
-}
-
-static addId(builder:flatbuffers.Builder, idOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(0, idOffset, 0);
-}
-
-static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(1, nameOffset, 0);
-}
-
-static addEmail(builder:flatbuffers.Builder, emailOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(2, emailOffset, 0);
-}
-
-static addRoles(builder:flatbuffers.Builder, rolesOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(3, rolesOffset, 0);
-}
-
-static createRolesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
-  builder.startVector(4, data.length, 4);
-  for (let i = data.length - 1; i >= 0; i--) {
-    builder.addOffset(data[i]!);
+  __init(i: number, bb: flatbuffers.ByteBuffer): AccountProfileResponse {
+    this.bb_pos = i;
+    this.bb = bb;
+    return this;
   }
-  return builder.endVector();
-}
 
-static startRolesVector(builder:flatbuffers.Builder, numElems:number) {
-  builder.startVector(4, numElems, 4);
-}
+  static getRootAsAccountProfileResponse(
+    bb: flatbuffers.ByteBuffer,
+    obj?: AccountProfileResponse,
+  ): AccountProfileResponse {
+    return (obj || new AccountProfileResponse()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb,
+    );
+  }
 
-static endAccountProfileResponse(builder:flatbuffers.Builder):flatbuffers.Offset {
-  const offset = builder.endObject();
-  return offset;
-}
+  static getSizePrefixedRootAsAccountProfileResponse(
+    bb: flatbuffers.ByteBuffer,
+    obj?: AccountProfileResponse,
+  ): AccountProfileResponse {
+    bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
+    return (obj || new AccountProfileResponse()).__init(
+      bb.readInt32(bb.position()) + bb.position(),
+      bb,
+    );
+  }
 
-static createAccountProfileResponse(builder:flatbuffers.Builder, idOffset:flatbuffers.Offset, nameOffset:flatbuffers.Offset, emailOffset:flatbuffers.Offset, rolesOffset:flatbuffers.Offset):flatbuffers.Offset {
-  AccountProfileResponse.startAccountProfileResponse(builder);
-  AccountProfileResponse.addId(builder, idOffset);
-  AccountProfileResponse.addName(builder, nameOffset);
-  AccountProfileResponse.addEmail(builder, emailOffset);
-  AccountProfileResponse.addRoles(builder, rolesOffset);
-  return AccountProfileResponse.endAccountProfileResponse(builder);
-}
+  id(): string | null;
+  id(optionalEncoding: flatbuffers.Encoding): string | Uint8Array | null;
+  id(optionalEncoding?: any): string | Uint8Array | null {
+    const offset = this.bb!.__offset(this.bb_pos, 4);
+    return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  }
 
-unpack(): AccountProfileResponseT {
-  return new AccountProfileResponseT(
-    this.id(),
-    this.name(),
-    this.email(),
-    this.bb!.createObjList<RoleResponse, RoleResponseT>(this.roles.bind(this), this.rolesLength())
-  );
-}
+  name(): string | null;
+  name(optionalEncoding: flatbuffers.Encoding): string | Uint8Array | null;
+  name(optionalEncoding?: any): string | Uint8Array | null {
+    const offset = this.bb!.__offset(this.bb_pos, 6);
+    return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  }
 
+  email(): string | null;
+  email(optionalEncoding: flatbuffers.Encoding): string | Uint8Array | null;
+  email(optionalEncoding?: any): string | Uint8Array | null {
+    const offset = this.bb!.__offset(this.bb_pos, 8);
+    return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+  }
 
-unpackTo(_o: AccountProfileResponseT): void {
-  _o.id = this.id();
-  _o.name = this.name();
-  _o.email = this.email();
-  _o.roles = this.bb!.createObjList<RoleResponse, RoleResponseT>(this.roles.bind(this), this.rolesLength());
-}
+  roles(index: number, obj?: RoleResponse): RoleResponse | null {
+    const offset = this.bb!.__offset(this.bb_pos, 10);
+    return offset
+      ? (obj || new RoleResponse()).__init(
+          this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4),
+          this.bb!,
+        )
+      : null;
+  }
+
+  rolesLength(): number {
+    const offset = this.bb!.__offset(this.bb_pos, 10);
+    return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+  }
+
+  static startAccountProfileResponse(builder: flatbuffers.Builder) {
+    builder.startObject(4);
+  }
+
+  static addId(builder: flatbuffers.Builder, idOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(0, idOffset, 0);
+  }
+
+  static addName(builder: flatbuffers.Builder, nameOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(1, nameOffset, 0);
+  }
+
+  static addEmail(builder: flatbuffers.Builder, emailOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(2, emailOffset, 0);
+  }
+
+  static addRoles(builder: flatbuffers.Builder, rolesOffset: flatbuffers.Offset) {
+    builder.addFieldOffset(3, rolesOffset, 0);
+  }
+
+  static createRolesVector(
+    builder: flatbuffers.Builder,
+    data: flatbuffers.Offset[],
+  ): flatbuffers.Offset {
+    builder.startVector(4, data.length, 4);
+    for (let i = data.length - 1; i >= 0; i--) {
+      builder.addOffset(data[i]!);
+    }
+    return builder.endVector();
+  }
+
+  static startRolesVector(builder: flatbuffers.Builder, numElems: number) {
+    builder.startVector(4, numElems, 4);
+  }
+
+  static endAccountProfileResponse(builder: flatbuffers.Builder): flatbuffers.Offset {
+    const offset = builder.endObject();
+    return offset;
+  }
+
+  static createAccountProfileResponse(
+    builder: flatbuffers.Builder,
+    idOffset: flatbuffers.Offset,
+    nameOffset: flatbuffers.Offset,
+    emailOffset: flatbuffers.Offset,
+    rolesOffset: flatbuffers.Offset,
+  ): flatbuffers.Offset {
+    AccountProfileResponse.startAccountProfileResponse(builder);
+    AccountProfileResponse.addId(builder, idOffset);
+    AccountProfileResponse.addName(builder, nameOffset);
+    AccountProfileResponse.addEmail(builder, emailOffset);
+    AccountProfileResponse.addRoles(builder, rolesOffset);
+    return AccountProfileResponse.endAccountProfileResponse(builder);
+  }
+
+  unpack(): AccountProfileResponseT {
+    return new AccountProfileResponseT(
+      this.id(),
+      this.name(),
+      this.email(),
+      this.bb!.createObjList<RoleResponse, RoleResponseT>(
+        this.roles.bind(this),
+        this.rolesLength(),
+      ),
+    );
+  }
+
+  unpackTo(_o: AccountProfileResponseT): void {
+    _o.id = this.id();
+    _o.name = this.name();
+    _o.email = this.email();
+    _o.roles = this.bb!.createObjList<RoleResponse, RoleResponseT>(
+      this.roles.bind(this),
+      this.rolesLength(),
+    );
+  }
 }
 
 export class AccountProfileResponseT implements flatbuffers.IGeneratedObject {
-constructor(
-  public id: string|Uint8Array|null = null,
-  public name: string|Uint8Array|null = null,
-  public email: string|Uint8Array|null = null,
-  public roles: (RoleResponseT)[] = []
-){}
+  constructor(
+    public id: string | Uint8Array | null = null,
+    public name: string | Uint8Array | null = null,
+    public email: string | Uint8Array | null = null,
+    public roles: RoleResponseT[] = [],
+  ) {}
 
+  pack(builder: flatbuffers.Builder): flatbuffers.Offset {
+    const id = this.id !== null ? builder.createString(this.id!) : 0;
+    const name = this.name !== null ? builder.createString(this.name!) : 0;
+    const email = this.email !== null ? builder.createString(this.email!) : 0;
+    const roles = AccountProfileResponse.createRolesVector(
+      builder,
+      builder.createObjectOffsetList(this.roles),
+    );
 
-pack(builder:flatbuffers.Builder): flatbuffers.Offset {
-  const id = (this.id !== null ? builder.createString(this.id!) : 0);
-  const name = (this.name !== null ? builder.createString(this.name!) : 0);
-  const email = (this.email !== null ? builder.createString(this.email!) : 0);
-  const roles = AccountProfileResponse.createRolesVector(builder, builder.createObjectOffsetList(this.roles));
-
-  return AccountProfileResponse.createAccountProfileResponse(builder,
-    id,
-    name,
-    email,
-    roles
-  );
-}
+    return AccountProfileResponse.createAccountProfileResponse(builder, id, name, email, roles);
+  }
 }

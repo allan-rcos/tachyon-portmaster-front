@@ -38,9 +38,12 @@ describe('createMutationSignal', () => {
 
   it('não chama onSuccess quando a mutação falha', async () => {
     const onSuccess = vi.fn();
-    const mutation = createMutationSignal(async () => {
-      throw new Error('falhou');
-    }, { onSuccess });
+    const mutation = createMutationSignal(
+      async () => {
+        throw new Error('falhou');
+      },
+      { onSuccess },
+    );
 
     await mutation.mutate(undefined);
     expect(onSuccess).not.toHaveBeenCalled();

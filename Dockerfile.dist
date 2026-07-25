@@ -1,0 +1,52 @@
+# ============================================================
+#  Empacota um `dist/` JÁ CONSTRUÍDO.
+#
+#  Existe para o CI: o pipeline já roda `bun run build` para publicar o zip da
+#  release, e rebuildar a aplicação dentro do Docker só para gerar a imagem
+#  seria fazer o mesmo trabalho duas vezes — com o risco de os dois artefatos
+#  divergirem. Aqui a imagem contém exatamente o mesmo `dist` que foi publicado.
+#
+#  Requer `bun run build` antes. Para buildar tudo de uma vez, use o Dockerfile.
+# ============================================================
+
+# ---------- 1. runtime txiki.js ----------
+FROM debian:bookworm-slim AS txiki
+
+ARG TXIKI_REF=v26.6.0
+
+# libffi e curl são dependências nativas do txiki (FFI e cliente HTTP), não
+# opcionais: sem elas o CMake falha ainda na configuração.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential clang cmake ninja-build git ca-certificates pkg-config \
+      libffi-dev libcurl4-openssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git clone --recursive --shallow-submodules --depth 1 --branch "${TXIKI_REF}" \
+      https://github.com/saghul/txiki.js /usr/src/txiki
+WORKDIR /usr/src/txiki
+
+# clang, e não gcc: o fonte usa `#pragma region`, que o gcc não conhece e que,
+# sob o `-Werror` do próprio projeto, aborta a compilação a 92%.
+ENV CC=clang CXX=clang++
+RUN make && strip build/tjs
+
+# ---------- 2. imagem final ----------
+FROM debian:bookworm-slim AS runtime
+
+# Só as bibliotecas de RUNTIME das dependências nativas do txiki (o `-dev`
+# ficou no estágio de compilação) mais os certificados para TLS de saída.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates libffi8 libcurl4 libatomic1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --create-home --uid 10001 portmaster
+
+COPY --from=txiki /usr/src/txiki/build/tjs /usr/local/bin/tjs
+COPY --chown=portmaster:portmaster dist /app/dist
+
+USER portmaster
+WORKDIR /app
+
+ENV PORT=3000
+EXPOSE 3000
+
+CMD ["tjs", "run", "dist/txiki/server.mjs"]

@@ -3,7 +3,6 @@ import { createSignal, onCleanup, type JSX } from 'solid-js';
 
 import styles from './SidebarDrawer.island.module.scss';
 
-
 /** Botão hambúrguer (mobile) que abre/fecha o drawer da sidebar via
  *  `html[data-drawer]`. O AppShell reage a esse atributo no CSS. */
 export function SidebarDrawer(): JSX.Element {

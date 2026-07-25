@@ -4,7 +4,6 @@ import { describe, it, expect } from 'vitest';
 
 import { OccupancyChart } from './OccupancyChart.island';
 
-
 const t = painelMessages('pt-BR');
 const division = { empty: 2, loading: 3, sealed: 2, in_transit: 1 };
 

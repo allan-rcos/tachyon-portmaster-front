@@ -6,7 +6,6 @@ import { ClientOnly } from 'vike-solid/ClientOnly';
 import { Brand } from './Brand';
 import styles from './Navbar.module.scss';
 
-
 /** Barra superior: hambúrguer (mobile) + marca compacta + tema. */
 export function Navbar(): JSX.Element {
   return (

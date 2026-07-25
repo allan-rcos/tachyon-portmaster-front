@@ -6,7 +6,6 @@ import { Brand } from './Brand';
 import { Icon, type IconName } from './Icon';
 import styles from './Sidebar.module.scss';
 
-
 type NavKey = 'painel' | 'conteineres' | 'produtos' | 'usuarios' | 'perfis';
 
 interface NavItem {

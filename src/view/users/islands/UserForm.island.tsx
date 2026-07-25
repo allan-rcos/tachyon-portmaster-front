@@ -40,23 +40,30 @@ function Inner(props: UserFormProps): JSX.Element {
   const schema = () =>
     props.mode === 'create' ? createUserCreateSchema(props.t) : createUserUpdateSchema(props.t);
 
-  const mutation = bindMutation(createMutationSignal(async (value: FormValues) => {
-      if (props.mode === 'create') {
-        return createUser({
+  const mutation = bindMutation(
+    createMutationSignal(
+      async (value: FormValues) => {
+        if (props.mode === 'create') {
+          return createUser({
+            name: value.name,
+            email: value.email,
+            initial_password: value.initial_password,
+            role_ids: value.role_ids,
+          });
+        }
+        return updateUser(props.userId!, {
           name: value.name,
           email: value.email,
-          initial_password: value.initial_password,
           role_ids: value.role_ids,
         });
-      }
-      return updateUser(props.userId!, {
-        name: value.name,
-        email: value.email,
-        role_ids: value.role_ids,
-      });
-    }, { onSuccess: () => {
-      window.location.href = '/painel/usuarios';
-    } }));
+      },
+      {
+        onSuccess: () => {
+          window.location.href = '/painel/usuarios';
+        },
+      },
+    ),
+  );
 
   const form = createForm(() => ({
     defaultValues: {
