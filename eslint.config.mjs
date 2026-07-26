@@ -1,5 +1,4 @@
 import tseslint from 'typescript-eslint';
-import solid from 'eslint-plugin-solid';
 import importPlugin from 'eslint-plugin-import';
 import jsdoc from 'eslint-plugin-jsdoc';
 import prettier from 'eslint-config-prettier';
@@ -14,6 +13,7 @@ export default tseslint.config(
       // origem. `packages/tachyon-portmaster-i18n` é NOSSO — fica lintável.
       'packages/tachyon-design/**',
       'packages/vike-txiki-adapter/**',
+      'packages/vike-lit/**',
       'packages/tachyon-portmaster-sdk/**',
       'node_modules/**',
       '.claude/**',
@@ -30,9 +30,8 @@ export default tseslint.config(
   prettier,
 
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.ts'],
     plugins: {
-      solid,
       import: importPlugin,
     },
     rules: {
@@ -41,15 +40,12 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
 
-      // Reatividade Solid.
-      //
-      // `toAccessor` é a nossa ponte alien-signals → Solid: ela monta um
-      // `effect` internamente, então a função que recebe É consumida num escopo
-      // rastreado. Sem declará-la aqui, a regra acusa toda leitura de ViewModel
-      // como reatividade perdida — um falso positivo por rota.
-      'solid/reactivity': ['warn', { customReactiveFunctions: ['toAccessor'] }],
-      'solid/no-destructure': 'error', // Desestruturar props quebra a reatividade granular
-      'solid/jsx-no-undef': 'error',
+      // As três regras do `eslint-plugin-solid` (`reactivity`, `no-destructure`,
+      // `jsx-no-undef`) saíram com o Solid. Não têm equivalente a instalar: elas
+      // existiam para policiar a reatividade granular do Solid, que era fácil de
+      // perder ao desestruturar props ou ler um sinal fora de escopo rastreado.
+      // Com Lit não há escopo rastreado a perder — o template é reavaliado
+      // inteiro e o diff decide o DOM.
 
       // Import order
       'import/order': [
@@ -124,8 +120,8 @@ export default tseslint.config(
   //  `require-param-description` é erro, e o autofix (que insere tags vazias)
   //  não deve ser usado para satisfazer estas regras.
   //
-  //  Na View o JSDoc é opcional: um componente Solid se documenta pela
-  //  assinatura de props. Ali as regras só garantem que o que EXISTE está
+  //  Na View o JSDoc é opcional: uma função que recebe props se documenta pela
+  //  própria assinatura. Ali as regras só garantem que o que EXISTE está
   //  correto e completo.
   // ============================================================
   {
@@ -153,8 +149,8 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/view/**/*.{ts,tsx}'],
-    ignores: ['**/*.test.{ts,tsx}'],
+    files: ['src/view/**/*.ts'],
+    ignores: ['**/*.test.ts'],
     extends: [jsdoc.configs['flat/recommended-typescript']],
     rules: {
       'jsdoc/require-jsdoc': 'off',
@@ -165,7 +161,8 @@ export default tseslint.config(
       'jsdoc/tag-lines': 'off',
       'jsdoc/multiline-blocks': 'off',
       // Componentes documentam props como `@param props.foo` — forma que o
-      // plugin não reconhece, mas que é a única legível para JSX.
+      // plugin não reconhece, mas que é a única legível para uma função que
+      // recebe um objeto de props.
       'jsdoc/check-param-names': 'off',
     },
   },
@@ -179,7 +176,7 @@ export default tseslint.config(
   //  Documentar não basta — aqui a regra falha o build.
   // ============================================================
   {
-    files: ['src/model/**/*.{ts,tsx}'],
+    files: ['src/model/**/*.ts'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -191,7 +188,7 @@ export default tseslint.config(
                 'O Model é a camada mais baixa: dados puros, sem framework, sem i18n, sem UI.',
             },
             {
-              group: ['solid-js', 'solid-js/*', '@tanstack/*'],
+              group: ['lit', 'lit/*', 'lit-html', 'lit-html/*', '@lit-labs/*', '@lit/*'],
               message: 'O Model não conhece a biblioteca de interface.',
             },
           ],
@@ -200,7 +197,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/viewmodel/**/*.{ts,tsx}'],
+    files: ['src/viewmodel/**/*.ts'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -212,9 +209,17 @@ export default tseslint.config(
                 'O ViewModel não enxerga a View. Se precisa de um tipo declarado lá (ex.: contrato de texto), mova a declaração para @viewmodel/<feature>/i18n/text-contracts.',
             },
             {
-              group: ['solid-js', 'solid-js/*', 'vike-solid', 'vike-solid/*', '@tanstack/solid-*'],
+              group: [
+                'lit',
+                'lit/*',
+                'lit-html',
+                'lit-html/*',
+                '@lit-labs/*',
+                '@lit/*',
+                'vike-lit',
+              ],
               message:
-                'O ViewModel é agnóstico de framework de interface — é o que o mantém testável sem DOM.',
+                'O ViewModel é agnóstico de framework de interface — é o que o mantém testável sem DOM. Estado de formulário mora aqui, mas em `signal` do alien-signals; quem transforma isso em markup é a View.',
             },
             {
               group: ['vike', 'vike/*'],
@@ -227,7 +232,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/view/**/*.{ts,tsx}'],
+    files: ['src/view/**/*.ts'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -241,7 +246,17 @@ export default tseslint.config(
             {
               group: ['vike', 'vike/*', 'vike-*'],
               message:
-                'Só @view/core/components/ClientOnly.tsx enxerga o vike-solid. Trocar de framework de rota deve ser trocar UM arquivo.',
+                'Só @view/core/components/ClientOnly.ts enxerga a integração de rota. Trocá-la deve ser trocar UM arquivo.',
+            },
+            {
+              group: [
+                '@lit-labs/ssr',
+                '@lit-labs/ssr/lib/install-global-dom-shim.js',
+                '@lit-labs/ssr/lib/module-loader.js',
+                '@lit-labs/ssr/lib/render-result-readable.js',
+              ],
+              message:
+                'Esses caminhos arrastam Node built-ins (node-fetch, enhanced-resolve, stream) que o txiki.js não tem. A serialização de SSR mora no vike-lit (lib/ssr.ts), que importa só `lib/render-lit-html.js`.',
             },
           ],
         },
@@ -250,12 +265,12 @@ export default tseslint.config(
   },
   {
     // A única exceção à regra acima: o wrapper existe justamente para embrulhar
-    // o `ClientOnly` do vike-solid.
-    files: ['src/view/core/components/ClientOnly.tsx'],
+    // o `clientOnly` do vike-lit.
+    files: ['src/view/core/components/ClientOnly.ts'],
     rules: { 'no-restricted-imports': 'off' },
   },
   {
-    files: ['pages/**/*.{ts,tsx,js}'],
+    files: ['pages/**/*.{ts,js}'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -272,16 +287,10 @@ export default tseslint.config(
     },
   },
 
-  // As telas recebem um ViewModel instanciado UMA vez pelo `+Page.tsx` e nunca
-  // trocado — ler `props.vm` fora de escopo rastreado é correto aqui, e é o que
-  // permite assinar os sinais na montagem. A regra não tem como saber disso;
-  // desligá-la só neste diretório evita 24 avisos falsos sem afrouxar o resto.
-  {
-    files: ['src/view/**/screens/**/*.{ts,tsx}'],
-    rules: {
-      'solid/reactivity': 'off',
-    },
-  },
+  // A exceção que existia aqui (`solid/reactivity: off` em `screens/`) saiu com
+  // o plugin: ela desligava 24 falsos positivos sobre ler `props.vm` fora de
+  // escopo rastreado. Sem reatividade granular não há escopo rastreado, e a
+  // leitura direta do ViewModel no template passou a ser simplesmente correta.
 
   // Config e scripts (Vite/Vitest/i18n) rodam em Node — liberam os built-ins.
   {

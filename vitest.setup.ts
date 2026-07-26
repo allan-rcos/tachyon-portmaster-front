@@ -6,13 +6,16 @@
 //  funções do Model (ou do ViewModel) de que precisa. A consequência prática:
 //  um teste falha por causa do código que ele exercita, e não por causa de um
 //  clone de backend que saiu de sincronia com o real.
+//
+//  Nem harness de render. O `cleanup()` do `@solidjs/testing-library` saiu com
+//  o Solid e não foi substituído por outro: montar um template do Lit é
+//  `render(tmpl, el)` inline no teste, e desmontar é esvaziar o `<body>`.
 // ============================================================
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@solidjs/testing-library';
 import { afterEach, vi } from 'vitest';
 
 afterEach(() => {
-  cleanup();
+  document.body.innerHTML = '';
   // Cada teste declara os próprios retornos; zerar entre eles impede que a
   // configuração de um vaze para o seguinte.
   vi.clearAllMocks();

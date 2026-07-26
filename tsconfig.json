@@ -5,8 +5,8 @@
     "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
+    // Sem `jsx`/`jsxImportSource`: não há JSX no projeto. A View é TypeScript
+    // com `html``` do Lit, que é tagged template — nenhum transform envolvido.
     "allowJs": true,
     "types": ["bun"],
 

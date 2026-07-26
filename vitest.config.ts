@@ -1,13 +1,12 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { fileURLToPath } from 'node:url';
-import solid from 'vite-plugin-solid';
 import { defineConfig } from 'vitest/config';
 
-// Config isolada de testes: usa `vite-plugin-solid` em modo de teste (sem o
-// plugin do Vike, que é só para SSR/build de produção). jsdom + jest-dom.
+// Config isolada de testes (sem o plugin do Vike, que é só para SSR/build de
+// produção). Não há plugin de framework de interface: com Lit não há transform
+// a aplicar — o que antes exigia `vite-plugin-solid` aqui hoje é só TypeScript.
+// jsdom + jest-dom.
 export default defineConfig({
-  // `hot: false` desliga a injeção do solid-refresh (HMR), que quebra o
-  // transform em ambiente de teste (id virtual `/@solid-refresh`).
   // `paraglideVitePlugin` gera `dist/paraglide/` também nos testes, então os
   // resolvers de rota (que chamam `m.*`) funcionam sob o Vitest.
   plugins: [
@@ -18,10 +17,11 @@ export default defineConfig({
       emitTsDeclarations: true,
       isServer: "typeof window === 'undefined'",
     }),
-    solid({ hot: false }),
   ],
   resolve: {
     conditions: ['development', 'browser'],
+    // Ver vite.config.ts: instância dupla de `lit-html` quebra a hidratação.
+    dedupe: ['lit', 'lit-html', '@lit/reactive-element'],
     alias: {
       // Fonte única do design system — ver vite.config.ts. Trocar aqui e no
       // vite.config muda a origem dos estilos (ex.: Bulma) sem tocar módulos.
@@ -42,10 +42,5 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     include: ['**/*.{test,spec}.{ts,tsx}'],
     exclude: ['node_modules', 'dist', 'packages/**', 'src/model/contract/**'],
-    server: {
-      deps: {
-        inline: [/solid-js/, /@solidjs\/testing-library/, /@tanstack/],
-      },
-    },
   },
 });
