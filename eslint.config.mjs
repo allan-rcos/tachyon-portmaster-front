@@ -237,6 +237,26 @@ export default tseslint.config(
       'no-restricted-imports': [
         'error',
         {
+          // Nome EXATO, não glob: o `@lit-labs/ssr` tem caminhos bons e ruins
+          // sob o mesmo prefixo. Liberados: `lib/render-lit-html.js` e
+          // `lib/render-result.js`, que são JS puro. Barrados os quatro abaixo,
+          // que arrastam Node built-ins ausentes no txiki.js.
+          paths: [
+            { name: '@lit-labs/ssr', message: 'A raiz importa lib/dom-shim.js → node-fetch.' },
+            {
+              name: '@lit-labs/ssr/lib/install-global-dom-shim.js',
+              message: 'Importa lib/dom-shim.js → node-fetch.',
+            },
+            {
+              name: '@lit-labs/ssr/lib/module-loader.js',
+              message: 'Importa enhanced-resolve.',
+            },
+            {
+              name: '@lit-labs/ssr/lib/render-result-readable.js',
+              message:
+                'Importa `stream` do Node. Para stream, use `renderToWebStream` do vike-lit (ReadableStream Web).',
+            },
+          ],
           patterns: [
             {
               group: ['@model/*'],
@@ -247,16 +267,6 @@ export default tseslint.config(
               group: ['vike', 'vike/*', 'vike-*'],
               message:
                 'Só @view/core/components/ClientOnly.ts enxerga a integração de rota. Trocá-la deve ser trocar UM arquivo.',
-            },
-            {
-              group: [
-                '@lit-labs/ssr',
-                '@lit-labs/ssr/lib/install-global-dom-shim.js',
-                '@lit-labs/ssr/lib/module-loader.js',
-                '@lit-labs/ssr/lib/render-result-readable.js',
-              ],
-              message:
-                'Esses caminhos arrastam Node built-ins (node-fetch, enhanced-resolve, stream) que o txiki.js não tem. A serialização de SSR mora no vike-lit (lib/ssr.ts), que importa só `lib/render-lit-html.js`.',
             },
           ],
         },
