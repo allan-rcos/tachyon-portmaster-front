@@ -12,10 +12,10 @@ import {
   type AsyncBoundaryText,
 } from '@viewmodel/core/i18n/async-boundary.messages';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
-import { createSignal, type Signal } from '@viewmodel/core/observable/signal';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
+import { signal } from 'alien-signals';
 
 import type { UserListText } from './i18n/text-contracts';
 import { usersListMessages } from './i18n/user-list-page.messages';
@@ -108,7 +108,7 @@ export interface UserListVM {
   /** Texto da fronteira de carregamento. */
   boundary: AsyncBoundaryText;
   /** Linhas acumuladas — cresce a cada `loadMore`. */
-  items: Signal<readonly UserRowData[]>;
+  items: () => readonly UserRowData[];
   /** Permissão de criação, já avaliada no servidor. */
   canCreate: boolean;
   /** Destino do botão "novo usuário". */
@@ -131,26 +131,26 @@ export interface UserListVM {
  * @param input Dado da rota, vindo do `+data`.
  */
 export function createUserListVM(input: UserListPageInput): UserListVM {
-  const items = createSignal<readonly UserRowData[]>(input.items);
-  const cursor = createSignal<string | undefined>(input.nextCursor);
-  const loadingMore = createSignal(false);
-  const failed = createSignal(false);
+  const items = signal<readonly UserRowData[]>(input.items);
+  const cursor = signal<string | undefined>(input.nextCursor);
+  const loadingMore = signal(false);
+  const failed = signal(false);
 
   async function fetchNext(): Promise<void> {
     const next = cursor();
     if (next === undefined || loadingMore()) return;
-    loadingMore.set(true);
-    failed.set(false);
+    loadingMore(true);
+    failed(false);
     try {
       // Sem headers: a paginação só acontece no navegador, onde o cookie viaja
       // sozinho. O servidor entrega apenas a primeira página.
       const page = await listUsers(undefined, new URLSearchParams({ cursor: next }));
-      items.set([...items(), ...page.data.map(toRow)]);
-      cursor.set(page.next_cursor);
+      items([...items(), ...page.data.map(toRow)]);
+      cursor(page.next_cursor);
     } catch {
-      failed.set(true);
+      failed(true);
     } finally {
-      loadingMore.set(false);
+      loadingMore(false);
     }
   }
 

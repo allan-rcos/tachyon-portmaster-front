@@ -13,11 +13,11 @@ import {
 } from '@viewmodel/core/i18n/async-boundary.messages';
 import { PERMISSION_LABEL } from '@viewmodel/core/i18n/labels';
 import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
-import { createSignal, type Signal } from '@viewmodel/core/observable/signal';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
 import { formatNumber } from '@viewmodel/core/utils/formatters';
+import { signal } from 'alien-signals';
 
 import { rolesListMessages } from './i18n/role-list-page.messages';
 import type { RoleListText } from './i18n/text-contracts';
@@ -120,7 +120,7 @@ export interface RoleListVM {
   /** Texto da fronteira de carregamento. */
   boundary: AsyncBoundaryText;
   /** Linhas acumuladas — cresce a cada `loadMore`. */
-  items: Signal<readonly RoleRowData[]>;
+  items: () => readonly RoleRowData[];
   /** Permissão de criação, já avaliada no servidor. */
   canCreate: boolean;
   /** Destino do botão "novo perfil". */
@@ -143,24 +143,24 @@ export interface RoleListVM {
  * @param input Dado da rota, vindo do `+data`.
  */
 export function createRoleListVM(input: RoleListPageInput): RoleListVM {
-  const items = createSignal<readonly RoleRowData[]>(input.items);
-  const cursor = createSignal<string | undefined>(input.nextCursor);
-  const loadingMore = createSignal(false);
-  const failed = createSignal(false);
+  const items = signal<readonly RoleRowData[]>(input.items);
+  const cursor = signal<string | undefined>(input.nextCursor);
+  const loadingMore = signal(false);
+  const failed = signal(false);
 
   async function fetchNext(): Promise<void> {
     const next = cursor();
     if (next === undefined || loadingMore()) return;
-    loadingMore.set(true);
-    failed.set(false);
+    loadingMore(true);
+    failed(false);
     try {
       const page = await listRoles(undefined, new URLSearchParams({ cursor: next }));
-      items.set([...items(), ...page.data.map((r) => toRow(r, input.locale))]);
-      cursor.set(page.next_cursor);
+      items([...items(), ...page.data.map((r) => toRow(r, input.locale))]);
+      cursor(page.next_cursor);
     } catch {
-      failed.set(true);
+      failed(true);
     } finally {
-      loadingMore.set(false);
+      loadingMore(false);
     }
   }
 
