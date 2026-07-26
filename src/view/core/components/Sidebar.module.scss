@@ -4,7 +4,7 @@
   @include glass.glass-l1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-5);
   padding: var(--space-6) var(--space-4);
   height: 100%;
   border-radius: var(--radius-lg);
@@ -20,13 +20,26 @@
 .nav {
   flex: 1 1 auto;
 }
+
 .list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Separa "administração" da operação sem gastar uma linha de texto explicando.
+.eyebrow {
+  display: block;
+  margin: var(--space-6) 0 var(--space-2);
+  padding: 0 0.8rem;
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-faint);
 }
 
 .link {
@@ -35,7 +48,7 @@
   gap: var(--space-3);
   padding: 0.65rem 0.8rem;
   border-radius: var(--radius-md);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-weight: var(--fw-medium);
   transition:
     background 0.14s,
@@ -47,6 +60,8 @@
     background: var(--glass-fill);
   }
 }
+
+// Fill + barra ouro à esquerda: a cor sozinha não marcaria a posição.
 .active {
   color: var(--color-text);
   background: var(--glass-fill-strong);
@@ -59,4 +74,58 @@
   gap: var(--space-2);
   padding-top: var(--space-4);
   border-top: 1px solid var(--glass-border-soft);
+}
+
+// Bloco de identidade: avatar de iniciais + nome + perfil.
+.account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  transition: background 0.14s;
+
+  &:hover {
+    text-decoration: none;
+    background: var(--glass-fill);
+  }
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-teal);
+  color: var(--teal-200);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.04em;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

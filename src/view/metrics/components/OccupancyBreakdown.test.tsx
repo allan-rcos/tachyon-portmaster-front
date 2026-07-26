@@ -1,22 +1,35 @@
+// ============================================================
+//  Uma LINHA por status (era uma barra empilhada única). O componente recebe as
+//  linhas já formatadas — contagem em string e fração já calculada.
+// ============================================================
 import { render } from '@solidjs/testing-library';
-import { painelMessages } from '@viewmodel/metrics/i18n/dashboard-page.messages';
+import type { OccupancyRowData } from '@viewmodel/metrics/dashboard-page.vm';
 import { describe, it, expect } from 'vitest';
 
-import { OccupancyBreakdown, segmentsOf } from './OccupancyBreakdown';
+import { OccupancyBreakdown } from './OccupancyBreakdown';
 
-const t = painelMessages('pt-BR');
-const division = { empty: 2, loading: 3, sealed: 2, in_transit: 1 };
+const rows: OccupancyRowData[] = [
+  { key: 'loading', label: 'Carregando', count: '4', share: 40, tone: 'gold' },
+  { key: 'sealed', label: 'Lacrados', count: '3', share: 30, tone: 'sage' },
+  { key: 'in_transit', label: 'Em trânsito', count: '2', share: 20, tone: 'teal' },
+  { key: 'empty', label: 'Vazios', count: '1', share: 10, tone: 'neutral' },
+];
 
 describe('OccupancyBreakdown', () => {
-  it('lista cada status com sua contagem', () => {
-    const { getByRole } = render(() => <OccupancyBreakdown division={division} t={t} />);
-    const dl = getByRole('img', { name: t.occupancy });
-    expect(dl).toBeInTheDocument();
+  it('desenha uma linha por status, com rótulo e contagem', () => {
+    const { getAllByRole, getByText } = render(() => (
+      <OccupancyBreakdown rows={rows} label="Ocupação do pátio" />
+    ));
+
+    expect(getAllByRole('listitem')).toHaveLength(4);
+    expect(getByText('Carregando')).toBeInTheDocument();
+    expect(getByText('4')).toBeInTheDocument();
   });
 
-  it('segmentsOf soma corretamente e ordena por relevância', () => {
-    const segs = segmentsOf(division, t);
-    expect(segs.map((s) => s.key)).toEqual(['loading', 'sealed', 'in_transit', 'empty']);
-    expect(segs.reduce((s, x) => s + x.count, 0)).toBe(8);
+  it('rotula o conjunto para leitores de tela', () => {
+    const { getByRole } = render(() => (
+      <OccupancyBreakdown rows={rows} label="Ocupação do pátio" />
+    ));
+    expect(getByRole('list', { name: 'Ocupação do pátio' })).toBeInTheDocument();
   });
 });

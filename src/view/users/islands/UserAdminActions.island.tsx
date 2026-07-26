@@ -2,8 +2,6 @@ import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
 import { ConfirmDialog } from '@view/core/islands/ConfirmDialog.island';
 import { bindMutation } from '@view/core/observable/bind-mutation';
-import { cn } from '@view/core/utils/ui';
-import { errText } from '@view/core/utils/ui';
 import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import type { UserAdminActionsText } from '@viewmodel/users/i18n/text-contracts';
 import { deleteUser } from '@viewmodel/users/mutations/delete-user.mutation';
@@ -13,7 +11,7 @@ import { type JSX } from 'solid-js';
 
 import styles from './UserAdminActions.island.module.scss';
 
-function Inner(props: { userId: string; t: UserAdminActionsText }): JSX.Element {
+function Inner(props: UserAdminActionsProps): JSX.Element {
   const reset = bindMutation(
     createMutationSignal((value: string) => resetUserPassword(props.userId, value), {
       onSuccess: () => form.reset(),
@@ -43,12 +41,13 @@ function Inner(props: { userId: string; t: UserAdminActionsText }): JSX.Element 
               <FormField
                 label={props.t.newPassword}
                 for="reset-pass"
-                error={errText(field().state.meta.errors)}
+                error={field().state.meta.errors[0]?.message}
               >
                 <input
                   id="reset-pass"
                   type="password"
-                  class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                  class={styles.input}
+                  classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                   value={field().state.value}
                   onInput={(e) => field().handleChange(e.currentTarget.value)}
                   onBlur={field().handleBlur}
@@ -86,8 +85,13 @@ function Inner(props: { userId: string; t: UserAdminActionsText }): JSX.Element 
   );
 }
 
+export interface UserAdminActionsProps {
+  userId: string;
+  t: UserAdminActionsText;
+}
+
 /** Ações administrativas de usuário: redefinir senha e excluir. */
-export function UserAdminActions(props: { userId: string; t: UserAdminActionsText }): JSX.Element {
+export function UserAdminActions(props: UserAdminActionsProps): JSX.Element {
   return <Inner {...props} />;
 }
 

@@ -1,5 +1,5 @@
 import { getMetrics as apiGetMetrics } from '@model/metrics';
-import { metricsFactory } from '@testing/factories/model.factory';
+import { metricsFactory } from '@viewmodel/metrics/testing/metrics.factory';
 import { describe, expect, it, vi } from 'vitest';
 
 import { getMetrics } from './get-metrics.query';

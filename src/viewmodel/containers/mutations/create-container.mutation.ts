@@ -1,8 +1,7 @@
 import { createContainer as apiCreateContainer } from '@model/containers';
-
-import { browserClient } from '../../core/client/api-client';
-import type { Container } from '../domain';
-import type { ContainerCreateData } from '../schemas/container.schema';
+import type { Container } from '@model/containers/dto';
+import type { ContainerCreateData } from '@viewmodel/containers/schemas/container.schema';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Registra um contêiner no pátio.

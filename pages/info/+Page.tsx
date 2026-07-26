@@ -1,9 +1,12 @@
-import { SystemInfoPanel } from '@view/info/components/SystemInfoPanel';
+import { SystemInfoScreen } from '@view/info/screens/SystemInfoScreen';
+import {
+  createSystemInfoVM,
+  type SystemInfoPageInput,
+} from '@viewmodel/system/system-info-page.vm';
+import type { JSX } from 'solid-js';
 import { useData } from 'vike-solid/useData';
 
-import type { DataProps } from './+data';
-
-export default function Page() {
-  const data = useData<DataProps>();
-  return <SystemInfoPanel frontend={data.frontend} />;
+export default function Page(): JSX.Element {
+  const input = useData<SystemInfoPageInput>();
+  return <SystemInfoScreen vm={createSystemInfoVM(input)} />;
 }

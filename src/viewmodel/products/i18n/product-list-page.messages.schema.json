@@ -3,16 +3,24 @@
   "$id": "https://portmaster.app/i18n/route/produtos.json",
   "title": "i18n da rota /painel/produtos (productsListMessages)",
   "type": "object",
-  "allOf": [{ "$ref": "https://portmaster.app/i18n/common.json" }],
+  "allOf": [
+    {
+      "$ref": "https://portmaster.app/i18n/common.json"
+    }
+  ],
   "required": [
     "products_title",
     "products_subtitle",
     "products_new",
     "products_name",
     "products_density",
-    "products_risk_class"
+    "products_risk_class",
+    "products_eyebrow"
   ],
   "patternProperties": {
-    "^products_": { "type": "string", "minLength": 1 }
+    "^products_": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

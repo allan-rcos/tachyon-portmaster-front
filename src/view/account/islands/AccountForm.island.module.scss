@@ -27,3 +27,8 @@
   opacity: 0.6;
   pointer-events: none;
 }
+.error {
+  margin: 0;
+  color: var(--red-400);
+  font-size: var(--text-sm);
+}

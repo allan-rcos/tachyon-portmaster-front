@@ -1,0 +1,59 @@
+@use '@ds/glass' as glass;
+@use '@ds/responsive' as rp;
+
+// UM cartão só, sem padding, com as linhas por dentro — é assim que o protótipo
+// desenha "tabela": a moldura é do conjunto, não de cada linha.
+//
+// As medidas de grade chegam por custom property (`--row-columns` e as duas
+// variantes mobile) porque cada tela tem a sua; ver `RowList.tsx`.
+.list {
+  @include glass.glass-l1;
+  padding: 0;
+  overflow: hidden;
+
+  @include rp.card-to-sheet;
+}
+
+.head,
+.row {
+  display: grid;
+  grid-template-columns: var(--row-columns);
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--glass-border-soft);
+}
+
+.head {
+  padding: 15px 22px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+
+  // No mobile a linha se explica sozinha (vira folha empilhada), então o
+  // cabeçalho de rótulos deixa de fazer sentido.
+  @include rp.mobile {
+    display: none;
+  }
+}
+
+.row {
+  padding: 15px 22px;
+  transition: background 0.14s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+  &:hover {
+    background: var(--glass-fill);
+  }
+
+  // A linha não encolhe: ela se REORGANIZA. As áreas vêm da tela porque a
+  // ordem do que importa muda de lista para lista.
+  @include rp.mobile {
+    grid-template-columns: var(--row-columns-mobile);
+    grid-template-areas: var(--row-areas-mobile);
+    gap: 8px 12px;
+    padding: 15px 16px;
+  }
+}

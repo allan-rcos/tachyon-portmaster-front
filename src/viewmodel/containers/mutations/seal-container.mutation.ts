@@ -1,6 +1,5 @@
 import { sealContainer as apiSealContainer } from '@model/containers';
-
-import { browserClient } from '../../core/client/api-client';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Lacra um contêiner, encerrando alterações no manifesto.

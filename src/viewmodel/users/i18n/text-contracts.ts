@@ -3,10 +3,12 @@
 //  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
 //  morar no ViewModel.
 // ============================================================
-import type { PasswordResetSchemaText, UserSchemaText } from '../schemas/user.schema';
+import type { PasswordResetSchemaText, UserSchemaText } from '@viewmodel/users/schemas/user.schema';
 
 /** Chaves de texto que a listagem de usuários consome. */
 export interface UserListText {
+  /** Linha de contexto em caixa alta, acima do título. */
+  eyebrow: string;
   title: string;
   subtitle: string;
   new: string;
@@ -16,6 +18,8 @@ export interface UserListText {
   actions: string;
   edit: string;
   empty: string;
+  /** Rótulo do botão que traz a próxima página do cursor. */
+  loadMore: string;
 }
 
 /** Chaves de texto do formulário de usuário (criação e edição). */

@@ -1,79 +1,171 @@
 // ============================================================
-//  Teste de ViewModel de tela — o modelo a seguir para os demais.
+//  Teste de rota — o modelo a seguir para as demais.
 //
-//  A query é mockada; o VM é exercitado sem DOM, sem Vike e sem rede. É essa
-//  ausência de dependências que a separação de camadas compra: o que se mede
-//  aqui é a lógica da tela, e nada mais.
+//  Cobre as DUAS metades separadamente, que é o ganho da divisão:
+//
+//   • `createProductListPageInput` (o data) é assíncrono e faz trabalho de
+//     servidor: autoriza, resolve i18n e busca a 1ª página. Testado com a query
+//     e a sessão mockadas — sem Vike, sem DOM, sem rede;
+//   • `createProductListVM` (a reatividade) é SÍNCRONO e não busca nada para
+//     existir: recebe dado pronto. Testar paginação vira exercitar `loadMore`.
+//
+//  Nenhum dos dois precisa de framework de interface para ser exercitado.
 // ============================================================
-import { paged, productFactory } from '@testing/factories/model.factory';
+import { Permission } from '@model/common';
+import { accountProfileFactory, roleRefFactory } from '@viewmodel/account/testing/account.factory';
+import { ForbiddenError, UnauthorizedError } from '@viewmodel/core/page/page-errors';
+import type { PageRequest } from '@viewmodel/core/page/page-request';
+import { loadAccount } from '@viewmodel/core/session/session';
+import { paged } from '@viewmodel/core/testing/factory-support';
 import { listProducts } from '@viewmodel/products/queries/list-products.query';
+import { productFactory } from '@viewmodel/products/testing/product.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createProductListVM, productListMeta } from './product-list-page.vm';
+import { createProductListPageInput, createProductListVM } from './product-list-page.vm';
 
 vi.mock('@viewmodel/products/queries/list-products.query');
+vi.mock('@viewmodel/core/session/session', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@viewmodel/core/session/session')>()),
+  loadAccount: vi.fn(),
+}));
 
 const mockedList = vi.mocked(listProducts);
+const mockedAccount = vi.mocked(loadAccount);
+
+/** Perfil com as permissões indicadas. */
+function accountWith(...permissions: Permission[]) {
+  return accountProfileFactory.build({
+    roles: [roleRefFactory.build({ permissions })],
+  });
+}
+
+const request: PageRequest = {
+  headers: { cookie: 'auth_token=abc' },
+  url: '/painel/produtos',
+  routeParams: {},
+};
 
 beforeEach(() => {
   mockedList.mockResolvedValue(paged(productFactory.buildList(3)));
+  mockedAccount.mockResolvedValue(accountWith(Permission.ProductRead, Permission.ProductCreate));
 });
 
-describe('createProductListVM', () => {
-  it('resolve o texto no locale pedido', () => {
-    expect(createProductListVM({ locale: 'en' }).t.title).not.toBe(
-      createProductListVM({ locale: 'pt-BR' }).t.title,
+describe('createProductListPageInput', () => {
+  it('entrega as linhas já formatadas, sem DTO', async () => {
+    mockedList.mockResolvedValueOnce(
+      paged([productFactory.build({ name: 'Diesel S10', density: 0.58, risk_class: 'None' })]),
     );
+
+    const input = await createProductListPageInput(request);
+
+    expect(input.items[0]).toMatchObject({
+      name: 'Diesel S10',
+      density: '0,58 t/m³',
+      risk: { label: expect.any(String), tone: expect.any(String) },
+      editHref: expect.stringContaining('/editar'),
+    });
   });
 
-  it('não busca nada até `load` ser chamado', () => {
-    const vm = createProductListVM();
-    expect(vm.products.status()).toBe('idle');
-    expect(mockedList).not.toHaveBeenCalled();
+  it('é serializável — nada de função ou classe atravessa para o cliente', async () => {
+    const input = await createProductListPageInput(request);
+    // Se algo aqui fosse função ou instância de classe, o round-trip perderia
+    // ou distorceria o valor; é exatamente o que o Vike faz ao hidratar.
+    expect(JSON.parse(JSON.stringify(input))).toEqual(input);
   });
 
-  it('carrega o catálogo e expõe o resultado como sinal', async () => {
-    const page = paged(productFactory.buildList(2));
-    mockedList.mockResolvedValueOnce(page);
+  it('avalia a permissão de criar e entrega a decisão pronta', async () => {
+    mockedAccount.mockResolvedValueOnce(accountWith(Permission.ProductRead));
+    expect((await createProductListPageInput(request)).canCreate).toBe(false);
 
-    const vm = createProductListVM();
-    await vm.load();
-
-    expect(vm.products.status()).toBe('success');
-    expect(vm.products.data()).toEqual(page);
+    mockedAccount.mockResolvedValueOnce(
+      accountWith(Permission.ProductRead, Permission.ProductCreate),
+    );
+    expect((await createProductListPageInput(request)).canCreate).toBe(true);
   });
 
-  it('roda no navegador quando não recebe headers', async () => {
-    await createProductListVM().load();
-    expect(mockedList).toHaveBeenCalledWith(undefined, undefined);
+  it('recusa quem não tem ProductRead', async () => {
+    mockedAccount.mockResolvedValueOnce(accountWith(Permission.MetricsRead));
+    await expect(createProductListPageInput(request)).rejects.toThrow(ForbiddenError);
   });
 
-  it('roda no servidor quando recebe headers — é assim que a rota volta ao SSR', async () => {
-    const headers = { cookie: 'auth_token=abc' };
-    await createProductListVM({ headers }).load();
-    expect(mockedList).toHaveBeenCalledWith(headers, undefined);
+  it('sinaliza sessão ausente sem conhecer redirect', async () => {
+    mockedAccount.mockRejectedValueOnce(new Error('401'));
+    await expect(createProductListPageInput(request)).rejects.toThrow(UnauthorizedError);
   });
 
   it('repassa a query string da rota para a busca', async () => {
-    await createProductListVM({ url: '/painel/produtos?search=diesel' }).load();
+    await createProductListPageInput({ ...request, url: '/painel/produtos?search=diesel' });
 
     const [, params] = mockedList.mock.calls[0] ?? [];
     expect(params?.get('search')).toBe('diesel');
   });
 
-  it('expõe a falha como estado, sem lançar', async () => {
-    mockedList.mockRejectedValueOnce(new Error('500'));
-
-    const vm = createProductListVM();
-    await expect(vm.load()).resolves.toBeUndefined();
-    expect(vm.products.status()).toBe('error');
+  it('resolve o texto no locale do cookie do request', async () => {
+    const pt = await createProductListPageInput(request);
+    const en = await createProductListPageInput({
+      ...request,
+      headers: { cookie: 'auth_token=abc; flow-locale=en' },
+    });
+    expect(pt.t.title).not.toBe(en.t.title);
   });
 });
 
-describe('productListMeta', () => {
-  it('devolve título e descrição para o <head>', () => {
-    const meta = productListMeta({ locale: 'pt-BR' });
-    expect(meta.title).toBeTruthy();
-    expect(meta.description).toBeTruthy();
+describe('createProductListVM', () => {
+  /** Dado de rota mínimo, com as linhas e o cursor indicados. */
+  async function inputWith(nextCursor?: string) {
+    mockedList.mockResolvedValueOnce(paged(productFactory.buildList(2), nextCursor));
+    return createProductListPageInput(request);
+  }
+
+  it('já nasce com as linhas — não busca nada para existir', async () => {
+    const vm = createProductListVM(await inputWith());
+    mockedList.mockClear();
+
+    expect(vm.items()).toHaveLength(2);
+    expect(mockedList).not.toHaveBeenCalled();
+  });
+
+  it('acumula a próxima página em vez de substituir', async () => {
+    const vm = createProductListVM(await inputWith('cursor-2'));
+    mockedList.mockResolvedValueOnce(paged(productFactory.buildList(3)));
+
+    await vm.loadMore();
+
+    expect(vm.items()).toHaveLength(5);
+    expect(vm.hasMore()).toBe(false);
+  });
+
+  it('não pagina quando não há cursor', async () => {
+    const vm = createProductListVM(await inputWith(undefined));
+    mockedList.mockClear();
+
+    await vm.loadMore();
+
+    expect(mockedList).not.toHaveBeenCalled();
+    expect(vm.hasMore()).toBe(false);
+  });
+
+  it('expõe a falha como estado, sem lançar, e permite repetir', async () => {
+    const vm = createProductListVM(await inputWith('cursor-2'));
+    mockedList.mockRejectedValueOnce(new Error('500'));
+
+    await expect(vm.loadMore()).resolves.toBeUndefined();
+    expect(vm.errorMessage()).toBeTruthy();
+
+    mockedList.mockResolvedValueOnce(paged(productFactory.buildList(1)));
+    await vm.retry();
+
+    expect(vm.errorMessage()).toBeUndefined();
+    expect(vm.items()).toHaveLength(3);
+  });
+
+  it('pagina no navegador, sem headers — o servidor só entrega a 1ª página', async () => {
+    const vm = createProductListVM(await inputWith('cursor-2'));
+    mockedList.mockResolvedValueOnce(paged([]));
+
+    await vm.loadMore();
+
+    const [headers] = mockedList.mock.calls.at(-1) ?? [];
+    expect(headers).toBeUndefined();
   });
 });

@@ -4,8 +4,12 @@
   "title": "i18n da rota /painel/conta (accountMessages)",
   "type": "object",
   "allOf": [
-    { "$ref": "https://portmaster.app/i18n/common.json" },
-    { "$ref": "https://portmaster.app/i18n/val.json" }
+    {
+      "$ref": "https://portmaster.app/i18n/common.json"
+    },
+    {
+      "$ref": "https://portmaster.app/i18n/val.json"
+    }
   ],
   "required": [
     "account_title",
@@ -18,9 +22,14 @@
     "account_current_password",
     "account_new_password",
     "account_change_password",
-    "account_password_changed"
+    "account_password_changed",
+    "account_permissions_count",
+    "account_eyebrow"
   ],
   "patternProperties": {
-    "^account_": { "type": "string", "minLength": 1 }
+    "^account_": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

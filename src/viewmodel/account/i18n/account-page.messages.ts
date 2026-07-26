@@ -8,6 +8,8 @@ import { m } from '@/paraglide/messages';
 
 export type AccountPageText = CommonText &
   ValText & {
+    /** Linha de contexto em caixa alta, acima do título. */
+    eyebrow: string;
     title: string;
     subtitle: string;
     profile: string;
@@ -19,9 +21,19 @@ export type AccountPageText = CommonText &
     newPassword: string;
     changePassword: string;
     passwordChanged: string;
+    /**
+     * Contagem de permissões de um perfil, já interpolada.
+     *
+     * É função, e não string, porque depende de um valor de runtime — é o
+     * único caso do catálogo. Quem chama é o `createAccountPageInput`, que
+     * resolve para string antes de a View ver: o `PageInput` continua
+     * serializável.
+     */
+    permissionsCount: (count: number) => string;
   };
 
 export const accountMessages = (locale: Locale): AccountPageText => ({
+  eyebrow: m.account_eyebrow({}, { locale }),
   ...commonText(locale),
   ...valText(locale),
   title: m.account_title({}, { locale }),
@@ -35,4 +47,5 @@ export const accountMessages = (locale: Locale): AccountPageText => ({
   newPassword: m.account_new_password({}, { locale }),
   changePassword: m.account_change_password({}, { locale }),
   passwordChanged: m.account_password_changed({}, { locale }),
+  permissionsCount: (count: number) => m.account_permissions_count({ count }, { locale }),
 });

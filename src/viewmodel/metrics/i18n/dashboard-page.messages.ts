@@ -6,9 +6,15 @@ import type { MetricsPanelText } from './text-contracts';
 
 import { m } from '@/paraglide/messages';
 
-export type PainelPageText = MetricsPanelText & { title: string; subtitle: string };
+export type PainelPageText = MetricsPanelText & {
+  /** Linha de contexto em caixa alta, acima do título. */
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+};
 
 export const painelMessages = (locale: Locale): PainelPageText => ({
+  eyebrow: m.metrics_eyebrow({}, { locale }),
   title: m.painel_title({}, { locale }),
   subtitle: m.painel_subtitle({}, { locale }),
   occupancy: m.painel_occupancy({}, { locale }),

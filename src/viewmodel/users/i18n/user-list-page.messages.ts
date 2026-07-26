@@ -7,6 +7,7 @@ import type { UserListText } from './text-contracts';
 import { m } from '@/paraglide/messages';
 
 export const usersListMessages = (locale: Locale): UserListText => ({
+  eyebrow: m.users_eyebrow({}, { locale }),
   ...commonText(locale),
   title: m.users_title({}, { locale }),
   subtitle: m.users_subtitle({}, { locale }),

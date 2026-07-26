@@ -4,10 +4,9 @@
 //  do ViewModel — a View não deveria saber que existem dois recursos.
 // ============================================================
 import { updateUser as apiUpdateUser, updateUserRoles } from '@model/users';
-
-import { browserClient } from '../../core/client/api-client';
-import type { UserAdmin } from '../domain';
-import type { UserUpdateData } from '../schemas/user.schema';
+import type { UserAdmin } from '@model/users/dto';
+import { browserClient } from '@viewmodel/core/client/api-client';
+import type { UserUpdateData } from '@viewmodel/users/schemas/user.schema';
 
 /**
  * Atualiza dados e perfis de um usuário numa operação só.

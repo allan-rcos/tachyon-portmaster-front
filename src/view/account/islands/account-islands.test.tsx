@@ -1,10 +1,10 @@
-import { render, waitFor } from '@solidjs/testing-library';
-import { setInput, stubLocation } from '@testing/dom';
-import { accountProfileFactory } from '@testing/factories/model.factory';
+import { fireEvent, render, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import { stubLocation } from '@view/core/testing/stub-location';
 import { accountMessages } from '@viewmodel/account/i18n/account-page.messages';
 import { changeAccountPassword } from '@viewmodel/account/mutations/change-account-password.mutation';
 import { updateAccountProfile } from '@viewmodel/account/mutations/update-account-profile.mutation';
+import { accountProfileFactory } from '@viewmodel/account/testing/account.factory';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AccountForm } from './AccountForm.island';
@@ -33,7 +33,7 @@ describe('AccountForm island', () => {
       <AccountForm name="Ana Marés" email="ana@portmaster.test" t={t} />
     ));
 
-    setInput(getByLabelText(t.name), 'Ana M. Marés');
+    fireEvent.input(getByLabelText(t.name), { target: { value: 'Ana M. Marés' } });
     await user.click(getByRole('button', { name: t.save }));
 
     await waitFor(() =>
@@ -51,8 +51,8 @@ describe('PasswordChange island', () => {
     const user = userEvent.setup();
     const { getByLabelText, getByRole } = render(() => <PasswordChange t={t} />);
 
-    setInput(getByLabelText(t.currentPassword), 'admin123');
-    setInput(getByLabelText(t.newPassword), 'novasenha');
+    fireEvent.input(getByLabelText(t.currentPassword), { target: { value: 'admin123' } });
+    fireEvent.input(getByLabelText(t.newPassword), { target: { value: 'novasenha' } });
     await user.click(getByRole('button', { name: t.changePassword }));
 
     await waitFor(() =>
@@ -69,8 +69,8 @@ describe('PasswordChange island', () => {
     const user = userEvent.setup();
     const { getByLabelText, getByRole } = render(() => <PasswordChange t={t} />);
 
-    setInput(getByLabelText(t.currentPassword), 'errada');
-    setInput(getByLabelText(t.newPassword), 'novasenha');
+    fireEvent.input(getByLabelText(t.currentPassword), { target: { value: 'errada' } });
+    fireEvent.input(getByLabelText(t.newPassword), { target: { value: 'novasenha' } });
     await user.click(getByRole('button', { name: t.changePassword }));
 
     await waitFor(() => expect(getByRole('alert')).toBeVisible());

@@ -1,80 +1,90 @@
+import { ContainerActions } from '@view/containers/islands/ContainerActions.island';
+import { ManifestEditor } from '@view/containers/islands/ManifestEditor.island';
+import { Badge } from '@view/core/components/Badge';
 import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { Card } from '@view/core/components/Card';
 import { Icon } from '@view/core/components/Icon';
-import { StatusBadge } from '@view/core/components/StatusBadge';
-import type { ContainerSummary as Summary } from '@viewmodel/containers/domain';
-import type { ContainerDetailText } from '@viewmodel/containers/i18n/text-contracts';
-import { formatWeight, formatPercent } from '@viewmodel/core/utils/formatters';
+import type { ContainerDetailVM } from '@viewmodel/containers/container-detail-page.vm';
 import type { JSX } from 'solid-js';
-import { ClientOnly } from 'vike-solid/ClientOnly';
 
 import styles from './ContainerSummary.module.scss';
 import { ManifestTable } from './ManifestTable';
 import { TelemetryLog } from './TelemetryLog';
-import { ContainerActions } from '../islands/ContainerActions.island';
-import { ManifestEditor, type ProductOption } from '../islands/ManifestEditor.island';
 
-function occupancy(weight: number, capacity: number): number {
-  return capacity ? Math.round((weight / capacity) * 1000) / 10 : 0;
+/** Props do detalhe de contêiner. */
+export interface ContainerSummaryProps {
+  /** ViewModel da rota. */
+  vm: ContainerDetailVM;
 }
 
-export function ContainerSummary(props: {
-  summary: Summary;
-  products: ProductOption[];
-  t: ContainerDetailText;
-}): JSX.Element {
-  const c = () => props.summary.container;
-
+/**
+ * Detalhe do contêiner: cabeçalho, fatos, ações, manifesto e telemetria.
+ *
+ * Tudo chega formatado pelo ViewModel — pesos, ocupação e datas já são string,
+ * então não há aritmética nem `Intl` nesta camada. Os `ClientOnly` em volta das
+ * islands saíram: o conteúdo agora vem do servidor e elas hidratam por cima.
+ *
+ * @param props.vm ViewModel da rota.
+ */
+export function ContainerSummary(props: ContainerSummaryProps): JSX.Element {
   return (
     <section>
       <Breadcrumbs
-        items={[{ label: props.t.title, href: '/painel/conteineres' }, { label: c().code }]}
+        items={[
+          { label: props.vm.t.title, href: props.vm.listHref },
+          { label: props.vm.facts.code },
+        ]}
       />
 
       <header class={styles.head}>
         <div class={styles.title}>
-          <h1 class={styles.code}>{c().code}</h1>
-          <StatusBadge status={c().status} />
+          <h1 class={styles.code}>{props.vm.facts.code}</h1>
+          <Badge tone={props.vm.facts.statusBadge.tone} dot>
+            {props.vm.facts.statusBadge.label}
+          </Badge>
         </div>
-        <a class={styles.editLink} href={`/painel/conteineres/${c().id}/editar`}>
+        <a class={styles.editLink} href={props.vm.facts.editHref}>
           <Icon name="pencil" size={16} />
-          {props.t.edit}
+          {props.vm.t.edit}
         </a>
       </header>
 
       <dl class={styles.facts}>
         <div>
-          <dt>{props.t.weight}</dt>
-          <dd>{formatWeight(c().current_weight)}</dd>
+          <dt>{props.vm.t.weight}</dt>
+          <dd>{props.vm.facts.weight}</dd>
         </div>
         <div>
-          <dt>{props.t.capacity}</dt>
-          <dd>{formatWeight(c().max_capacity)}</dd>
+          <dt>{props.vm.t.capacity}</dt>
+          <dd>{props.vm.facts.capacity}</dd>
         </div>
         <div>
-          <dt>{props.t.occupancy}</dt>
-          <dd>{formatPercent(occupancy(c().current_weight, c().max_capacity))}</dd>
+          <dt>{props.vm.t.occupancy}</dt>
+          <dd>{props.vm.facts.occupancy}</dd>
         </div>
       </dl>
 
-      <ClientOnly fallback={<span />}>
-        <ContainerActions containerId={c().id} status={c().status} t={props.t} />
-      </ClientOnly>
+      <ContainerActions
+        containerId={props.vm.facts.id}
+        canSeal={props.vm.facts.canSeal}
+        canDispatch={props.vm.facts.canDispatch}
+        t={props.vm.t}
+      />
 
       <div class={styles.grid}>
-        <Card title={props.t.manifest}>
-          <ManifestTable items={props.summary.manifest} t={props.t} />
-          <ClientOnly fallback={<span />}>
-            <ManifestEditor containerId={c().id} products={props.products} t={props.t} />
-          </ClientOnly>
+        <Card title={props.vm.t.manifest}>
+          <ManifestTable items={props.vm.manifest} t={props.vm.t} />
+          <ManifestEditor
+            containerId={props.vm.facts.id}
+            products={[...props.vm.products]}
+            t={props.vm.t}
+          />
         </Card>
 
-        <Card title={props.t.logs}>
-          <TelemetryLog logs={props.summary.recent_logs} t={props.t} />
+        <Card title={props.vm.t.logs}>
+          <TelemetryLog logs={props.vm.logs} t={props.vm.t} />
         </Card>
       </div>
     </section>
   );
 }
-
-export type { ContainerDetailText };

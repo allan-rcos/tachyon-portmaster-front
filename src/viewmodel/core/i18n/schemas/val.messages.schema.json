@@ -17,8 +17,11 @@
     "val_code_long",
     "val_code_format",
     "val_capacity_positive",
+    "val_capacity_format",
     "val_density_positive",
+    "val_density_format",
     "val_quantity_positive",
+    "val_quantity_format",
     "val_product_required"
   ],
   "patternProperties": {

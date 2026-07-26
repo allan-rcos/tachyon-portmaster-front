@@ -1,31 +1,23 @@
-import { AsyncBoundary } from '@view/core/components/AsyncBoundary';
-import { Skeleton } from '@view/core/components/Skeleton';
-import { createScreenBinding } from '@view/core/screens/createScreenBinding';
 import { ProductList } from '@view/products/components/ProductList';
 import type { ProductListVM } from '@viewmodel/products/product-list-page.vm';
 import type { JSX } from 'solid-js';
 
+/** Props da tela de listagem de produtos. */
+export interface ProductListScreenProps {
+  /** ViewModel da rota, construído no `+Page`. */
+  vm: ProductListVM;
+}
+
 /**
- * Tela da listagem de produtos: liga o ViewModel observável ao componente puro.
+ * Tela da listagem de produtos.
  *
- * Esta camada existe para que `ProductList` continue recebendo apenas dados
- * prontos — o que a mantém trivial de testar e indiferente à origem dos dados.
+ * Stateless: não guarda estado, não formata e não busca nada — a primeira
+ * página já chegou pronta pelo `+data` e o resto vem dos handlers do ViewModel.
+ * Não há mais `AsyncBoundary` de carregamento inicial porque não há mais
+ * carregamento inicial: quando esta tela renderiza, o dado já existe.
  *
  * @param props.vm ViewModel da rota.
  */
-export function ProductListScreen(props: { vm: ProductListVM }): JSX.Element {
-  const { data, status } = createScreenBinding(props.vm.products, props.vm.load);
-
-  return (
-    <AsyncBoundary
-      status={status()}
-      data={data()}
-      fallback={<Skeleton height="18rem" />}
-      errorMessage={props.vm.boundary.loadError}
-      retryLabel={props.vm.boundary.retry}
-      onRetry={() => void props.vm.load()}
-    >
-      {(page) => <ProductList items={page.data} total={page.total} t={props.vm.t} />}
-    </AsyncBoundary>
-  );
+export function ProductListScreen(props: ProductListScreenProps): JSX.Element {
+  return <ProductList vm={props.vm} />;
 }

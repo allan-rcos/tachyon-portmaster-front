@@ -1,49 +1,111 @@
 // ============================================================
-//  ViewModel da rota. Observável: a tela assina os sinais e reage.
-//  Roda no navegador (VMContext sem `headers`); passar os headers do request
-//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
+//  Rota /painel/conteineres/@id/editar.
+//
+//  O contêiner é buscado no `+data`, então o formulário chega preenchido no
+//  HTML da primeira requisição. Ver `@viewmodel/products/product-list-page.vm`
+//  para os dois papéis.
 // ============================================================
-import type { Container } from './domain';
-import { containerEditMessages } from './i18n/container-edit-page.messages';
-import type { ContainerEditText } from './i18n/container-edit-page.messages';
-import { getContainer } from './queries/get-container.query';
+import { Permission } from '@model/common';
+import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import { authorize } from '@viewmodel/core/page/authorize';
 import {
-  asyncBoundaryMessages,
-  type AsyncBoundaryText,
-} from '../core/i18n/async-boundary.messages';
-import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
-import type { PageMeta } from '../core/page/page-request';
-import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';
+  PageNotFoundError,
+  routeParam,
+  type PageMeta,
+  type PageRequest,
+} from '@viewmodel/core/page/page-request';
+import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
 
-/** Superfície observável da edição de contêiner. */
-export interface ContainerEditVM {
+import { containerEditMessages, type ContainerEditText } from './i18n/container-edit-page.messages';
+import { getContainer } from './queries/get-container.query';
+
+/** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
+export const CONTAINER_EDIT_PERMISSIONS = [
+  Permission.ContainerRead,
+  Permission.ContainerUpdate,
+] as const;
+
+/** Valores iniciais do formulário — dado plano, atravessa a serialização. */
+export interface ContainerFormValues {
+  /** Código ISO do contêiner. */
+  code: string;
+  /** Capacidade máxima em quilos, crua. */
+  max_capacity: number;
+}
+
+/** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
+export interface ContainerEditPageInput {
+  /** `<title>`/`<description>` da rota. */
+  meta: PageMeta;
+  /** Identidade que o rodapé da barra lateral mostra. */
+  shell: ShellIdentity;
+  /** Texto da tela, já no locale do request. */
   t: ContainerEditText;
-  /** Texto da fronteira de carregamento (erro e nova tentativa). */
-  boundary: AsyncBoundaryText;
   /** Identificador opaco do contêiner em edição. */
   id: string;
-  container: AsyncSignal<Container, []>;
-  load: () => Promise<void>;
+  /** Código do contêiner, para o cabeçalho e a trilha. */
+  code: string;
+  /** Valores que preenchem o formulário. */
+  values: ContainerFormValues;
+  /** Volta para a listagem — a View não monta rota. */
+  listHref: string;
 }
 
 /**
- * Cria o ViewModel da edição de contêiner.
+ * O trabalho de servidor da rota: autorização, i18n e o contêiner em edição.
  *
- * @param context Contexto de execução; precisa do parâmetro de rota `id`.
+ * @param request Requisição de página, neutra de framework.
+ * @throws {UnauthorizedError} Sem sessão válida.
+ * @throws {ForbiddenError} Sem `ContainerRead` + `ContainerUpdate`.
+ * @throws {PageNotFoundError} Quando o id não corresponde a um contêiner.
  */
-export function createContainerEditVM(context: VMContext): ContainerEditVM {
-  const t = containerEditMessages(contextLocale(context));
-  const boundary = asyncBoundaryMessages(contextLocale(context));
-  const id = routeParam(context, 'id');
-  const container = createAsyncSignal<Container, []>(() => getContainer(id, context.headers));
-  return { t, boundary, id, container, load: () => container.run() };
+export async function createContainerEditPageInput(
+  request: PageRequest,
+): Promise<ContainerEditPageInput> {
+  const account = await authorize(request, CONTAINER_EDIT_PERMISSIONS);
+  const t = containerEditMessages(resolveLocale(request.headers));
+  const id = routeParam(request, 'id');
+
+  const container = await getContainer(id, request.headers).catch(() => {
+    throw new PageNotFoundError(`Contêiner não encontrado: ${id}`);
+  });
+
+  return {
+    meta: { title: `${t.edit} — ${container.code}`, description: t.subtitle },
+    shell: shellIdentity(account),
+    t,
+    id,
+    code: container.code,
+    values: { code: container.code, max_capacity: container.max_capacity },
+    listHref: '/painel/conteineres',
+  };
+}
+
+/** Superfície da edição de contêiner. */
+export interface ContainerEditVM {
+  /** Texto da tela. */
+  t: ContainerEditText;
+  /** Identificador opaco do contêiner em edição. */
+  id: string;
+  /** Código do contêiner. */
+  code: string;
+  /** Valores que preenchem o formulário. */
+  values: ContainerFormValues;
+  /** Volta para a listagem. */
+  listHref: string;
 }
 
 /**
- * Título e descrição da rota, para o `<head>`.
- * @param context Contexto de execução — só o locale importa aqui.
+ * Cria o ViewModel da edição a partir do dado já resolvido.
+ *
+ * @param input Dado da rota, vindo do `+data`.
  */
-export function containerEditMeta(context: VMContext = {}): PageMeta {
-  const t = containerEditMessages(contextLocale(context));
-  return { title: t.edit, description: t.subtitle };
+export function createContainerEditVM(input: ContainerEditPageInput): ContainerEditVM {
+  return {
+    t: input.t,
+    id: input.id,
+    code: input.code,
+    values: input.values,
+    listHref: input.listHref,
+  };
 }

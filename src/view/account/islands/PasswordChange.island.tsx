@@ -1,8 +1,6 @@
 import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
 import { bindMutation } from '@view/core/observable/bind-mutation';
-import { cn } from '@view/core/utils/ui';
-import { errText } from '@view/core/utils/ui';
 import type { PasswordChangeText } from '@viewmodel/account/i18n/text-contracts';
 import { changeAccountPassword } from '@viewmodel/account/mutations/change-account-password.mutation';
 import {
@@ -14,7 +12,7 @@ import { type JSX } from 'solid-js';
 
 import styles from './PasswordChange.island.module.scss';
 
-function Inner(props: { t: PasswordChangeText }): JSX.Element {
+function Inner(props: PasswordChangeProps): JSX.Element {
   const mutation = bindMutation(
     createMutationSignal((value: PasswordChangeData) => changeAccountPassword(value), {
       onSuccess: () => form.reset(),
@@ -44,12 +42,13 @@ function Inner(props: { t: PasswordChangeText }): JSX.Element {
             <FormField
               label={props.t.currentPassword}
               for="cur-pass"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="cur-pass"
                 type="password"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -63,12 +62,13 @@ function Inner(props: { t: PasswordChangeText }): JSX.Element {
             <FormField
               label={props.t.newPassword}
               for="new-pass"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="new-pass"
                 type="password"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -87,7 +87,8 @@ function Inner(props: { t: PasswordChangeText }): JSX.Element {
 
       <button
         type="submit"
-        class={cn(styles.submit, mutation.isPending() && styles.loading)}
+        class={styles.submit}
+        classList={{ [styles.loading]: mutation.isPending() }}
         disabled={mutation.isPending()}
       >
         {props.t.changePassword}
@@ -96,8 +97,12 @@ function Inner(props: { t: PasswordChangeText }): JSX.Element {
   );
 }
 
+export interface PasswordChangeProps {
+  t: PasswordChangeText;
+}
+
 /** Troca da própria senha (island). */
-export function PasswordChange(props: { t: PasswordChangeText }): JSX.Element {
+export function PasswordChange(props: PasswordChangeProps): JSX.Element {
   return <Inner t={props.t} />;
 }
 

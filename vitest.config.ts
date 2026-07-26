@@ -30,16 +30,16 @@ export default defineConfig({
       '@model': fileURLToPath(new URL('./src/model', import.meta.url)),
       '@viewmodel': fileURLToPath(new URL('./src/viewmodel', import.meta.url)),
       '@view': fileURLToPath(new URL('./src/view', import.meta.url)),
-      '@testing': fileURLToPath(new URL('./src/testing', import.meta.url)),
-      // Ver vite.config.ts: precisa vir antes de `@`.
+      // Ver vite.config.ts: precisam vir antes de `@`.
       '@/paraglide': fileURLToPath(new URL('./dist/paraglide', import.meta.url)),
+      '@/fbs': fileURLToPath(new URL('./dist/fbs', import.meta.url)),
       '@': fileURLToPath(new URL('.', import.meta.url)),
     },
   },
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./src/testing/setup.ts'],
+    setupFiles: ['./vitest.setup.ts'],
     include: ['**/*.{test,spec}.{ts,tsx}'],
     exclude: ['node_modules', 'dist', 'packages/**', 'src/model/contract/**'],
     server: {

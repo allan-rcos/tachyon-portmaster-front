@@ -77,7 +77,10 @@ for (const dir of SOURCE_ROOTS) {
 // ---------------------------------------------------------------- parse dos resolvers
 // nome-do-resolver → { direct: Set<chave>, spreads: Set<nome>, file }
 const resolvers = new Map();
-const KEY_RE = /\bm\.([A-Za-z0-9_]+)\s*\(\s*\{\s*\}/g;
+// Casa `m.chave({}` e também `m.chave({ count }` — mensagem COM parâmetro é
+// recurso legítimo do Paraglide (ex.: `account_permissions_count`), e o regex
+// antigo, que exigia objeto vazio, as reportava como "declaradas e não usadas".
+const KEY_RE = /\bm\.([A-Za-z0-9_]+)\s*\(\s*\{/g;
 const SPREAD_RE = /\.\.\.(\w+)\s*\(\s*locale\s*\)/g;
 const EXPORT_RE = /export\s+(?:const|function)\s+(\w+)\b/g;
 

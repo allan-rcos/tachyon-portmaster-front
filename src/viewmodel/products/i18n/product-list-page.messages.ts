@@ -8,6 +8,7 @@ import type { ProductListText } from './text-contracts';
 import { m } from '@/paraglide/messages';
 
 export const productsListMessages = (locale: Locale): ProductListText => ({
+  eyebrow: m.products_eyebrow({}, { locale }),
   ...commonText(locale),
   title: m.products_title({}, { locale }),
   subtitle: m.products_subtitle({}, { locale }),

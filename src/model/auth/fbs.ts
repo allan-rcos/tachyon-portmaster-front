@@ -1,7 +1,9 @@
+import { toBytes, buf, fromT } from '@model/core/fbs-runtime';
+
 import type { LoginRequest, LoginResponse } from './dto';
-import { toBytes, buf, fromT } from '../core/fbs-runtime';
-import { LoginRequestT } from '../generated/fbs/api/fbs/auth/login-request';
-import { LoginResponse as FbLoginResponse } from '../generated/fbs/api/fbs/auth/login-response';
+
+import { LoginRequestT } from '@/fbs/api/fbs/auth/login-request';
+import { LoginResponse as FbLoginResponse } from '@/fbs/api/fbs/auth/login-response';
 
 export const encLogin = (v: LoginRequest): Uint8Array =>
   toBytes(new LoginRequestT(v.email, v.password));

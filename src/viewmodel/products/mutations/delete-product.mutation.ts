@@ -1,6 +1,5 @@
 import { deleteProduct as apiDeleteProduct } from '@model/products';
-
-import { browserClient } from '../../core/client/api-client';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Remove um produto do catálogo.

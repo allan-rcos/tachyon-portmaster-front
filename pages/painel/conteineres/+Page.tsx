@@ -1,14 +1,10 @@
 import { ContainerListScreen } from '@view/containers/screens/ContainerListScreen';
-import { createContainerListVM } from '@viewmodel/containers/container-list-page.vm';
-import { ClientOnly } from 'vike-solid/ClientOnly';
-import { usePageContext } from 'vike-solid/usePageContext';
+import { createContainerListVM, type ContainerListPageInput } from '@viewmodel/containers/container-list-page.vm';
+import type { JSX } from 'solid-js';
+import { useData } from 'vike-solid/useData';
 
-export default function Page() {
-  const pageContext = usePageContext();
-  const vm = createContainerListVM({ url: pageContext.urlOriginal });
-  return (
-    <ClientOnly fallback={<div />}>
-      <ContainerListScreen vm={vm} />
-    </ClientOnly>
-  );
+/** Único ponto de composição da rota. */
+export default function Page(): JSX.Element {
+  const input = useData<ContainerListPageInput>();
+  return <ContainerListScreen vm={createContainerListVM(input)} />;
 }

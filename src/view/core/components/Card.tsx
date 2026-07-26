@@ -1,4 +1,3 @@
-import { cn } from '@view/core/utils/ui';
 import type { JSX } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 
@@ -20,7 +19,10 @@ export interface CardProps {
 /** Painel de vidro (glass L1). HTML puro. */
 export function Card(props: CardProps): JSX.Element {
   return (
-    <Dynamic component={props.as ?? 'article'} class={cn(styles.card, props.class)}>
+    <Dynamic
+      component={props.as ?? 'article'}
+      class={props.class ? `${styles.card} ${props.class}` : styles.card}
+    >
       {(props.title || props.actions) && (
         <header class={styles.head}>
           {props.title && (

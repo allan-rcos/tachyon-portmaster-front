@@ -1,55 +1,83 @@
 // ============================================================
-//  ViewModel da rota. Observável: a tela assina os sinais e reage.
-//  Roda no navegador (VMContext sem `headers`); passar os headers do request
-//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
+//  Rota /painel/usuarios/nova.
+//
+//  Os perfis disponíveis são buscados no `+data`: o `<select>` chega populado
+//  no HTML da primeira requisição, em vez de aparecer vazio e preencher depois.
+//
+//  Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
 // ============================================================
-import { userNewMessages } from './i18n/user-create-page.messages';
-import type { UserNewText } from './i18n/user-create-page.messages';
-import {
-  asyncBoundaryMessages,
-  type AsyncBoundaryText,
-} from '../core/i18n/async-boundary.messages';
-import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
-import type { PageMeta } from '../core/page/page-request';
-import { contextLocale, type VMContext } from '../core/page/vm-context';
-import { listRoles } from '../roles/queries/list-roles.query';
+import { Permission } from '@model/common';
+import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import { authorize } from '@viewmodel/core/page/authorize';
+import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
+import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
+import { listRoles } from '@viewmodel/roles/queries/list-roles.query';
+
+import { userNewMessages, type UserNewText } from './i18n/user-create-page.messages';
+
+/** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
+export const USER_CREATE_PERMISSIONS = [Permission.UserCreate] as const;
 
 /** Opção de perfil oferecida no formulário. */
 export interface RoleOption {
+  /** Id opaco base62 do perfil. */
   id: string;
+  /** Nome exibido na opção. */
   name: string;
 }
 
-/** Superfície observável da criação de usuário. */
-export interface UserCreateVM {
+/** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
+export interface UserCreatePageInput {
+  /** `<title>`/`<description>` da rota. */
+  meta: PageMeta;
+  /** Identidade que o rodapé da barra lateral mostra. */
+  shell: ShellIdentity;
+  /** Texto da tela, já no locale do request. */
   t: UserNewText;
-  /** Texto da fronteira de carregamento (erro e nova tentativa). */
-  boundary: AsyncBoundaryText;
   /** Perfis disponíveis para vincular ao novo usuário. */
-  roles: AsyncSignal<RoleOption[], []>;
-  load: () => Promise<void>;
+  roles: readonly RoleOption[];
+  /** Volta para a listagem — a View não monta rota. */
+  listHref: string;
 }
 
 /**
- * Cria o ViewModel do formulário de novo usuário.
+ * O trabalho de servidor da rota: autorização, i18n e os perfis do formulário.
  *
- * @param context Contexto de execução — navegador quando omitido.
+ * @param request Requisição de página, neutra de framework.
+ * @throws {UnauthorizedError} Sem sessão válida.
+ * @throws {ForbiddenError} Sem a permissão `UserCreate`.
  */
-export function createUserCreateVM(context: VMContext = {}): UserCreateVM {
-  const t = userNewMessages(contextLocale(context));
-  const boundary = asyncBoundaryMessages(contextLocale(context));
-  const roles = createAsyncSignal<RoleOption[], []>(async () => {
-    const res = await listRoles(context.headers);
-    return res.data.map((role) => ({ id: role.id, name: role.name }));
-  }, []);
-  return { t, boundary, roles, load: () => roles.run() };
+export async function createUserCreatePageInput(
+  request: PageRequest,
+): Promise<UserCreatePageInput> {
+  const account = await authorize(request, USER_CREATE_PERMISSIONS);
+  const t = userNewMessages(resolveLocale(request.headers));
+  const roles = await listRoles(request.headers);
+
+  return {
+    meta: { title: t.new, description: t.subtitle },
+    shell: shellIdentity(account),
+    t,
+    roles: roles.data.map((role) => ({ id: role.id, name: role.name })),
+    listHref: '/painel/usuarios',
+  };
+}
+
+/** Superfície da criação de usuário. */
+export interface UserCreateVM {
+  /** Texto da tela. */
+  t: UserNewText;
+  /** Perfis disponíveis para vincular. */
+  roles: readonly RoleOption[];
+  /** Volta para a listagem. */
+  listHref: string;
 }
 
 /**
- * Título e descrição da rota, para o `<head>`.
- * @param context Contexto de execução — só o locale importa aqui.
+ * Cria o ViewModel da criação a partir do dado já resolvido.
+ *
+ * @param input Dado da rota, vindo do `+data`.
  */
-export function userCreateMeta(context: VMContext = {}): PageMeta {
-  const t = userNewMessages(contextLocale(context));
-  return { title: t.new, description: t.subtitle };
+export function createUserCreateVM(input: UserCreatePageInput): UserCreateVM {
+  return { t: input.t, roles: input.roles, listHref: input.listHref };
 }

@@ -13,15 +13,16 @@
     // Um alias por camada do MVVM: o import declara a camada de destino, então
     // toda violação da regra de dependência (pages → view → viewmodel → model)
     // fica visível no próprio specifier — e é barrada pelo eslint.
-    // `@/paraglide/*` é caso à parte: saída de compilador, mora em `dist/`.
+    // `@/paraglide/*` e `@/fbs/*` são casos à parte: saída de compilador
+    // (paraglide-js e flatc), moram em `dist/` e não versionam.
     // Os específicos precisam vir ANTES de `@/*`.
     "baseUrl": ".",
     "paths": {
       "@model/*": ["./src/model/*"],
       "@viewmodel/*": ["./src/viewmodel/*"],
       "@view/*": ["./src/view/*"],
-      "@testing/*": ["./src/testing/*"],
       "@/paraglide/*": ["./dist/paraglide/*"],
+      "@/fbs/*": ["./dist/fbs/*"],
       "@/*": ["./*"]
     },
 

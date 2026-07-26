@@ -1,47 +1,179 @@
 // ============================================================
-//  ViewModel da rota. Observável: a tela assina os sinais e reage.
-//  Roda no navegador (VMContext sem `headers`); passar os headers do request
-//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
+//  Rota /painel/perfis.
+//
+//  Mesmo desenho de `@viewmodel/products/product-list-page.vm`, que documenta
+//  os dois papéis (o `PageInput` como "data" serializável e o VM como
+//  reatividade). Aqui só muda o recurso.
 // ============================================================
-import type { RoleList } from './domain';
-import { rolesListMessages } from './i18n/role-list-page.messages';
-import type { RoleListText } from './i18n/text-contracts';
-import { listRoles } from './queries/list-roles.query';
+import { Permission } from '@model/common';
+import type { Role } from '@model/roles/dto';
 import {
   asyncBoundaryMessages,
   type AsyncBoundaryText,
-} from '../core/i18n/async-boundary.messages';
-import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
-import type { PageMeta } from '../core/page/page-request';
-import { contextLocale, contextParams, type VMContext } from '../core/page/vm-context';
+} from '@viewmodel/core/i18n/async-boundary.messages';
+import { PERMISSION_LABEL } from '@viewmodel/core/i18n/labels';
+import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
+import { createSignal, type Signal } from '@viewmodel/core/observable/signal';
+import { authorize, can } from '@viewmodel/core/page/authorize';
+import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
+import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
+import { formatNumber } from '@viewmodel/core/utils/formatters';
 
-/** Superfície observável da listagem de perfis. */
-export interface RoleListVM {
+import { rolesListMessages } from './i18n/role-list-page.messages';
+import type { RoleListText } from './i18n/text-contracts';
+import { listRoles } from './queries/list-roles.query';
+
+/** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
+export const ROLE_LIST_PERMISSIONS = [Permission.RoleList] as const;
+
+/** Permissões exigidas para criar um perfil (habilitam o botão "novo"). */
+const ROLE_CREATE_PERMISSIONS = [Permission.RoleCreate] as const;
+
+/** Uma linha da listagem, já em formato de apresentação. */
+export interface RoleRowData {
+  /** Id opaco base62, usado como chave de lista. */
+  id: string;
+  /** Nome do perfil. */
+  name: string;
+  /** Quantidade de usuários, já formatada. */
+  userCount: string;
+  /** Quantidade de permissões, já formatada. */
+  permissionCount: string;
+  /**
+   * As permissões concedidas, com rótulo já traduzido — o cartão as mostra como
+   * chips. A View recebe texto, não o enum: ver `@viewmodel/core/page/options`.
+   */
+  permissions: readonly string[];
+  /** Destino da tela de permissões deste perfil. */
+  permissionsHref: string;
+}
+
+/** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
+export interface RoleListPageInput {
+  /** `<title>`/`<description>` da rota. */
+  meta: PageMeta;
+  /** Identidade que o rodapé da barra lateral mostra. */
+  shell: ShellIdentity;
+  /** Texto da tela, já no locale do request. */
   t: RoleListText;
-  /** Texto da fronteira de carregamento (erro e nova tentativa). */
+  /** Texto da fronteira de carregamento. */
   boundary: AsyncBoundaryText;
-  roles: AsyncSignal<RoleList, []>;
-  load: () => Promise<void>;
+  /** Primeira página, já formatada. */
+  items: readonly RoleRowData[];
+  /** Cursor da próxima página; ausente quando acabou. */
+  nextCursor?: string;
+  /** Permissão de criação, já avaliada. */
+  canCreate: boolean;
+  /** Destino do botão "novo perfil". */
+  newHref: string;
+  /** Locale resolvido, para formatar as páginas seguintes igual à primeira. */
+  locale: Locale;
 }
 
 /**
- * Cria o ViewModel da listagem de perfis.
+ * Converte o DTO do Model na linha que a tela desenha.
  *
- * @param context Contexto de execução — navegador quando omitido.
+ * @param r      Perfil vindo do Model.
+ * @param locale Locale da apresentação.
  */
-export function createRoleListVM(context: VMContext = {}): RoleListVM {
-  const t = rolesListMessages(contextLocale(context));
-  const boundary = asyncBoundaryMessages(contextLocale(context));
-  const params = contextParams(context);
-  const roles = createAsyncSignal<RoleList, []>(() => listRoles(context.headers, params));
-  return { t, boundary, roles, load: () => roles.run() };
+function toRow(r: Role, locale: Locale): RoleRowData {
+  return {
+    id: r.id,
+    name: r.name,
+    userCount: formatNumber(r.user_count, locale),
+    permissionCount: formatNumber(r.permissions.length, locale),
+    permissions: r.permissions.map((p) => PERMISSION_LABEL[p]),
+    permissionsHref: `/painel/perfis/${r.id}/permissoes`,
+  };
 }
 
 /**
- * Título e descrição da rota, para o `<head>`.
- * @param context Contexto de execução — só o locale importa aqui.
+ * O trabalho de servidor da rota: sessão, permissão, i18n e primeira página.
+ *
+ * @param request Requisição de página, neutra de framework.
+ * @throws {UnauthorizedError} Sem sessão válida.
+ * @throws {ForbiddenError} Sem a permissão `RoleList`.
  */
-export function roleListMeta(context: VMContext = {}): PageMeta {
-  const t = rolesListMessages(contextLocale(context));
-  return { title: t.title, description: t.subtitle };
+export async function createRoleListPageInput(request: PageRequest): Promise<RoleListPageInput> {
+  const account = await authorize(request, ROLE_LIST_PERMISSIONS);
+  const locale = resolveLocale(request.headers);
+  const t = rolesListMessages(locale);
+  const page = await listRoles(request.headers, searchParams(request));
+
+  return {
+    meta: { title: t.title, description: t.subtitle },
+    shell: shellIdentity(account),
+    t,
+    boundary: asyncBoundaryMessages(locale),
+    items: page.data.map((r) => toRow(r, locale)),
+    nextCursor: page.next_cursor,
+    canCreate: can(account, ROLE_CREATE_PERMISSIONS),
+    newHref: '/painel/perfis/nova',
+    locale,
+  };
+}
+
+/** Superfície reativa da listagem de perfis. */
+export interface RoleListVM {
+  /** Texto da tela. */
+  t: RoleListText;
+  /** Texto da fronteira de carregamento. */
+  boundary: AsyncBoundaryText;
+  /** Linhas acumuladas — cresce a cada `loadMore`. */
+  items: Signal<readonly RoleRowData[]>;
+  /** Permissão de criação, já avaliada no servidor. */
+  canCreate: boolean;
+  /** Destino do botão "novo perfil". */
+  newHref: string;
+  /** Há mais páginas a carregar. */
+  hasMore: () => boolean;
+  /** Uma página adicional está em voo. */
+  isLoadingMore: () => boolean;
+  /** Mensagem de erro da última tentativa, se houve. */
+  errorMessage: () => string | undefined;
+  /** Carrega a próxima página. Passar direto ao handler, sem lambda. */
+  loadMore: () => Promise<void>;
+  /** Repete a tentativa que falhou. Passar direto ao handler, sem lambda. */
+  retry: () => Promise<void>;
+}
+
+/**
+ * Cria o ViewModel da listagem a partir do dado já resolvido.
+ *
+ * @param input Dado da rota, vindo do `+data`.
+ */
+export function createRoleListVM(input: RoleListPageInput): RoleListVM {
+  const items = createSignal<readonly RoleRowData[]>(input.items);
+  const cursor = createSignal<string | undefined>(input.nextCursor);
+  const loadingMore = createSignal(false);
+  const failed = createSignal(false);
+
+  async function fetchNext(): Promise<void> {
+    const next = cursor();
+    if (next === undefined || loadingMore()) return;
+    loadingMore.set(true);
+    failed.set(false);
+    try {
+      const page = await listRoles(undefined, new URLSearchParams({ cursor: next }));
+      items.set([...items(), ...page.data.map((r) => toRow(r, input.locale))]);
+      cursor.set(page.next_cursor);
+    } catch {
+      failed.set(true);
+    } finally {
+      loadingMore.set(false);
+    }
+  }
+
+  return {
+    t: input.t,
+    boundary: input.boundary,
+    items,
+    canCreate: input.canCreate,
+    newHref: input.newHref,
+    hasMore: () => cursor() !== undefined,
+    isLoadingMore: loadingMore,
+    errorMessage: () => (failed() ? input.boundary.loadError : undefined),
+    loadMore: fetchNext,
+    retry: fetchNext,
+  };
 }

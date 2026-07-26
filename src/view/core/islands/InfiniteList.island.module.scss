@@ -1,0 +1,34 @@
+@use '@ds/responsive' as rp;
+@use '@ds/ui' as ui;
+
+.foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) 0;
+}
+
+// O alvo do observador. Sem altura ele nunca cruzaria o viewport.
+.sentinel {
+  width: 100%;
+  height: 1px;
+}
+
+.more {
+  @include ui.button-secondary;
+  @include rp.touch-target;
+}
+
+.error {
+  margin: 0;
+  color: var(--red-400);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.retry {
+  @include ui.button-ghost;
+  @include ui.button-sm;
+  color: var(--color-link);
+}

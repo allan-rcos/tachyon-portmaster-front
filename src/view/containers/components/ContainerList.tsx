@@ -1,140 +1,88 @@
-import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
-import { DataTable, type Column } from '@view/core/components/DataTable';
+import { ContainerCard } from '@view/containers/components/ContainerCard';
+import { CardList } from '@view/core/components/CardList';
 import { EmptyState } from '@view/core/components/EmptyState';
+import { FilterTabs } from '@view/core/components/FilterTabs';
 import { Icon } from '@view/core/components/Icon';
-import { PageHeader } from '@view/core/components/PageHeader';
-import { Pagination } from '@view/core/components/Pagination';
-import { StatusBadge } from '@view/core/components/StatusBadge';
-import type { Container } from '@viewmodel/containers/domain';
-import type { ContainerListText } from '@viewmodel/containers/i18n/text-contracts';
-import { CONTAINER_STATUS } from '@viewmodel/core/domain';
-import { CONTAINER_STATUS_LABEL } from '@viewmodel/core/i18n/labels';
-import { formatWeight, formatPercent } from '@viewmodel/core/utils/formatters';
-import { For } from 'solid-js';
+import { Toolbar } from '@view/core/components/Toolbar';
+import { InfiniteList } from '@view/core/islands/InfiniteList.island';
+import { toAccessor } from '@view/core/observable/to-accessor';
+import type { ContainerListVM } from '@viewmodel/containers/container-list-page.vm';
 import { Show, type JSX } from 'solid-js';
 
 import styles from './ContainerList.module.scss';
 
+/** Props da listagem de contêineres. */
 export interface ContainerListProps {
-  items: Container[];
-  total: number;
-  nextCursor?: string;
-  filters: { search: string; status: string };
-  t: ContainerListText;
+  /** ViewModel da rota. */
+  vm: ContainerListVM;
 }
 
-function occupancy(c: Container): number {
-  return c.max_capacity ? Math.round((c.current_weight / c.max_capacity) * 1000) / 10 : 0;
-}
-
-function buildHref(filters: { search: string; status: string }, cursor?: string): string {
-  const p = new URLSearchParams();
-  if (filters.search) p.set('search', filters.search);
-  if (filters.status) p.set('status', filters.status);
-  if (cursor) p.set('cursor', cursor);
-  const s = p.toString();
-  return s ? `/painel/conteineres?${s}` : '/painel/conteineres';
-}
-
+/**
+ * Listagem de contêineres — o padrão `CardList` do protótipo.
+ *
+ * Contêiner é a única entidade cujo estado é visual (quanto está cheio), e é
+ * por isso que aqui a lista é de cartões e não de linhas: o cartão tem espaço
+ * para a silhueta preenchida e para o número grande de ocupação.
+ *
+ * Busca e filtro continuam sendo `GET` nativo — o recorte vem renderizado do
+ * servidor e a URL fica compartilhável. Só a paginação por cursor é incremental.
+ *
+ * @param props.vm ViewModel da rota.
+ */
 export function ContainerList(props: ContainerListProps): JSX.Element {
-  const columns = (): Column<Container>[] => [
-    {
-      header: props.t.code,
-      cell: (c) => (
-        <a class={styles.code} href={`/painel/conteineres/${c.id}`}>
-          {c.code}
-        </a>
-      ),
-    },
-    { header: props.t.status, cell: (c) => <StatusBadge status={c.status} /> },
-    { header: props.t.weight, align: 'end', cell: (c) => formatWeight(c.current_weight) },
-    { header: props.t.capacity, align: 'end', cell: (c) => formatWeight(c.max_capacity) },
-    {
-      header: props.t.occupancy,
-      cell: (c) => (
-        <div class={styles.occ}>
-          <div class={styles.occBar}>
-            <span style={{ width: `${Math.min(occupancy(c), 100)}%` }} />
-          </div>
-          <span class={styles.occVal}>{formatPercent(occupancy(c))}</span>
-        </div>
-      ),
-    },
-    {
-      header: props.t.actions,
-      align: 'end',
-      cell: (c) => (
-        <a
-          class={styles.editLink}
-          href={`/painel/conteineres/${c.id}/editar`}
-          aria-label={`${props.t.edit} ${c.code}`}
-        >
-          <Icon name="pencil" size={16} />
-        </a>
-      ),
-    },
-  ];
+  const items = toAccessor(() => props.vm.items());
+  const isLoadingMore = toAccessor(() => props.vm.isLoadingMore());
+  const errorMessage = toAccessor(() => props.vm.errorMessage());
+  const hasMore = toAccessor(() => props.vm.hasMore());
 
   return (
     <section>
-      <Breadcrumbs items={[{ label: props.t.title }]} />
-      <PageHeader
-        title={props.t.title}
-        subtitle={props.t.subtitle}
-        action={
-          <a class={styles.newBtn} href="/painel/conteineres/nova">
-            <Icon name="plus" size={18} />
-            {props.t.new}
-          </a>
-        }
+      <Toolbar
+        eyebrow={props.vm.t.eyebrow}
+        title={props.vm.t.title}
+        search={{
+          name: 'search',
+          value: props.vm.filters.search,
+          label: props.vm.t.search,
+          placeholder: `${props.vm.t.search} ${props.vm.t.code.toLowerCase()}`,
+          // O status ativo viaja junto, senão buscar apagaria o filtro.
+          keep: props.vm.filters.status ? { status: props.vm.filters.status } : undefined,
+        }}
       />
 
-      <form class={styles.filters} method="get" role="search">
-        <div class={styles.searchBox}>
-          <Icon name="search" size={16} />
-          <input
-            name="search"
-            value={props.filters.search}
-            placeholder={`${props.t.search} ${props.t.code.toLowerCase()}`}
-          />
-        </div>
-        <select name="status" aria-label={props.t.status}>
-          <option value="">{props.t.status}: todos</option>
-          <For each={CONTAINER_STATUS}>
-            {(s) => (
-              <option value={s} selected={props.filters.status === s}>
-                {CONTAINER_STATUS_LABEL[s]}
-              </option>
-            )}
-          </For>
-        </select>
-        <button type="submit" class={styles.filterBtn}>
-          {props.t.search}
-        </button>
-      </form>
+      <div class={styles.bar}>
+        <FilterTabs
+          label={props.vm.t.status}
+          tabs={props.vm.statusOptions.map((option) => ({
+            label: option.label,
+            href: option.href,
+            selected: option.selected,
+          }))}
+        />
+        <Show when={props.vm.canCreate}>
+          <a class={styles.newBtn} href={props.vm.newHref}>
+            <Icon name="plus" size={16} />
+            {props.vm.t.new}
+          </a>
+        </Show>
+      </div>
 
       <Show
-        when={props.items.length > 0}
-        fallback={<EmptyState icon="container" message={props.t.empty} />}
+        when={items().length > 0}
+        fallback={<EmptyState icon="container" message={props.vm.t.empty} />}
       >
-        <DataTable
-          columns={columns()}
-          rows={props.items}
-          rowKey={(c) => c.id}
-          caption={props.t.title}
-        />
-        <Pagination
-          total={props.total}
-          shown={props.items.length}
-          prevHref={
-            props.filters.search || props.filters.status ? buildHref(props.filters) : undefined
-          }
-          nextHref={props.nextCursor ? buildHref(props.filters, props.nextCursor) : undefined}
-          labels={{ previous: props.t.previous, next: props.t.next }}
-        />
+        <CardList items={items()}>{(item) => <ContainerCard item={item} />}</CardList>
       </Show>
+
+      <InfiniteList
+        hasMore={hasMore()}
+        isLoading={isLoadingMore()}
+        error={errorMessage()}
+        loadMore={props.vm.loadMore}
+        retry={props.vm.retry}
+        loadMoreLabel={props.vm.t.loadMore}
+        retryLabel={props.vm.boundary.retry}
+      />
     </section>
   );
 }
-
-export type { ContainerListText };

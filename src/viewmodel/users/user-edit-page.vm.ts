@@ -1,66 +1,124 @@
 // ============================================================
-//  ViewModel da rota. Observável: a tela assina os sinais e reage.
-//  Roda no navegador (VMContext sem `headers`); passar os headers do request
-//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
+//  Rota /painel/usuarios/@id/editar.
+//
+//  Usuário e perfis são buscados em PARALELO no `+data`: são recursos
+//  independentes, e serializar as chamadas só somaria latência ao SSR.
+//
+//  Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
 // ============================================================
-import type { UserAdmin } from './domain';
-import { userEditMessages } from './i18n/user-edit-page.messages';
-import type { UserEditText } from './i18n/user-edit-page.messages';
+import { Permission } from '@model/common';
+import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import { authorize } from '@viewmodel/core/page/authorize';
+import {
+  PageNotFoundError,
+  routeParam,
+  type PageMeta,
+  type PageRequest,
+} from '@viewmodel/core/page/page-request';
+import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
+import { listRoles } from '@viewmodel/roles/queries/list-roles.query';
+
+import { userEditMessages, type UserEditText } from './i18n/user-edit-page.messages';
 import { getUser } from './queries/get-user.query';
 import type { RoleOption } from './user-create-page.vm';
-import {
-  asyncBoundaryMessages,
-  type AsyncBoundaryText,
-} from '../core/i18n/async-boundary.messages';
-import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
-import type { PageMeta } from '../core/page/page-request';
-import { contextLocale, routeParam, type VMContext } from '../core/page/vm-context';
-import { listRoles } from '../roles/queries/list-roles.query';
 
-/** Usuário em edição, junto dos perfis disponíveis para vincular. */
-export interface UserEditData {
-  user: UserAdmin;
-  roles: RoleOption[];
+/** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
+export const USER_EDIT_PERMISSIONS = [Permission.UserGet, Permission.UserUpdate] as const;
+
+/** Valores iniciais do formulário — dado plano, atravessa a serialização. */
+export interface UserFormValues {
+  /** Nome do usuário. */
+  name: string;
+  /** E-mail do usuário. */
+  email: string;
+  /** Ids dos perfis já vinculados. */
+  roleIds: readonly string[];
 }
 
-/** Superfície observável da edição de usuário. */
-export interface UserEditVM {
+/** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
+export interface UserEditPageInput {
+  /** `<title>`/`<description>` da rota. */
+  meta: PageMeta;
+  /** Identidade que o rodapé da barra lateral mostra. */
+  shell: ShellIdentity;
+  /** Texto da tela, já no locale do request. */
   t: UserEditText;
-  /** Texto da fronteira de carregamento (erro e nova tentativa). */
-  boundary: AsyncBoundaryText;
   /** Identificador opaco do usuário em edição. */
   id: string;
-  data: AsyncSignal<UserEditData, []>;
-  load: () => Promise<void>;
+  /** Nome do usuário, para o cabeçalho e a trilha. */
+  userName: string;
+  /** Valores que preenchem o formulário. */
+  values: UserFormValues;
+  /** Perfis disponíveis para vincular. */
+  roles: readonly RoleOption[];
+  /** Volta para a listagem — a View não monta rota. */
+  listHref: string;
 }
 
 /**
- * Cria o ViewModel da edição de usuário.
+ * O trabalho de servidor da rota: autorização, i18n, usuário e perfis.
  *
- * Usuário e perfis são buscados em paralelo: são recursos independentes, e
- * serializar as chamadas só somaria latência.
- *
- * @param context Contexto de execução; precisa do parâmetro de rota `id`.
+ * @param request Requisição de página, neutra de framework.
+ * @throws {UnauthorizedError} Sem sessão válida.
+ * @throws {ForbiddenError} Sem `UserGet` + `UserUpdate`.
+ * @throws {PageNotFoundError} Quando o id não corresponde a um usuário.
  */
-export function createUserEditVM(context: VMContext): UserEditVM {
-  const t = userEditMessages(contextLocale(context));
-  const boundary = asyncBoundaryMessages(contextLocale(context));
-  const id = routeParam(context, 'id');
-  const data = createAsyncSignal<UserEditData, []>(async () => {
-    const [user, roles] = await Promise.all([
-      getUser(id, context.headers),
-      listRoles(context.headers),
-    ]);
-    return { user, roles: roles.data.map((role) => ({ id: role.id, name: role.name })) };
-  });
-  return { t, boundary, id, data, load: () => data.run() };
+export async function createUserEditPageInput(request: PageRequest): Promise<UserEditPageInput> {
+  const account = await authorize(request, USER_EDIT_PERMISSIONS);
+  const t = userEditMessages(resolveLocale(request.headers));
+  const id = routeParam(request, 'id');
+
+  const [user, roles] = await Promise.all([
+    getUser(id, request.headers).catch(() => {
+      throw new PageNotFoundError(`Usuário não encontrado: ${id}`);
+    }),
+    listRoles(request.headers),
+  ]);
+
+  return {
+    meta: { title: `${t.edit} — ${user.name}`, description: t.subtitle },
+    shell: shellIdentity(account),
+    t,
+    id,
+    userName: user.name,
+    values: {
+      name: user.name,
+      email: user.email,
+      roleIds: user.roles.map((r) => r.id),
+    },
+    roles: roles.data.map((role) => ({ id: role.id, name: role.name })),
+    listHref: '/painel/usuarios',
+  };
+}
+
+/** Superfície da edição de usuário. */
+export interface UserEditVM {
+  /** Texto da tela. */
+  t: UserEditText;
+  /** Identificador opaco do usuário em edição. */
+  id: string;
+  /** Nome do usuário, para o cabeçalho e a trilha. */
+  userName: string;
+  /** Valores que preenchem o formulário. */
+  values: UserFormValues;
+  /** Perfis disponíveis para vincular. */
+  roles: readonly RoleOption[];
+  /** Volta para a listagem. */
+  listHref: string;
 }
 
 /**
- * Título e descrição da rota, para o `<head>`.
- * @param context Contexto de execução — só o locale importa aqui.
+ * Cria o ViewModel da edição a partir do dado já resolvido.
+ *
+ * @param input Dado da rota, vindo do `+data`.
  */
-export function userEditMeta(context: VMContext = {}): PageMeta {
-  const t = userEditMessages(contextLocale(context));
-  return { title: t.edit, description: t.subtitle };
+export function createUserEditVM(input: UserEditPageInput): UserEditVM {
+  return {
+    t: input.t,
+    id: input.id,
+    userName: input.userName,
+    values: input.values,
+    roles: input.roles,
+    listHref: input.listHref,
+  };
 }

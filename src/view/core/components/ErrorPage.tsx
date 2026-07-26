@@ -1,7 +1,6 @@
+import styles from '@view/core/styles/ErrorPage.module.scss';
 import type { JSX } from 'solid-js';
 import { Show } from 'solid-js';
-
-import styles from '../styles/ErrorPage.module.scss';
 
 /** Estado de erro a exibir: 403 do guard, 404 de rota ou 500 de runtime. */
 export interface ErrorPageProps {

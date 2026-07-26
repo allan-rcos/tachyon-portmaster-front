@@ -1,8 +1,7 @@
 import { createUser as apiCreateUser } from '@model/users';
-
-import { browserClient } from '../../core/client/api-client';
-import type { UserAdmin } from '../domain';
-import type { UserCreateData } from '../schemas/user.schema';
+import type { UserAdmin } from '@model/users/dto';
+import { browserClient } from '@viewmodel/core/client/api-client';
+import type { UserCreateData } from '@viewmodel/users/schemas/user.schema';
 
 /**
  * Cria um usuário já vinculado aos perfis informados.

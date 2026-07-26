@@ -9,6 +9,9 @@
 @use '@ds/variables';
 @use '@ds/fonts';
 @use '@ds/glass' as glass;
+// Emite o passo atrás dos tokens em `:root` — é global por natureza, então
+// entra aqui uma vez e chega a todo módulo.
+@use '@ds/responsive';
 
 *,
 *::before,

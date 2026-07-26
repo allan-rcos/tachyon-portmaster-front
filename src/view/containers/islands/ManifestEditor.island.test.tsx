@@ -1,6 +1,6 @@
-import { render, waitFor } from '@solidjs/testing-library';
-import { setInput, stubLocation } from '@testing/dom';
+import { fireEvent, render, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import { stubLocation } from '@view/core/testing/stub-location';
 import { containerDetailMessages } from '@viewmodel/containers/i18n/container-detail-page.messages';
 import { loadManifestItem } from '@viewmodel/containers/mutations/load-manifest-item.mutation';
 import { unloadManifestItem } from '@viewmodel/containers/mutations/unload-manifest-item.mutation';
@@ -35,7 +35,7 @@ describe('ManifestEditor island', () => {
       <ManifestEditor containerId="ctr_1" products={products} t={t} />
     ));
 
-    setInput(getByLabelText(t.quantity), '500');
+    fireEvent.input(getByLabelText(t.quantity), { target: { value: '500' } });
     await user.click(getByRole('button', { name: t.load }));
 
     await waitFor(() =>
@@ -50,7 +50,7 @@ describe('ManifestEditor island', () => {
       <ManifestEditor containerId="ctr_1" products={products} t={t} />
     ));
 
-    setInput(getByLabelText(t.quantity), '20');
+    fireEvent.input(getByLabelText(t.quantity), { target: { value: '20' } });
     await user.click(getByRole('button', { name: t.unload }));
 
     await waitFor(() =>

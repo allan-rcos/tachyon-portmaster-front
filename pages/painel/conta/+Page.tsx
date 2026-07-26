@@ -1,14 +1,10 @@
 import { AccountScreen } from '@view/account/screens/AccountScreen';
-import { createAccountPageVM } from '@viewmodel/account/account-page.vm';
-import { ClientOnly } from 'vike-solid/ClientOnly';
-import { usePageContext } from 'vike-solid/usePageContext';
+import { createAccountPageVM, type AccountPageInput } from '@viewmodel/account/account-page.vm';
+import type { JSX } from 'solid-js';
+import { useData } from 'vike-solid/useData';
 
-export default function Page() {
-  const pageContext = usePageContext();
-  const vm = createAccountPageVM({ url: pageContext.urlOriginal });
-  return (
-    <ClientOnly fallback={<div />}>
-      <AccountScreen vm={vm} />
-    </ClientOnly>
-  );
+/** Único ponto de composição da rota. */
+export default function Page(): JSX.Element {
+  const input = useData<AccountPageInput>();
+  return <AccountScreen vm={createAccountPageVM(input)} />;
 }

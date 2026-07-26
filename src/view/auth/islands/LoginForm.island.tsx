@@ -2,8 +2,6 @@ import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
 import { Icon } from '@view/core/components/Icon';
 import { bindMutation } from '@view/core/observable/bind-mutation';
-import { cn } from '@view/core/utils/ui';
-import { errText } from '@view/core/utils/ui';
 import type { LoginFormText } from '@viewmodel/auth/i18n/text-contracts';
 import { signIn } from '@viewmodel/auth/mutations/sign-in.mutation';
 import { createLoginSchema, type LoginFormData } from '@viewmodel/auth/schemas/login.schema';
@@ -17,7 +15,7 @@ function redirectTarget(): string {
   return to && to.startsWith('/') ? to : '/painel';
 }
 
-function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
+function LoginFormInner(props: LoginFormProps): JSX.Element {
   const mutation = bindMutation(
     createMutationSignal((v: LoginFormData) => signIn(v), {
       onSuccess: () => {
@@ -47,12 +45,17 @@ function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
     >
       <form.Field name="email">
         {(field) => (
-          <FormField label={props.t.email} for="email" error={errText(field().state.meta.errors)}>
+          <FormField
+            label={props.t.email}
+            for="email"
+            error={field().state.meta.errors[0]?.message}
+          >
             <input
               id="email"
               type="email"
               autocomplete="email"
-              class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+              class={styles.input}
+              classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
               value={field().state.value}
               onInput={(e) => field().handleChange(e.currentTarget.value)}
               onBlur={field().handleBlur}
@@ -67,13 +70,14 @@ function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
           <FormField
             label={props.t.password}
             for="password"
-            error={errText(field().state.meta.errors)}
+            error={field().state.meta.errors[0]?.message}
           >
             <input
               id="password"
               type="password"
               autocomplete="current-password"
-              class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+              class={styles.input}
+              classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
               value={field().state.value}
               onInput={(e) => field().handleChange(e.currentTarget.value)}
               onBlur={field().handleBlur}
@@ -89,7 +93,8 @@ function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
 
       <button
         type="submit"
-        class={cn(styles.submit, mutation.isPending() && styles.loading)}
+        class={styles.submit}
+        classList={{ [styles.loading]: mutation.isPending() }}
         disabled={mutation.isPending()}
       >
         <Icon name="login" size={18} />
@@ -99,9 +104,13 @@ function LoginFormInner(props: { t: LoginFormText }): JSX.Element {
   );
 }
 
+export interface LoginFormProps {
+  t: LoginFormText;
+}
+
 /** Formulário de login (island). Autentica na API (same-origin token) e grava
  *  o cookie `auth_token`, depois recarrega para a rota destino (novo SSR). */
-export function LoginForm(props: { t: LoginFormText }): JSX.Element {
+export function LoginForm(props: LoginFormProps): JSX.Element {
   return <LoginFormInner t={props.t} />;
 }
 

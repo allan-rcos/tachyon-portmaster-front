@@ -3,16 +3,26 @@
   "$id": "https://portmaster.app/i18n/route/perfis.json",
   "title": "i18n da rota /painel/perfis (rolesListMessages)",
   "type": "object",
-  "allOf": [{ "$ref": "https://portmaster.app/i18n/common.json" }],
+  "allOf": [
+    {
+      "$ref": "https://portmaster.app/i18n/common.json"
+    }
+  ],
   "required": [
     "roles_title",
     "roles_subtitle",
     "roles_new",
     "roles_name",
     "roles_user_count",
-    "roles_permissions"
+    "roles_permissions",
+    "roles_eyebrow",
+    "roles_permissions_count_label",
+    "roles_user_count_label"
   ],
   "patternProperties": {
-    "^roles_": { "type": "string", "minLength": 1 }
+    "^roles_": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

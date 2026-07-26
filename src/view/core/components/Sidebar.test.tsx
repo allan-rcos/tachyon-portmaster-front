@@ -19,4 +19,30 @@ describe('Sidebar', () => {
     const { getByRole } = render(() => <Sidebar currentPath="/painel" nav={nav} />);
     expect(getByRole('link', { name: /Produtos/ })).not.toHaveAttribute('aria-current');
   });
+
+  it('mostra quem está logado no rodapé, com as iniciais', () => {
+    const identity = {
+      name: 'Ana Luiza Ferreira',
+      role: 'Administrador',
+      // Primeira e ÚLTIMA inicial — ver `shellIdentity`.
+      initials: 'AF',
+      href: '/painel/conta',
+    };
+    const { getByText, getByRole } = render(() => (
+      <Sidebar currentPath="/painel" nav={nav} identity={identity} />
+    ));
+
+    expect(getByText('AF')).toBeInTheDocument();
+    expect(getByText('Ana Luiza Ferreira')).toBeInTheDocument();
+    expect(getByText('Administrador')).toBeInTheDocument();
+    expect(getByRole('link', { name: /Ana Luiza Ferreira/ })).toHaveAttribute(
+      'href',
+      '/painel/conta',
+    );
+  });
+
+  it('sem sessão resolvida, cai no link simples de conta', () => {
+    const { getByRole } = render(() => <Sidebar currentPath="/painel" nav={nav} />);
+    expect(getByRole('link', { name: nav.conta })).toHaveAttribute('href', '/painel/conta');
+  });
 });

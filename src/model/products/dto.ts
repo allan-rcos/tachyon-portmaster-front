@@ -1,4 +1,4 @@
-import type { RiskClass, Paged } from '../common/dto';
+import type { RiskClass, Paged } from '@model/common/dto';
 
 /** Produto do catálogo, com densidade e classe de risco. */
 export interface Product {

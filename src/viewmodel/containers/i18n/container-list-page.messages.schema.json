@@ -3,7 +3,11 @@
   "$id": "https://portmaster.app/i18n/route/conteineres.json",
   "title": "i18n da rota /painel/conteineres (containersListMessages)",
   "type": "object",
-  "allOf": [{ "$ref": "https://portmaster.app/i18n/common.json" }],
+  "allOf": [
+    {
+      "$ref": "https://portmaster.app/i18n/common.json"
+    }
+  ],
   "required": [
     "containers_title",
     "containers_subtitle",
@@ -12,9 +16,14 @@
     "containers_status",
     "containers_weight",
     "containers_capacity",
-    "containers_occupancy"
+    "containers_occupancy",
+    "containers_all_statuses",
+    "containers_eyebrow"
   ],
   "patternProperties": {
-    "^containers_": { "type": "string", "minLength": 1 }
+    "^containers_": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

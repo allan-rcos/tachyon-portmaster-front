@@ -43,11 +43,12 @@ export default defineConfig({
       '@model': fileURLToPath(new URL('./src/model', import.meta.url)),
       '@viewmodel': fileURLToPath(new URL('./src/viewmodel', import.meta.url)),
       '@view': fileURLToPath(new URL('./src/view', import.meta.url)),
-      '@testing': fileURLToPath(new URL('./src/testing', import.meta.url)),
-      // A saída do Paraglide vive em `dist/`, mas o specifier continua sendo
-      // `@/paraglide/*` — trocar o destino do build não toca em nenhum import.
-      // Precisa vir antes de `@`, senão o alias mais genérico vence.
+      // Saídas de compilador vivem em `dist/`, mas os specifiers continuam
+      // estáveis (`@/paraglide/*`, `@/fbs/*`) — trocar o destino do build não
+      // toca em nenhum import. Precisam vir antes de `@`, senão o alias mais
+      // genérico vence.
       '@/paraglide': fileURLToPath(new URL('./dist/paraglide', import.meta.url)),
+      '@/fbs': fileURLToPath(new URL('./dist/fbs', import.meta.url)),
       '@': fileURLToPath(new URL('.', import.meta.url)),
     },
   },

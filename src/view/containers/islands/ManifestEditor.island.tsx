@@ -1,10 +1,8 @@
 import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
 import { Icon } from '@view/core/components/Icon';
-import { zodValidator } from '@view/core/forms/zod-adapter';
 import { bindMutation } from '@view/core/observable/bind-mutation';
-import { cn } from '@view/core/utils/ui';
-import { errText } from '@view/core/utils/ui';
+import type { ProductOption } from '@viewmodel/containers/container-detail-page.vm';
 import type { ContainerDetailText } from '@viewmodel/containers/i18n/text-contracts';
 import { loadManifestItem } from '@viewmodel/containers/mutations/load-manifest-item.mutation';
 import { unloadManifestItem } from '@viewmodel/containers/mutations/unload-manifest-item.mutation';
@@ -22,16 +20,14 @@ interface ManifestFormValues {
   quantity: string;
 }
 
-export interface ProductOption {
-  id: string;
-  name: string;
+export interface ManifestEditorProps {
+  containerId: string;
+  /** Catálogo oferecido pelo seletor de produto, vindo do ViewModel. */
+  products: readonly ProductOption[];
+  t: ContainerDetailText;
 }
 
-function Inner(props: {
-  containerId: string;
-  products: ProductOption[];
-  t: ContainerDetailText;
-}): JSX.Element {
+function Inner(props: ManifestEditorProps): JSX.Element {
   const [target, setTarget] = createSignal<'load' | 'unload'>('load');
 
   // Carregar/descarregar altera o peso e o status do contêiner, exibidos por
@@ -55,7 +51,7 @@ function Inner(props: {
 
   const form = createForm(() => ({
     defaultValues: { product_id: props.products[0]?.id ?? '', quantity: '' } as ManifestFormValues,
-    validators: { onChange: zodValidator<ManifestFormValues>(createLoadItemSchema(props.t)) },
+    validators: { onChange: createLoadItemSchema(props.t) },
     onSubmit: ({ value }) => {
       const data = createLoadItemSchema(props.t).parse(value);
       (target() === 'load' ? loadMut : unloadMut).mutate(data);
@@ -77,7 +73,7 @@ function Inner(props: {
             <FormField
               label={props.t.product}
               for="mani-product"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <select
                 id="mani-product"
@@ -96,13 +92,14 @@ function Inner(props: {
             <FormField
               label={props.t.quantity}
               for="mani-qty"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="mani-qty"
                 type="number"
                 min="1"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -142,10 +139,6 @@ function Inner(props: {
 }
 
 /** Editor de manifesto: carrega/descarrega itens (island). */
-export function ManifestEditor(props: {
-  containerId: string;
-  products: ProductOption[];
-  t: ContainerDetailText;
-}): JSX.Element {
+export function ManifestEditor(props: ManifestEditorProps): JSX.Element {
   return <Inner {...props} />;
 }

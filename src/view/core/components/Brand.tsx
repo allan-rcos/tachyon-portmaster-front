@@ -2,9 +2,13 @@ import type { JSX } from 'solid-js';
 
 import styles from './Brand.module.scss';
 
+export interface BrandProps {
+  compact?: boolean;
+}
+
 /** Lockup da marca: emblema "Volt" (circuito) + wordmark. O sufixo
  *  fica em ouro, evocando "powered on / connected". */
-export function Brand(props: { compact?: boolean }): JSX.Element {
+export function Brand(props: BrandProps): JSX.Element {
   return (
     <span class={styles.brand}>
       <svg class={styles.emblem} viewBox="0 0 32 32" fill="none" aria-hidden="true">

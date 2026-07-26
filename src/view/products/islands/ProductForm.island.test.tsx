@@ -1,6 +1,7 @@
-import { render, waitFor } from '@solidjs/testing-library';
-import { setInput, setSelect, stubLocation } from '@testing/dom';
+import { fireEvent, render, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import { stubLocation } from '@view/core/testing/stub-location';
+import { RISK_CLASS_OPTIONS } from '@viewmodel/core/i18n/labels';
 import { productFormMessages } from '@viewmodel/products/i18n/product-form.messages';
 import { createProduct } from '@viewmodel/products/mutations/create-product.mutation';
 import { deleteProduct } from '@viewmodel/products/mutations/delete-product.mutation';
@@ -29,11 +30,15 @@ afterEach(() => loc.restore());
 describe('ProductForm island', () => {
   it('cria o produto com a densidade já convertida em número', async () => {
     const user = userEvent.setup();
-    const { getByLabelText, getByRole } = render(() => <ProductForm mode="create" t={t} />);
+    const { getByLabelText, getByRole } = render(() => (
+      <ProductForm mode="create" t={t} riskOptions={RISK_CLASS_OPTIONS} />
+    ));
 
-    setInput(getByLabelText(t.name), 'Cimento');
-    setInput(getByLabelText(t.density), '1.44');
-    setSelect(getByLabelText(t.riskClass), 'Class8CorrosiveSubstances');
+    fireEvent.input(getByLabelText(t.name), { target: { value: 'Cimento' } });
+    fireEvent.input(getByLabelText(t.density), { target: { value: '1.44' } });
+    fireEvent.change(getByLabelText(t.riskClass), {
+      target: { value: 'Class8CorrosiveSubstances' },
+    });
     await user.click(getByRole('button', { name: t.create }));
 
     await waitFor(() =>
@@ -54,10 +59,11 @@ describe('ProductForm island', () => {
         productId="prd_cafe"
         defaultValues={{ name: 'Café', density: 0.67, risk_class: 'None' }}
         t={t}
+        riskOptions={RISK_CLASS_OPTIONS}
       />
     ));
 
-    setInput(getByLabelText(t.name), 'Café torrado');
+    fireEvent.input(getByLabelText(t.name), { target: { value: 'Café torrado' } });
     await user.click(getByRole('button', { name: t.save }));
 
     await waitFor(() =>
@@ -77,6 +83,7 @@ describe('ProductForm island', () => {
         productId="prd_cafe"
         defaultValues={{ name: 'Café', density: 0.67, risk_class: 'None' }}
         t={t}
+        riskOptions={RISK_CLASS_OPTIONS}
       />
     ));
 
@@ -92,10 +99,12 @@ describe('ProductForm island', () => {
 
   it('não envia quando a validação falha', async () => {
     const user = userEvent.setup();
-    const { getByLabelText, getByRole } = render(() => <ProductForm mode="create" t={t} />);
+    const { getByLabelText, getByRole } = render(() => (
+      <ProductForm mode="create" t={t} riskOptions={RISK_CLASS_OPTIONS} />
+    ));
 
-    setInput(getByLabelText(t.name), '');
-    setInput(getByLabelText(t.density), '-1');
+    fireEvent.input(getByLabelText(t.name), { target: { value: '' } });
+    fireEvent.input(getByLabelText(t.density), { target: { value: '-1' } });
     await user.click(getByRole('button', { name: t.create }));
 
     await waitFor(() => expect(mockedCreate).not.toHaveBeenCalled());

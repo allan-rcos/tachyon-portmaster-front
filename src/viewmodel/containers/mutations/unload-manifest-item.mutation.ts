@@ -1,8 +1,7 @@
 import { unloadItem } from '@model/containers';
-
-import { browserClient } from '../../core/client/api-client';
-import type { ManifestResponse } from '../domain';
-import type { LoadItemData } from '../schemas/manifest.schema';
+import type { ManifestResponse } from '@model/containers/dto';
+import type { LoadItemData } from '@viewmodel/containers/schemas/manifest.schema';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Descarrega um item do manifesto do contêiner.

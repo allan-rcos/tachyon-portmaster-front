@@ -11,6 +11,7 @@ import type { ContainerListText } from './text-contracts';
 import { m } from '@/paraglide/messages';
 
 export const containersListMessages = (locale: Locale): ContainerListText => ({
+  eyebrow: m.containers_eyebrow({}, { locale }),
   ...commonText(locale),
   title: m.containers_title({}, { locale }),
   subtitle: m.containers_subtitle({}, { locale }),
@@ -20,4 +21,5 @@ export const containersListMessages = (locale: Locale): ContainerListText => ({
   weight: m.containers_weight({}, { locale }),
   capacity: m.containers_capacity({}, { locale }),
   occupancy: m.containers_occupancy({}, { locale }),
+  allStatuses: m.containers_all_statuses({}, { locale }),
 });

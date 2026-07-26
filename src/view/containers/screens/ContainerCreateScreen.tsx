@@ -1,29 +1,28 @@
 import { ContainerForm } from '@view/containers/islands/ContainerForm.island';
 import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { PageHeader } from '@view/core/components/PageHeader';
-import { FormSkeleton } from '@view/core/components/Skeleton';
 import type { ContainerCreateVM } from '@viewmodel/containers/container-create-page.vm';
 import type { JSX } from 'solid-js';
-import { ClientOnly } from 'vike-solid/ClientOnly';
+
+/** Props da tela de registro de contêiner. */
+export interface ContainerCreateScreenProps {
+  /** ViewModel da rota, construído no `+Page`. */
+  vm: ContainerCreateVM;
+}
 
 /**
- * Tela de registro de contêiner. Sem carga assíncrona: só o formulário.
+ * Tela de registro de contêiner. Stateless: só o formulário.
  *
  * @param props.vm ViewModel da rota.
  */
-export function ContainerCreateScreen(props: { vm: ContainerCreateVM }): JSX.Element {
+export function ContainerCreateScreen(props: ContainerCreateScreenProps): JSX.Element {
   return (
     <section>
       <Breadcrumbs
-        items={[
-          { label: props.vm.t.title, href: '/painel/conteineres' },
-          { label: props.vm.t.new },
-        ]}
+        items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
       />
       <PageHeader title={props.vm.t.new} />
-      <ClientOnly fallback={<FormSkeleton rows={2} />}>
-        <ContainerForm mode="create" t={props.vm.t} />
-      </ClientOnly>
+      <ContainerForm mode="create" t={props.vm.t} />
     </section>
   );
 }

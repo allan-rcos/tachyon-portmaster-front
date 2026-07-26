@@ -1,8 +1,6 @@
 import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
 import { bindMutation } from '@view/core/observable/bind-mutation';
-import { cn } from '@view/core/utils/ui';
-import { errText } from '@view/core/utils/ui';
 import type { AccountFormText } from '@viewmodel/account/i18n/text-contracts';
 import { updateAccountProfile } from '@viewmodel/account/mutations/update-account-profile.mutation';
 import {
@@ -14,7 +12,7 @@ import { type JSX } from 'solid-js';
 
 import styles from './AccountForm.island.module.scss';
 
-function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.Element {
+function Inner(props: AccountFormProps): JSX.Element {
   const mutation = bindMutation(
     createMutationSignal((value: AccountFormData) => updateAccountProfile(value), {
       onSuccess: () => window.location.reload(),
@@ -44,11 +42,12 @@ function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.
             <FormField
               label={props.t.name}
               for="acc-name"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="acc-name"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -62,12 +61,13 @@ function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.
             <FormField
               label={props.t.email}
               for="acc-email"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="acc-email"
                 type="email"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -83,7 +83,8 @@ function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.
 
       <button
         type="submit"
-        class={cn(styles.submit, mutation.isPending() && styles.loading)}
+        class={styles.submit}
+        classList={{ [styles.loading]: mutation.isPending() }}
         disabled={mutation.isPending()}
       >
         {props.t.save}
@@ -92,12 +93,14 @@ function Inner(props: { name: string; email: string; t: AccountFormText }): JSX.
   );
 }
 
-/** Formulário de dados da própria conta (island). */
-export function AccountForm(props: {
+export interface AccountFormProps {
   name: string;
   email: string;
   t: AccountFormText;
-}): JSX.Element {
+}
+
+/** Formulário de dados da própria conta (island). */
+export function AccountForm(props: AccountFormProps): JSX.Element {
   return <Inner {...props} />;
 }
 

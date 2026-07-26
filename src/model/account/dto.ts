@@ -1,4 +1,4 @@
-import type { Permission } from '../common/dto';
+import type { Permission } from '@model/common/dto';
 
 /** Perfil como aparece embutido em um usuário ou conta. */
 export interface RoleRef {

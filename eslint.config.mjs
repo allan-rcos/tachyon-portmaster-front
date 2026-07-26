@@ -41,8 +41,13 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
 
-      // Reatividade Solid
-      'solid/reactivity': 'warn',
+      // Reatividade Solid.
+      //
+      // `toAccessor` é a nossa ponte alien-signals → Solid: ela monta um
+      // `effect` internamente, então a função que recebe É consumida num escopo
+      // rastreado. Sem declará-la aqui, a regra acusa toda leitura de ViewModel
+      // como reatividade perdida — um falso positivo por rota.
+      'solid/reactivity': ['warn', { customReactiveFunctions: ['toAccessor'] }],
       'solid/no-destructure': 'error', // Desestruturar props quebra a reatividade granular
       'solid/jsx-no-undef': 'error',
 
@@ -98,6 +103,13 @@ export default tseslint.config(
           ],
         },
       ],
+
+      // Import relativo que ATRAVESSA diretório (`../`) esconde a camada de
+      // destino no specifier, que é justamente onde a regra de dependência
+      // (view → viewmodel → model) precisa estar visível — e é o que as regras
+      // de fronteira mais abaixo inspecionam. Irmão (`./`) continua liberado:
+      // um arquivo referir o vizinho não atravessa fronteira nenhuma.
+      'import/no-relative-parent-imports': 'error',
     },
   },
 
@@ -118,7 +130,7 @@ export default tseslint.config(
   // ============================================================
   {
     files: ['src/model/**/*.ts', 'src/viewmodel/**/*.ts'],
-    ignores: ['src/model/generated/**', '**/*.test.ts'],
+    ignores: ['**/*.test.ts'],
     extends: [jsdoc.configs['flat/recommended-typescript-error']],
     rules: {
       'jsdoc/require-jsdoc': [
@@ -224,12 +236,23 @@ export default tseslint.config(
             {
               group: ['@model/*'],
               message:
-                'A View não fala com a camada de dados. Use os tipos de @viewmodel/<feature>/domain e as queries/mutations do ViewModel.',
+                'A View não fala com a camada de dados — e, desde a Etapa 4, também não PRECISA: o ViewModel entrega dado de apresentação (rótulo, tom, opções), não DTO.',
+            },
+            {
+              group: ['vike', 'vike/*', 'vike-*'],
+              message:
+                'Só @view/core/components/ClientOnly.tsx enxerga o vike-solid. Trocar de framework de rota deve ser trocar UM arquivo.',
             },
           ],
         },
       ],
     },
+  },
+  {
+    // A única exceção à regra acima: o wrapper existe justamente para embrulhar
+    // o `ClientOnly` do vike-solid.
+    files: ['src/view/core/components/ClientOnly.tsx'],
+    rules: { 'no-restricted-imports': 'off' },
   },
   {
     files: ['pages/**/*.{ts,tsx,js}'],

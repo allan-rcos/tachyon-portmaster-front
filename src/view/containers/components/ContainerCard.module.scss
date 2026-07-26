@@ -1,0 +1,131 @@
+@use '@ds/glass' as glass;
+@use '@ds/responsive' as rp;
+@use '@ds/ui' as ui;
+
+// Cartão de contêiner — medidas do protótipo (`pm-cont-grid > .glass`).
+.card {
+  @include glass.glass-l1;
+  @include ui.tone-vars;
+  display: block;
+  padding: 18px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.16s var(--ease-out),
+    border-color 0.16s;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.26);
+  }
+
+  @include rp.card-to-sheet;
+  @include rp.mobile {
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.01em;
+}
+
+.capacity {
+  margin-top: 3px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.body {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+// A silhueta do contêiner, preenchida em proporção à ocupação. É o único lugar
+// do produto em que o dado vira desenho — daí valer os 46×62 do protótipo.
+.silhouette {
+  position: relative;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 62px;
+  overflow: hidden;
+  border: 2px solid var(--glass-border);
+  border-radius: 7px;
+  background: var(--glass-fill-weak);
+}
+
+.fill {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--tone);
+  opacity: 0.75;
+}
+
+// As nervuras verticais do contêiner corrugado.
+.ribs {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 9px,
+    rgba(255, 255, 255, 0.07) 9px,
+    rgba(255, 255, 255, 0.07) 10px
+  );
+}
+
+.meter {
+  flex: 1;
+  min-width: 0;
+}
+
+.meterHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.percent {
+  font-size: var(--text-2xl);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.weight {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--glass-fill-strong);
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--tone);
+}

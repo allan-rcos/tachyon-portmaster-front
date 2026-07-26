@@ -1,0 +1,105 @@
+@use '@ds/glass' as glass;
+@use '@ds/responsive' as rp;
+@use '@ds/ui' as ui;
+
+.card {
+  @include glass.glass-l1;
+  padding: var(--space-5) var(--space-6);
+
+  @include rp.card-to-sheet;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-sage);
+  color: var(--sage-300);
+}
+
+.identity {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--fw-medium);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+// Contagem de usuários: pílula com ícone, não um selo de status.
+.users {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border-soft);
+  background: var(--glass-fill);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.edit {
+  @include ui.icon-button;
+  @include ui.icon-button-sm;
+  color: var(--color-text-muted);
+}
+
+.count {
+  display: block;
+  margin: var(--space-5) 0 var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border-soft);
+  background: var(--glass-fill);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+}

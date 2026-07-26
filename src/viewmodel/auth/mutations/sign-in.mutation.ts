@@ -4,10 +4,9 @@
 //  decisão do ViewModel, não da interface. A View só reage ao sucesso.
 // ============================================================
 import { login } from '@model/auth';
-
-import { browserClient } from '../../core/client/api-client';
-import { setCookie } from '../../core/utils/cookies';
-import type { LoginFormData } from '../schemas/login.schema';
+import type { LoginFormData } from '@viewmodel/auth/schemas/login.schema';
+import { browserClient } from '@viewmodel/core/client/api-client';
+import { setCookie } from '@viewmodel/core/utils/cookies';
 
 /**
  * Autentica o usuário e grava o cookie `auth_token` da sessão.

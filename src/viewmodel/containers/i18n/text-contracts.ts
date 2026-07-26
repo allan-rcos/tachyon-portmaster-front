@@ -3,10 +3,13 @@
 //  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
 //  morar no ViewModel.
 // ============================================================
-import type { ContainerSchemaText } from '../schemas/container.schema';
+import type { ContainerSchemaText } from '@viewmodel/containers/schemas/container.schema';
+import type { LoadItemSchemaText } from '@viewmodel/containers/schemas/manifest.schema';
 
 /** Chaves de texto que a listagem de contêineres consome. */
 export interface ContainerListText {
+  /** Linha de contexto em caixa alta, acima do título. */
+  eyebrow: string;
   title: string;
   subtitle: string;
   new: string;
@@ -21,6 +24,10 @@ export interface ContainerListText {
   empty: string;
   previous: string;
   next: string;
+  /** Rótulo do botão que traz a próxima página do cursor. */
+  loadMore: string;
+  /** Opção "sem filtro" do seletor de status. */
+  allStatuses: string;
 }
 
 /**
@@ -28,7 +35,7 @@ export interface ContainerListText {
  * + ManifestTable + TelemetryLog + ContainerActions + ManifestEditor): um único
  * `t` resolvido alimenta todos, e cada um usa o subconjunto de que precisa.
  */
-export interface ContainerDetailText {
+export interface ContainerDetailText extends LoadItemSchemaText {
   title: string;
   edit: string;
   weight: string;
@@ -49,8 +56,6 @@ export interface ContainerDetailText {
   cancel: string;
   load: string;
   unload: string;
-  productRequired: string;
-  quantityPositive: string;
 }
 
 /** Chaves de texto do formulário de contêiner (criação e edição). */

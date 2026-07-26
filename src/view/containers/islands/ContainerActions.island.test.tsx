@@ -1,6 +1,6 @@
 import { render, waitFor } from '@solidjs/testing-library';
-import { stubLocation } from '@testing/dom';
 import userEvent from '@testing-library/user-event';
+import { stubLocation } from '@view/core/testing/stub-location';
 import { containerDetailMessages } from '@viewmodel/containers/i18n/container-detail-page.messages';
 import { deleteContainer } from '@viewmodel/containers/mutations/delete-container.mutation';
 import { dispatchContainer } from '@viewmodel/containers/mutations/dispatch-container.mutation';
@@ -29,18 +29,18 @@ beforeEach(() => {
 afterEach(() => loc.restore());
 
 describe('ContainerActions island', () => {
-  it('oferece lacrar e excluir em Loading, mas não despachar', () => {
+  it('oferece lacrar e excluir quando só lacrar é permitido', () => {
     const { getByRole, queryByRole } = render(() => (
-      <ContainerActions containerId="ctr_1" status="Loading" t={t} />
+      <ContainerActions containerId="ctr_1" canSeal canDispatch={false} t={t} />
     ));
     expect(getByRole('button', { name: t.seal })).toBeInTheDocument();
     expect(getByRole('button', { name: t.delete })).toBeInTheDocument();
     expect(queryByRole('button', { name: t.dispatch })).toBeNull();
   });
 
-  it('oferece despachar quando o contêiner está lacrado', () => {
+  it('oferece despachar quando despachar é permitido', () => {
     const { getByRole } = render(() => (
-      <ContainerActions containerId="ctr_1" status="Sealed" t={t} />
+      <ContainerActions containerId="ctr_1" canSeal={false} canDispatch t={t} />
     ));
     expect(getByRole('button', { name: t.dispatch })).toBeInTheDocument();
   });
@@ -48,7 +48,7 @@ describe('ContainerActions island', () => {
   it('só lacra após a confirmação, e então recarrega', async () => {
     const user = userEvent.setup();
     const { getByRole, getAllByRole } = render(() => (
-      <ContainerActions containerId="ctr_1" status="Loading" t={t} />
+      <ContainerActions containerId="ctr_1" canSeal canDispatch={false} t={t} />
     ));
 
     await user.click(getByRole('button', { name: t.seal }));
@@ -64,7 +64,7 @@ describe('ContainerActions island', () => {
   it('exclui pelo id após confirmação', async () => {
     const user = userEvent.setup();
     const { getByRole, getAllByRole } = render(() => (
-      <ContainerActions containerId="ctr_9" status="Loading" t={t} />
+      <ContainerActions containerId="ctr_9" canSeal canDispatch={false} t={t} />
     ));
 
     await user.click(getByRole('button', { name: t.delete }));

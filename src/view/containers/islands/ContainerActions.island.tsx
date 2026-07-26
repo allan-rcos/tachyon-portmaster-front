@@ -3,24 +3,25 @@ import type { ContainerDetailText } from '@viewmodel/containers/i18n/text-contra
 import { deleteContainer } from '@viewmodel/containers/mutations/delete-container.mutation';
 import { dispatchContainer } from '@viewmodel/containers/mutations/dispatch-container.mutation';
 import { sealContainer } from '@viewmodel/containers/mutations/seal-container.mutation';
-import type { ContainerStatus } from '@viewmodel/core/domain';
 import { Show, type JSX } from 'solid-js';
 
 import styles from './ContainerActions.island.module.scss';
 
+export interface ContainerActionsProps {
+  containerId: string;
+  /** Se lacrar é permitido — decidido pelo ViewModel, que conhece o status. */
+  canSeal: boolean;
+  /** Se despachar é permitido. */
+  canDispatch: boolean;
+  t: ContainerDetailText;
+}
+
 /** Ações de estado do contêiner: lacrar / despachar / excluir.
  *  Cada uma confirma antes e recarrega (novo SSR) ao concluir. */
-export function ContainerActions(props: {
-  containerId: string;
-  status: ContainerStatus;
-  t: ContainerDetailText;
-}): JSX.Element {
-  const canSeal = () => props.status === 'Empty' || props.status === 'Loading';
-  const canDispatch = () => props.status === 'Sealed';
-
+export function ContainerActions(props: ContainerActionsProps): JSX.Element {
   return (
     <menu class={styles.actions}>
-      <Show when={canSeal()}>
+      <Show when={props.canSeal}>
         <li>
           <ConfirmDialog
             triggerLabel={props.t.seal}
@@ -36,7 +37,7 @@ export function ContainerActions(props: {
         </li>
       </Show>
 
-      <Show when={canDispatch()}>
+      <Show when={props.canDispatch}>
         <li>
           <ConfirmDialog
             triggerLabel={props.t.dispatch}

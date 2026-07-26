@@ -1,30 +1,19 @@
 import { ContainerSummary } from '@view/containers/components/ContainerSummary';
-import { AsyncBoundary } from '@view/core/components/AsyncBoundary';
-import { Skeleton } from '@view/core/components/Skeleton';
-import { createScreenBinding } from '@view/core/screens/createScreenBinding';
 import type { ContainerDetailVM } from '@viewmodel/containers/container-detail-page.vm';
 import type { JSX } from 'solid-js';
 
+/** Props da tela de detalhe de contêiner. */
+export interface ContainerDetailScreenProps {
+  /** ViewModel da rota, construído no `+Page`. */
+  vm: ContainerDetailVM;
+}
+
 /**
- * Tela de detalhe do contêiner: resumo, manifesto, telemetria e ações.
+ * Tela de detalhe do contêiner. Stateless: resumo, manifesto, telemetria e
+ * catálogo já vieram resolvidos pelo `+data`.
  *
  * @param props.vm ViewModel da rota.
  */
-export function ContainerDetailScreen(props: { vm: ContainerDetailVM }): JSX.Element {
-  const { data, status } = createScreenBinding(props.vm.data, props.vm.load);
-
-  return (
-    <AsyncBoundary
-      status={status()}
-      data={data()}
-      fallback={<Skeleton height="26rem" />}
-      errorMessage={props.vm.boundary.loadError}
-      retryLabel={props.vm.boundary.retry}
-      onRetry={() => void props.vm.load()}
-    >
-      {(detail) => (
-        <ContainerSummary summary={detail.summary} products={detail.products} t={props.vm.t} />
-      )}
-    </AsyncBoundary>
-  );
+export function ContainerDetailScreen(props: ContainerDetailScreenProps): JSX.Element {
+  return <ContainerSummary vm={props.vm} />;
 }

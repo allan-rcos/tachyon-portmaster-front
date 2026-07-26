@@ -1,7 +1,8 @@
+import type { ApiClient } from '@model/core/http';
+import { wire } from '@model/core/wire';
+
 import type { AccountProfile, AccountUpdateRequest, AccountPasswordChangeRequest } from './dto';
 import { encAccountUpdate, encAccountPassword, decAccountProfile } from './fbs';
-import type { ApiClient } from '../core/http';
-import { wire } from '../core/wire';
 
 export const getAccount = (c: ApiClient): Promise<AccountProfile> =>
   wire(c, { method: 'GET', path: '/v1/account', decode: decAccountProfile });

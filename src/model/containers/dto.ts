@@ -1,4 +1,4 @@
-import type { ContainerStatus, TelemetryEvent, Paged } from '../common/dto';
+import type { ContainerStatus, TelemetryEvent, Paged } from '@model/common/dto';
 
 /** Contêiner do pátio, com ocupação atual e capacidade máxima. */
 export interface Container {

@@ -1,3 +1,6 @@
+import type { ApiClient } from '@model/core/http';
+import { wire } from '@model/core/wire';
+
 import type {
   UserAdmin,
   UserCreateRequest,
@@ -7,8 +10,6 @@ import type {
   UserList,
 } from './dto';
 import { encUserCreate, encUserUpdate, encUserResetPassword, decUserAdmin } from './fbs';
-import type { ApiClient } from '../core/http';
-import { wire } from '../core/wire';
 
 // Lista de usuários não tem tabela FlatBuffers no schema → wire JSON.
 export const listUsers = (c: ApiClient, query?: Record<string, string>): Promise<UserList> =>

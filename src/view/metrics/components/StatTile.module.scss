@@ -1,0 +1,54 @@
+@use '@ds/glass' as glass;
+@use '@ds/responsive' as rp;
+@use '@ds/ui' as ui;
+
+// Bloco de número do painel — medidas do protótipo (`pm-stats > .glass`).
+.tile {
+  @include glass.glass-l1;
+  @include ui.tone-vars;
+  padding: 18px;
+
+  @include rp.card-to-sheet;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: 14px;
+}
+
+// Quadrado de vidro tingido com o ícone dentro.
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--tone-soft);
+  color: var(--tone);
+}
+
+.value {
+  font-size: var(--text-3xl);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+// Unidade ou total ("/10", "t"): acompanha o número sem competir com ele.
+.unit {
+  margin-left: 4px;
+  font-size: var(--text-lg);
+  font-weight: var(--fw-normal);
+  color: var(--color-text-muted);
+}
+
+.label {
+  margin-top: 6px;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}

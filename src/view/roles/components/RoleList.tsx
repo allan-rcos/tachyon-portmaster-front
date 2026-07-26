@@ -1,69 +1,77 @@
-import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
-import { DataTable, type Column } from '@view/core/components/DataTable';
+import { CardList } from '@view/core/components/CardList';
 import { EmptyState } from '@view/core/components/EmptyState';
 import { Icon } from '@view/core/components/Icon';
-import { PageHeader } from '@view/core/components/PageHeader';
-import { formatNumber } from '@viewmodel/core/utils/formatters';
-import type { Role } from '@viewmodel/roles/domain';
-import type { RoleListText } from '@viewmodel/roles/i18n/text-contracts';
-import { Show } from 'solid-js';
-import type { JSX } from 'solid-js';
+import { Toolbar } from '@view/core/components/Toolbar';
+import { InfiniteList } from '@view/core/islands/InfiniteList.island';
+import { toAccessor } from '@view/core/observable/to-accessor';
+import { RoleCard } from '@view/roles/components/RoleCard';
+import type { RoleListVM } from '@viewmodel/roles/role-list-page.vm';
+import { Show, type JSX } from 'solid-js';
 
 import styles from './RoleList.module.scss';
 
-export function RoleList(props: { items: Role[]; total: number; t: RoleListText }): JSX.Element {
-  const columns = (): Column<Role>[] => [
-    {
-      header: props.t.name,
-      cell: (r) => (
-        <a class={styles.name} href={`/painel/perfis/${r.id}/permissoes`}>
-          {r.name}
-        </a>
-      ),
-    },
-    { header: props.t.userCount, align: 'end', cell: (r) => formatNumber(r.user_count) },
-    { header: props.t.permissions, align: 'end', cell: (r) => formatNumber(r.permissions.length) },
-    {
-      header: props.t.actions,
-      align: 'end',
-      cell: (r) => (
-        <a
-          class={styles.editLink}
-          href={`/painel/perfis/${r.id}/permissoes`}
-          aria-label={`${props.t.edit} ${r.name}`}
-        >
-          <Icon name="shield" size={16} />
-        </a>
-      ),
-    },
-  ];
+/** Props da listagem de perfis. */
+export interface RoleListProps {
+  /** ViewModel da rota. */
+  vm: RoleListVM;
+}
+
+/**
+ * Listagem de perfis — `CardList` empilhado, um cartão por perfil.
+ *
+ * Perfil não cabe numa linha: o que interessa de um perfil é o CONJUNTO de
+ * permissões que ele concede, e isso são dezenas de chips. O protótipo desenha
+ * cada perfil como um cartão largo com as chips por baixo do cabeçalho.
+ *
+ * @param props.vm ViewModel da rota.
+ */
+export function RoleList(props: RoleListProps): JSX.Element {
+  const items = toAccessor(() => props.vm.items());
+  const isLoadingMore = toAccessor(() => props.vm.isLoadingMore());
+  const errorMessage = toAccessor(() => props.vm.errorMessage());
+  const hasMore = toAccessor(() => props.vm.hasMore());
 
   return (
     <section>
-      <Breadcrumbs items={[{ label: props.t.title }]} />
-      <PageHeader
-        title={props.t.title}
-        subtitle={props.t.subtitle}
+      <Toolbar
+        eyebrow={props.vm.t.eyebrow}
+        title={props.vm.t.title}
+        subtitle={props.vm.t.subtitle}
         action={
-          <a class={styles.newBtn} href="/painel/perfis/nova">
-            <Icon name="plus" size={18} />
-            {props.t.new}
-          </a>
+          <Show when={props.vm.canCreate}>
+            <a class={styles.newBtn} href={props.vm.newHref}>
+              <Icon name="plus" size={16} />
+              {props.vm.t.new}
+            </a>
+          </Show>
         }
       />
+
       <Show
-        when={props.items.length > 0}
-        fallback={<EmptyState icon="shield" message={props.t.empty} />}
+        when={items().length > 0}
+        fallback={<EmptyState icon="shield" message={props.vm.t.empty} />}
       >
-        <DataTable
-          columns={columns()}
-          rows={props.items}
-          rowKey={(r) => r.id}
-          caption={props.t.title}
-        />
+        <CardList items={items()} layout="column">
+          {(item) => (
+            <RoleCard
+              item={item}
+              editLabel={props.vm.t.edit}
+              permissionsLabel={props.vm.t.permissionsCountLabel}
+              usersLabel={props.vm.t.userCountLabel}
+            />
+          )}
+        </CardList>
       </Show>
+
+      <InfiniteList
+        hasMore={hasMore()}
+        isLoading={isLoadingMore()}
+        error={errorMessage()}
+        loadMore={props.vm.loadMore}
+        retry={props.vm.retry}
+        loadMoreLabel={props.vm.t.loadMore}
+        retryLabel={props.vm.boundary.retry}
+      />
     </section>
   );
 }
-
-export type { RoleListText };

@@ -38,6 +38,19 @@ RUN make && strip build/tjs
 # ---------- 2. build da aplicação ----------
 FROM oven/bun:1 AS build
 
+# Os bindings do FlatBuffers não são versionados (saída de compilador), então
+# `bun run build` chama `gen:fbs` e precisa do `flatc`. Binário oficial do
+# release — compilar o flatbuffers da fonte custaria mais que todo o resto.
+ARG FLATC_VERSION=25.12.19
+RUN apt-get update && apt-get install -y --no-install-recommends curl unzip ca-certificates \
+    && curl -fsSL -o /tmp/flatc.zip \
+         "https://github.com/google/flatbuffers/releases/download/v${FLATC_VERSION}/Linux.flatc.binary.g++-13.zip" \
+    && unzip -q /tmp/flatc.zip -d /usr/local/bin \
+    && chmod +x /usr/local/bin/flatc \
+    && rm -f /tmp/flatc.zip \
+    && rm -rf /var/lib/apt/lists/* \
+    && flatc --version
+
 WORKDIR /app
 
 # Manifests primeiro: enquanto as dependências não mudam, esta camada é cache.

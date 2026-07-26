@@ -1,34 +1,32 @@
-import { AsyncBoundary } from '@view/core/components/AsyncBoundary';
-import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
-import { PageHeader } from '@view/core/components/PageHeader';
-import { Skeleton } from '@view/core/components/Skeleton';
-import { createScreenBinding } from '@view/core/screens/createScreenBinding';
+import { Toolbar } from '@view/core/components/Toolbar';
 import { MetricsPanel } from '@view/metrics/components/MetricsPanel';
 import type { DashboardVM } from '@viewmodel/metrics/dashboard-page.vm';
 import type { JSX } from 'solid-js';
 
+/** Props da tela do painel operacional. */
+export interface DashboardScreenProps {
+  /** ViewModel da rota, construído no `+Page`. */
+  vm: DashboardVM;
+}
+
 /**
- * Tela do painel operacional.
+ * Tela do painel operacional. Stateless: as métricas já vieram resolvidas pelo
+ * `+data`, então o HTML da primeira requisição já traz os números.
+ *
+ * Sem trilha de navegação: o painel é a raiz do app autenticado, e uma trilha
+ * de um item só não informa nada.
  *
  * @param props.vm ViewModel da rota.
  */
-export function DashboardScreen(props: { vm: DashboardVM }): JSX.Element {
-  const { data, status } = createScreenBinding(props.vm.metrics, props.vm.load);
-
+export function DashboardScreen(props: DashboardScreenProps): JSX.Element {
   return (
     <>
-      <Breadcrumbs items={[{ label: props.vm.t.title }]} />
-      <PageHeader title={props.vm.t.title} subtitle={props.vm.t.subtitle} />
-      <AsyncBoundary
-        status={status()}
-        data={data()}
-        fallback={<Skeleton height="20rem" />}
-        errorMessage={props.vm.boundary.loadError}
-        retryLabel={props.vm.boundary.retry}
-        onRetry={() => void props.vm.load()}
-      >
-        {(metrics) => <MetricsPanel metrics={metrics} t={props.vm.t} />}
-      </AsyncBoundary>
+      <Toolbar
+        eyebrow={props.vm.t.eyebrow}
+        title={props.vm.t.title}
+        subtitle={props.vm.t.subtitle}
+      />
+      <MetricsPanel vm={props.vm} />
     </>
   );
 }

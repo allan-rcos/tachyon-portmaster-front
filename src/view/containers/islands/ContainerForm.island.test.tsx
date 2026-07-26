@@ -1,6 +1,6 @@
-import { render, waitFor } from '@solidjs/testing-library';
-import { setInput, stubLocation } from '@testing/dom';
+import { fireEvent, render, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import { stubLocation } from '@view/core/testing/stub-location';
 import { containerFormMessages } from '@viewmodel/containers/i18n/container-form.messages';
 import { createContainer } from '@viewmodel/containers/mutations/create-container.mutation';
 import { updateContainer } from '@viewmodel/containers/mutations/update-container.mutation';
@@ -27,8 +27,8 @@ describe('ContainerForm island', () => {
     const user = userEvent.setup();
     const { getByLabelText, getByRole } = render(() => <ContainerForm mode="create" t={t} />);
 
-    setInput(getByLabelText(t.code), 'MSKU-9911');
-    setInput(getByLabelText(t.maxCapacity), '28000');
+    fireEvent.input(getByLabelText(t.code), { target: { value: 'MSKU-9911' } });
+    fireEvent.input(getByLabelText(t.maxCapacity), { target: { value: '28000' } });
     await user.click(getByRole('button', { name: t.create }));
 
     await waitFor(() =>
@@ -51,7 +51,7 @@ describe('ContainerForm island', () => {
     // Em edição o código vira `<output>`, não campo editável.
     expect(queryByLabelText(t.code)).not.toBeInstanceOf(HTMLInputElement);
 
-    setInput(getByLabelText(t.maxCapacity), '32000');
+    fireEvent.input(getByLabelText(t.maxCapacity), { target: { value: '32000' } });
     await user.click(getByRole('button', { name: t.save }));
 
     await waitFor(() =>

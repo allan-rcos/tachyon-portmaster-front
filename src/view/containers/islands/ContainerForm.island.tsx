@@ -1,16 +1,10 @@
 import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
-import { zodValidator } from '@view/core/forms/zod-adapter';
 import { bindMutation } from '@view/core/observable/bind-mutation';
-import { cn } from '@view/core/utils/ui';
-import { errText } from '@view/core/utils/ui';
 import type { ContainerFormText } from '@viewmodel/containers/i18n/text-contracts';
 import { createContainer } from '@viewmodel/containers/mutations/create-container.mutation';
 import { updateContainer } from '@viewmodel/containers/mutations/update-container.mutation';
-import {
-  createContainerCreateSchema,
-  createContainerUpdateSchema,
-} from '@viewmodel/containers/schemas/container.schema';
+import { createContainerSchema } from '@viewmodel/containers/schemas/container.schema';
 import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import { Show, type JSX } from 'solid-js';
 
@@ -32,12 +26,11 @@ function Inner(props: ContainerFormProps): JSX.Element {
   const mutation = bindMutation(
     createMutationSignal(
       (value: FormValues) => {
-        if (props.mode === 'create') {
-          const body = createContainerCreateSchema(props.t).parse(value);
-          return createContainer(body);
-        }
-        const body = createContainerUpdateSchema(props.t).parse(value);
-        return updateContainer(props.containerId!, body);
+        const body = createContainerSchema(props.mode, props.t).parse(value);
+        return props.mode === 'create'
+          ? createContainer(body)
+          : // O código não é editável: só a capacidade vai no PATCH.
+            updateContainer(props.containerId!, { max_capacity: body.max_capacity });
       },
       {
         onSuccess: () => {
@@ -53,13 +46,7 @@ function Inner(props: ContainerFormProps): JSX.Element {
       max_capacity:
         props.defaultValues?.max_capacity != null ? String(props.defaultValues.max_capacity) : '',
     } as FormValues,
-    validators: {
-      onChange: zodValidator<FormValues>(
-        props.mode === 'create'
-          ? createContainerCreateSchema(props.t)
-          : createContainerUpdateSchema(props.t),
-      ),
-    },
+    validators: { onChange: createContainerSchema(props.mode, props.t) },
     onSubmit: ({ value }) => mutation.mutate(value),
   }));
 
@@ -78,10 +65,15 @@ function Inner(props: ContainerFormProps): JSX.Element {
         <Show when={props.mode === 'create'}>
           <form.Field name="code">
             {(field) => (
-              <FormField label={props.t.code} for="code" error={errText(field().state.meta.errors)}>
+              <FormField
+                label={props.t.code}
+                for="code"
+                error={field().state.meta.errors[0]?.message}
+              >
                 <input
                   id="code"
-                  class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                  class={styles.input}
+                  classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                   value={field().state.value}
                   onInput={(e) => field().handleChange(e.currentTarget.value)}
                   onBlur={field().handleBlur}
@@ -103,13 +95,14 @@ function Inner(props: ContainerFormProps): JSX.Element {
             <FormField
               label={props.t.maxCapacity}
               for="max_capacity"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="max_capacity"
                 type="number"
                 min="1"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -128,7 +121,8 @@ function Inner(props: ContainerFormProps): JSX.Element {
         <li>
           <button
             type="submit"
-            class={cn(styles.submit, mutation.isPending() && styles.loading)}
+            class={styles.submit}
+            classList={{ [styles.loading]: mutation.isPending() }}
             disabled={mutation.isPending()}
           >
             {props.mode === 'create' ? props.t.create : props.t.save}

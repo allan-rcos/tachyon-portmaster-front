@@ -1,57 +1,33 @@
-import { Icon, type IconName } from '@view/core/components/Icon';
-import { formatNumber, formatPercent } from '@viewmodel/core/utils/formatters';
-import type { Metrics } from '@viewmodel/metrics/domain';
+import type { StatTileData } from '@viewmodel/metrics/dashboard-page.vm';
 import { For, type JSX } from 'solid-js';
 
-import type { MetricsPanelText } from './MetricsPanel';
+import { StatTile } from './StatTile';
 import styles from './StatTiles.module.scss';
 
-interface Tile {
-  label: string;
-  value: string;
-  icon: IconName;
-  tone: string;
+/** Props dos cartões de KPI. */
+export interface StatTilesProps {
+  /** Cartões já formatados pelo ViewModel. */
+  tiles: readonly StatTileData[];
 }
 
-/** Cartões de KPI do painel (SSR). */
-export function StatTiles(props: { metrics: Metrics; t: MetricsPanelText }): JSX.Element {
-  const tiles = (): Tile[] => [
-    {
-      label: props.t.activeContainers,
-      value: formatNumber(props.metrics.active_containers),
-      icon: 'container',
-      tone: 'gold',
-    },
-    {
-      label: props.t.totalContainers,
-      value: formatNumber(props.metrics.total_containers),
-      icon: 'package',
-      tone: 'teal',
-    },
-    {
-      label: props.t.yardLoad,
-      value: formatPercent(props.metrics.yard_load),
-      icon: 'weight',
-      tone: 'orange',
-    },
-    {
-      label: props.t.registeredProducts,
-      value: formatNumber(props.metrics.registered_products),
-      icon: 'flask',
-      tone: 'sage',
-    },
-  ];
-
+/**
+ * Grade dos cartões de KPI do painel (SSR). Valores já chegam formatados.
+ *
+ * @param props.tiles Cartões a desenhar.
+ */
+export function StatTiles(props: StatTilesProps): JSX.Element {
   return (
     <ul class={styles.grid}>
-      <For each={tiles()}>
+      <For each={props.tiles}>
         {(tile) => (
-          <li class={styles.tile} data-tone={tile.tone}>
-            <span class={styles.icon} aria-hidden="true">
-              <Icon name={tile.icon} size={22} />
-            </span>
-            <span class={styles.value}>{tile.value}</span>
-            <span class={styles.label}>{tile.label}</span>
+          <li>
+            <StatTile
+              icon={tile.icon}
+              tone={tile.tone}
+              value={tile.value}
+              unit={tile.unit}
+              label={tile.label}
+            />
           </li>
         )}
       </For>

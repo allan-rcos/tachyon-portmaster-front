@@ -1,39 +1,43 @@
 import { AccountProfile } from '@view/account/components/AccountProfile';
 import { AccountForm } from '@view/account/islands/AccountForm.island';
 import { PasswordChange } from '@view/account/islands/PasswordChange.island';
+import styles from '@view/account/styles/AccountPage.module.scss';
 import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { Card } from '@view/core/components/Card';
 import { PageHeader } from '@view/core/components/PageHeader';
-import { FormSkeleton } from '@view/core/components/Skeleton';
-import type { AccountProfile as Profile } from '@viewmodel/account/domain';
-import type { AccountPageText } from '@viewmodel/account/i18n/account-page.messages';
+import type { AccountPageVM } from '@viewmodel/account/account-page.vm';
 import type { JSX } from 'solid-js';
-import { ClientOnly } from 'vike-solid/ClientOnly';
 
-import styles from '../styles/AccountPage.module.scss';
+/** Props da tela da conta própria. */
+export interface AccountPageProps {
+  /** ViewModel da rota. */
+  vm: AccountPageVM;
+}
 
 /**
- * Tela da conta própria: resumo SSR + formulários hidratados no cliente.
+ * Tela da conta própria: resumo + formulários. Stateless.
  *
- * @param props.profile Perfil do usuário autenticado.
- * @param props.t       Texto já resolvido para o locale da requisição.
+ * Os `ClientOnly` em volta dos formulários saíram: o conteúdo vem do servidor e
+ * as islands hidratam por cima, sem esqueleto piscando.
+ *
+ * @param props.vm ViewModel da rota.
  */
-export function AccountPage(props: { profile: Profile; t: AccountPageText }): JSX.Element {
+export function AccountPage(props: AccountPageProps): JSX.Element {
   return (
     <section>
-      <Breadcrumbs items={[{ label: props.t.title }]} />
-      <PageHeader title={props.t.title} subtitle={props.t.subtitle} />
+      <Breadcrumbs items={[{ label: props.vm.t.title }]} />
+      <PageHeader title={props.vm.t.title} subtitle={props.vm.t.subtitle} />
       <div class={styles.grid}>
-        <AccountProfile profile={props.profile} t={props.t} />
-        <Card title={props.t.profile}>
-          <ClientOnly fallback={<FormSkeleton rows={2} />}>
-            <AccountForm name={props.profile.name} email={props.profile.email} t={props.t} />
-          </ClientOnly>
+        <AccountProfile vm={props.vm} />
+        <Card title={props.vm.t.profile}>
+          <AccountForm
+            name={props.vm.identity.name}
+            email={props.vm.identity.email}
+            t={props.vm.t}
+          />
         </Card>
-        <Card title={props.t.security}>
-          <ClientOnly fallback={<FormSkeleton rows={2} />}>
-            <PasswordChange t={props.t} />
-          </ClientOnly>
+        <Card title={props.vm.t.security}>
+          <PasswordChange t={props.vm.t} />
         </Card>
       </div>
     </section>

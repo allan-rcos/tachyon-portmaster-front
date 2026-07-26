@@ -1,38 +1,38 @@
 import { Badge } from '@view/core/components/Badge';
-import type { TelemetryLogItem } from '@viewmodel/containers/domain';
-import type { TelemetryEvent } from '@viewmodel/core/domain';
-import type { Tone } from '@viewmodel/core/i18n/labels';
-import { TELEMETRY_EVENT_LABEL } from '@viewmodel/core/i18n/labels';
-import { formatDateTime } from '@viewmodel/core/utils/formatters';
+import type { TelemetryRowData } from '@viewmodel/containers/container-detail-page.vm';
+import type { ContainerDetailPageText } from '@viewmodel/containers/i18n/container-detail-page.messages';
 import { For, Show, type JSX } from 'solid-js';
 
-import type { ContainerDetailText } from './ContainerSummary';
 import styles from './TelemetryLog.module.scss';
 
-const EVENT_TONE: Record<TelemetryEvent, Tone> = {
-  Create: 'neutral',
-  Load: 'gold',
-  Unload: 'orange',
-  Seal: 'sage',
-  Dispatch: 'teal',
-};
+/** Props da linha do tempo de telemetria. */
+export interface TelemetryLogProps {
+  /** Eventos já formatados pelo ViewModel. */
+  logs: readonly TelemetryRowData[];
+  /** Texto do cluster de detalhe. */
+  t: ContainerDetailPageText;
+}
 
-/** Linha do tempo de telemetria (SSR). */
-export function TelemetryLog(props: {
-  logs: TelemetryLogItem[];
-  t: ContainerDetailText;
-}): JSX.Element {
+/**
+ * Linha do tempo de telemetria (SSR). Rótulo, tom e data já chegam resolvidos —
+ * o mapa de tom por evento mora em `@viewmodel/core/i18n/labels`, junto do
+ * resto do vocabulário de apresentação.
+ *
+ * @param props.logs Eventos a exibir.
+ * @param props.t    Texto do cluster de detalhe.
+ */
+export function TelemetryLog(props: TelemetryLogProps): JSX.Element {
   return (
     <Show when={props.logs.length > 0} fallback={<p class={styles.empty}>{props.t.empty}</p>}>
       <ol class={styles.list}>
-        <For each={props.logs}>
+        <For each={[...props.logs]}>
           {(log) => (
             <li class={styles.item}>
-              <Badge tone={EVENT_TONE[log.event]}>{TELEMETRY_EVENT_LABEL[log.event]}</Badge>
+              <Badge tone={log.event.tone}>{log.event.label}</Badge>
               <div class={styles.body}>
                 <p class={styles.desc}>{log.description}</p>
                 <time class={styles.time} datetime={log.timestamp}>
-                  {formatDateTime(log.timestamp)}
+                  {log.formattedTimestamp}
                 </time>
               </div>
             </li>

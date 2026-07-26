@@ -1,7 +1,6 @@
 import { changePassword } from '@model/account';
-
-import { browserClient } from '../../core/client/api-client';
-import type { PasswordChangeData } from '../schemas/account.schema';
+import type { PasswordChangeData } from '@viewmodel/account/schemas/account.schema';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Troca a senha do próprio usuário autenticado.

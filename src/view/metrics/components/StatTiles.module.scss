@@ -1,65 +1,21 @@
-@use '@ds/glass' as glass;
+@use '@ds/responsive' as rp;
 
+// Quatro blocos no desktop, dois no tablet. No celular continuam dois: com um
+// número curto por bloco, uma coluna só desperdiçaria a largura.
+// O visual de cada bloco mora em `StatTile.module.scss`.
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-4);
-  list-style: none;
-  margin: 0 0 var(--space-6);
+  gap: 14px;
+  margin: 0 0 var(--space-5);
   padding: 0;
-}
+  list-style: none;
 
-.tile {
-  @include glass.glass-l1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-5);
-}
-
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-2);
-}
-.value {
-  font-size: var(--text-2xl);
-  font-weight: var(--fw-medium);
-  font-variant-numeric: tabular-nums;
-}
-.label {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-.tile[data-tone='gold'] .icon {
-  color: var(--gold-300);
-  background: var(--glass-gold);
-}
-.tile[data-tone='teal'] .icon {
-  color: var(--teal-200);
-  background: var(--glass-teal);
-}
-.tile[data-tone='orange'] .icon {
-  color: var(--orange-300);
-  background: var(--glass-orange);
-}
-.tile[data-tone='sage'] .icon {
-  color: var(--sage-300);
-  background: var(--glass-sage);
-}
-
-@media (max-width: 1024px) {
-  .grid {
+  @include rp.tablet-down {
     grid-template-columns: repeat(2, 1fr);
   }
-}
-@media (max-width: 480px) {
-  .grid {
-    grid-template-columns: 1fr;
+
+  @include rp.mobile {
+    gap: 10px;
   }
 }

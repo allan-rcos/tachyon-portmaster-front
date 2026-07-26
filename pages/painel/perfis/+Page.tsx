@@ -1,14 +1,10 @@
 import { RoleListScreen } from '@view/roles/screens/RoleListScreen';
-import { createRoleListVM } from '@viewmodel/roles/role-list-page.vm';
-import { ClientOnly } from 'vike-solid/ClientOnly';
-import { usePageContext } from 'vike-solid/usePageContext';
+import { createRoleListVM, type RoleListPageInput } from '@viewmodel/roles/role-list-page.vm';
+import type { JSX } from 'solid-js';
+import { useData } from 'vike-solid/useData';
 
-export default function Page() {
-  const pageContext = usePageContext();
-  const vm = createRoleListVM({ url: pageContext.urlOriginal });
-  return (
-    <ClientOnly fallback={<div />}>
-      <RoleListScreen vm={vm} />
-    </ClientOnly>
-  );
+/** Único ponto de composição da rota. */
+export default function Page(): JSX.Element {
+  const input = useData<RoleListPageInput>();
+  return <RoleListScreen vm={createRoleListVM(input)} />;
 }

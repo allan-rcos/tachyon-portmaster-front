@@ -1,6 +1,6 @@
-import { render, waitFor } from '@solidjs/testing-library';
-import { setInput, stubLocation } from '@testing/dom';
+import { fireEvent, render, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import { stubLocation } from '@view/core/testing/stub-location';
 import { userEditMessages } from '@viewmodel/users/i18n/user-edit-page.messages';
 import { deleteUser } from '@viewmodel/users/mutations/delete-user.mutation';
 import { resetUserPassword } from '@viewmodel/users/mutations/reset-user-password.mutation';
@@ -31,7 +31,7 @@ describe('UserAdminActions island', () => {
       <UserAdminActions userId="usr_bruno" t={t} />
     ));
 
-    setInput(getByLabelText(t.newPassword), 'novasenha');
+    fireEvent.input(getByLabelText(t.newPassword), { target: { value: 'novasenha' } });
     await user.click(getByRole('button', { name: t.resetPassword }));
 
     await waitFor(() => expect(mockedReset).toHaveBeenCalledWith('usr_bruno', 'novasenha'));

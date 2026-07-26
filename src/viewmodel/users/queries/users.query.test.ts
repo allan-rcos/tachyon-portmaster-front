@@ -1,5 +1,6 @@
 import { getUser as apiGetUser, listUsers as apiListUsers } from '@model/users';
-import { paged, userFactory } from '@testing/factories/model.factory';
+import { paged } from '@viewmodel/core/testing/factory-support';
+import { userFactory } from '@viewmodel/users/testing/user.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getUser } from './get-user.query';

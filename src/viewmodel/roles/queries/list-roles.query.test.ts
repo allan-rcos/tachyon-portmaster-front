@@ -1,5 +1,6 @@
 import { listRoles as apiListRoles } from '@model/roles';
-import { paged, roleFactory } from '@testing/factories/model.factory';
+import { paged } from '@viewmodel/core/testing/factory-support';
+import { roleFactory } from '@viewmodel/roles/testing/role.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { listRoles } from './list-roles.query';

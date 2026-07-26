@@ -3,9 +3,10 @@
 //  Recebe `PageRequest` (neutro), nunca o PageContext do Vike.
 // ============================================================
 
+import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import type { PageRequest } from '@viewmodel/core/page/page-request';
+
 import { loginMessages, type LoginPageText } from './i18n/login-page.messages';
-import { resolveLocale } from '../core/i18n/locale';
-import type { PageRequest } from '../core/page/page-request';
 
 /** Dados que a rota entrega à View. */
 export interface LoginPageData {

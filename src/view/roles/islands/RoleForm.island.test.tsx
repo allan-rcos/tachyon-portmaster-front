@@ -1,12 +1,12 @@
-import { render, waitFor } from '@solidjs/testing-library';
-import { setInput, stubLocation } from '@testing/dom';
-import { roleFactory } from '@testing/factories/model.factory';
+import { fireEvent, render, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import { stubLocation } from '@view/core/testing/stub-location';
 import { PermissionMatrix } from '@view/roles/components/PermissionMatrix';
-import type { Permission } from '@viewmodel/core/domain';
+import { PERMISSION_OPTION_GROUPS } from '@viewmodel/core/i18n/labels';
 import { roleFormMessages } from '@viewmodel/roles/i18n/role-form.messages';
 import { createRole } from '@viewmodel/roles/mutations/create-role.mutation';
 import { updateRolePermissions } from '@viewmodel/roles/mutations/update-role-permissions.mutation';
+import { roleFactory } from '@viewmodel/roles/testing/role.factory';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RoleForm } from './RoleForm.island';
@@ -30,10 +30,11 @@ afterEach(() => loc.restore());
 describe('PermissionMatrix', () => {
   it('reflete a seleção atual e emite o toggle', async () => {
     const user = userEvent.setup();
-    let toggled: [Permission, boolean] | undefined;
+    let toggled: [string, boolean] | undefined;
     const { getByLabelText } = render(() => (
       <PermissionMatrix
-        selected={new Set<Permission>(['ProductRead'])}
+        groups={PERMISSION_OPTION_GROUPS}
+        selected={new Set(['ProductRead'])}
         onToggle={(p, c) => (toggled = [p, c])}
       />
     ));
@@ -47,9 +48,11 @@ describe('PermissionMatrix', () => {
 describe('RoleForm island', () => {
   it('cria o perfil com nome e permissões marcadas', async () => {
     const user = userEvent.setup();
-    const { getByLabelText, getByRole } = render(() => <RoleForm mode="create" t={t} />);
+    const { getByLabelText, getByRole } = render(() => (
+      <RoleForm mode="create" t={t} permissionGroups={PERMISSION_OPTION_GROUPS} />
+    ));
 
-    setInput(getByLabelText(t.name), 'Conferente');
+    fireEvent.input(getByLabelText(t.name), { target: { value: 'Conferente' } });
     await user.click(getByLabelText('Ver contêineres'));
     await user.click(getByRole('button', { name: t.create }));
 
@@ -64,9 +67,11 @@ describe('RoleForm island', () => {
 
   it('exige ao menos uma permissão', async () => {
     const user = userEvent.setup();
-    const { getByLabelText, getByRole } = render(() => <RoleForm mode="create" t={t} />);
+    const { getByLabelText, getByRole } = render(() => (
+      <RoleForm mode="create" t={t} permissionGroups={PERMISSION_OPTION_GROUPS} />
+    ));
 
-    setInput(getByLabelText(t.name), 'Vazio');
+    fireEvent.input(getByLabelText(t.name), { target: { value: 'Vazio' } });
     await user.click(getByRole('button', { name: t.create }));
 
     await waitFor(() => expect(getByRole('alert')).toBeVisible());
@@ -82,6 +87,7 @@ describe('RoleForm island', () => {
         defaultName="Auditor"
         defaultPermissions={['MetricsRead']}
         t={t}
+        permissionGroups={PERMISSION_OPTION_GROUPS}
       />
     ));
 

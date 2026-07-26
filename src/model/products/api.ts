@@ -1,7 +1,8 @@
+import type { ApiClient } from '@model/core/http';
+import { wire } from '@model/core/wire';
+
 import type { Product, ProductCreateRequest, ProductUpdateRequest, ProductList } from './dto';
 import { encProductCreate, encProductUpdate, decProduct, decProductList } from './fbs';
-import type { ApiClient } from '../core/http';
-import { wire } from '../core/wire';
 
 export const listProducts = (c: ApiClient, query?: Record<string, string>): Promise<ProductList> =>
   wire(c, { method: 'GET', path: '/v1/products', query, decode: decProductList });

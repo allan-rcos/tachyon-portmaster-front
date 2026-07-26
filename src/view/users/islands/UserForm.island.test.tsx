@@ -1,10 +1,10 @@
-import { render, waitFor } from '@solidjs/testing-library';
-import { setInput, stubLocation } from '@testing/dom';
-import { userFactory } from '@testing/factories/model.factory';
+import { fireEvent, render, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import { stubLocation } from '@view/core/testing/stub-location';
 import { userFormMessages } from '@viewmodel/users/i18n/user-form.messages';
 import { createUser } from '@viewmodel/users/mutations/create-user.mutation';
 import { updateUser } from '@viewmodel/users/mutations/update-user.mutation';
+import { userFactory } from '@viewmodel/users/testing/user.factory';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UserForm } from './UserForm.island';
@@ -33,9 +33,9 @@ describe('UserForm island', () => {
       <UserForm mode="create" roles={roles} t={t} />
     ));
 
-    setInput(getByLabelText(t.name), 'João Porto');
-    setInput(getByLabelText(t.email), 'joao@portmaster.test');
-    setInput(getByLabelText(t.initialPassword), 'senha123');
+    fireEvent.input(getByLabelText(t.name), { target: { value: 'João Porto' } });
+    fireEvent.input(getByLabelText(t.email), { target: { value: 'joao@portmaster.test' } });
+    fireEvent.input(getByLabelText(t.initialPassword), { target: { value: 'senha123' } });
     await user.click(getByLabelText('Auditor'));
     await user.click(getByRole('button', { name: t.create }));
 
@@ -56,9 +56,9 @@ describe('UserForm island', () => {
       <UserForm mode="create" roles={roles} t={t} />
     ));
 
-    setInput(getByLabelText(t.name), 'João Porto');
-    setInput(getByLabelText(t.email), 'joao@portmaster.test');
-    setInput(getByLabelText(t.initialPassword), 'senha123');
+    fireEvent.input(getByLabelText(t.name), { target: { value: 'João Porto' } });
+    fireEvent.input(getByLabelText(t.email), { target: { value: 'joao@portmaster.test' } });
+    fireEvent.input(getByLabelText(t.initialPassword), { target: { value: 'senha123' } });
     await user.click(getByRole('button', { name: t.create }));
 
     await waitFor(() => expect(getByRole('alert')).toBeVisible());
@@ -81,7 +81,7 @@ describe('UserForm island', () => {
       />
     ));
 
-    setInput(getByLabelText(t.name), 'Bruno Pátio');
+    fireEvent.input(getByLabelText(t.name), { target: { value: 'Bruno Pátio' } });
     await user.click(getByRole('button', { name: t.save }));
 
     await waitFor(() =>

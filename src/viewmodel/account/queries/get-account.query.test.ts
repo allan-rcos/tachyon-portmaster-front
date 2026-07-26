@@ -1,5 +1,5 @@
 import { getAccount as apiGetAccount } from '@model/account';
-import { accountProfileFactory } from '@testing/factories/model.factory';
+import { accountProfileFactory } from '@viewmodel/account/testing/account.factory';
 import { describe, expect, it, vi } from 'vitest';
 
 import { getAccount } from './get-account.query';

@@ -1,5 +1,5 @@
-import type { RoleRef } from '../account/dto';
-import type { Paged } from '../common/dto';
+import type { RoleRef } from '@model/account/dto';
+import type { Paged } from '@model/common/dto';
 
 /** Usuário na visão administrativa, com os perfis vinculados. */
 export interface UserAdmin {

@@ -18,6 +18,9 @@
 .input {
   @include ui.input;
 }
+.invalid {
+  border-color: var(--red-500);
+}
 .roles {
   @include glass.glass-inset;
   border: 1px solid var(--glass-border-soft);

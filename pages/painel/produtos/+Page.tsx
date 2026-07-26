@@ -1,14 +1,17 @@
 import { ProductListScreen } from '@view/products/screens/ProductListScreen';
-import { createProductListVM } from '@viewmodel/products/product-list-page.vm';
-import { ClientOnly } from 'vike-solid/ClientOnly';
-import { usePageContext } from 'vike-solid/usePageContext';
+import {
+  createProductListVM,
+  type ProductListPageInput,
+} from '@viewmodel/products/product-list-page.vm';
+import type { JSX } from 'solid-js';
+import { useData } from 'vike-solid/useData';
 
-export default function Page() {
-  const pageContext = usePageContext();
-  const vm = createProductListVM({ url: pageContext.urlOriginal });
-  return (
-    <ClientOnly fallback={<div />}>
-      <ProductListScreen vm={vm} />
-    </ClientOnly>
-  );
+/**
+ * Único ponto de composição da rota: pega o dado que o `+data` resolveu e
+ * constrói o ViewModel a partir dele. Nem o ViewModel nem a tela conhecem o
+ * Vike — o `+data` é quem faz a tradução.
+ */
+export default function Page(): JSX.Element {
+  const input = useData<ProductListPageInput>();
+  return <ProductListScreen vm={createProductListVM(input)} />;
 }

@@ -1,3 +1,5 @@
+import { toBytes, buf, fromT } from '@model/core/fbs-runtime';
+
 import type {
   Container,
   ContainerCreateRequest,
@@ -8,15 +10,15 @@ import type {
   UnloadItemRequest,
   ManifestResponse,
 } from './dto';
-import { toBytes, buf, fromT } from '../core/fbs-runtime';
-import { ContainerCreateRequestT } from '../generated/fbs/api/fbs/container/container-create-request';
-import { ContainerListResponse as FbContainerListResponse } from '../generated/fbs/api/fbs/container/container-list-response';
-import { ContainerResponse as FbContainerResponse } from '../generated/fbs/api/fbs/container/container-response';
-import { ContainerSummaryListResponse as FbContainerSummaryListResponse } from '../generated/fbs/api/fbs/container/container-summary-list-response';
-import { ContainerUpdateRequestT } from '../generated/fbs/api/fbs/container/container-update-request';
-import { LoadItemRequestT } from '../generated/fbs/api/fbs/manifest/load-item-request';
-import { ManifestResponse as FbManifestResponse } from '../generated/fbs/api/fbs/manifest/manifest-response';
-import { UnloadItemRequestT } from '../generated/fbs/api/fbs/manifest/unload-item-request';
+
+import { ContainerCreateRequestT } from '@/fbs/api/fbs/container/container-create-request';
+import { ContainerListResponse as FbContainerListResponse } from '@/fbs/api/fbs/container/container-list-response';
+import { ContainerResponse as FbContainerResponse } from '@/fbs/api/fbs/container/container-response';
+import { ContainerSummaryListResponse as FbContainerSummaryListResponse } from '@/fbs/api/fbs/container/container-summary-list-response';
+import { ContainerUpdateRequestT } from '@/fbs/api/fbs/container/container-update-request';
+import { LoadItemRequestT } from '@/fbs/api/fbs/manifest/load-item-request';
+import { ManifestResponse as FbManifestResponse } from '@/fbs/api/fbs/manifest/manifest-response';
+import { UnloadItemRequestT } from '@/fbs/api/fbs/manifest/unload-item-request';
 
 export const encContainerCreate = (v: ContainerCreateRequest): Uint8Array =>
   toBytes(new ContainerCreateRequestT(v.code, v.max_capacity));

@@ -1,36 +1,29 @@
-import { AsyncBoundary } from '@view/core/components/AsyncBoundary';
 import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { PageHeader } from '@view/core/components/PageHeader';
-import { FormSkeleton } from '@view/core/components/Skeleton';
-import { createScreenBinding } from '@view/core/screens/createScreenBinding';
 import { UserForm } from '@view/users/islands/UserForm.island';
 import type { UserCreateVM } from '@viewmodel/users/user-create-page.vm';
 import type { JSX } from 'solid-js';
 
+/** Props da tela de criação de usuário. */
+export interface UserCreateScreenProps {
+  /** ViewModel da rota, construído no `+Page`. */
+  vm: UserCreateVM;
+}
+
 /**
- * Tela de criação de usuário. Depende dos perfis disponíveis, então carrega.
+ * Tela de criação de usuário. Stateless: os perfis já vieram pelo `+data`, e
+ * com eles o `<select>` chega populado no HTML da primeira requisição.
  *
  * @param props.vm ViewModel da rota.
  */
-export function UserCreateScreen(props: { vm: UserCreateVM }): JSX.Element {
-  const { data, status } = createScreenBinding(props.vm.roles, props.vm.load);
-
+export function UserCreateScreen(props: UserCreateScreenProps): JSX.Element {
   return (
     <section>
       <Breadcrumbs
-        items={[{ label: props.vm.t.title, href: '/painel/usuarios' }, { label: props.vm.t.new }]}
+        items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
       />
       <PageHeader title={props.vm.t.new} />
-      <AsyncBoundary
-        status={status()}
-        data={data()}
-        fallback={<FormSkeleton rows={4} />}
-        errorMessage={props.vm.boundary.loadError}
-        retryLabel={props.vm.boundary.retry}
-        onRetry={() => void props.vm.load()}
-      >
-        {(roles) => <UserForm mode="create" roles={roles} t={props.vm.t} />}
-      </AsyncBoundary>
+      <UserForm mode="create" roles={[...props.vm.roles]} t={props.vm.t} />
     </section>
   );
 }

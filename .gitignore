@@ -6,10 +6,17 @@ out
 dist
 *.tgz
 
-# gerado por comando (codegen) — regenerável no build
-# (o flatc do SDK gera src/fbs-gen — COMMITADO)
-# A saída do Paraglide (funções `m.*` tree-shakeable) vive em dist/paraglide,
-# já coberta por `dist` acima — por ser build, e não fonte.
+# gerado por comando (codegen) — regenerável no build, nada aqui é fonte.
+# Ambas as saídas vivem em `dist/`, já coberto acima:
+#   • dist/paraglide — funções `m.*` tree-shakeable do Paraglide (i18n:compile)
+#   • dist/fbs       — bindings do FlatBuffers (gen:fbs, exige `flatc`)
+# `gen` (gen:fbs + gen:css) é pré-passo de `dev`/`build`/`test`/`typecheck`,
+# então o gerado nunca precisa ser commitado — e não pode divergir da fonte.
+
+# Tipos exatos dos CSS Modules (gen:css). Ficam ao LADO do .scss porque é assim
+# que o TypeScript resolve `import styles from './x.module.scss'` — não dá para
+# jogá-los em dist/.
+*.module.scss.d.ts
 
 # API reference gerada pelo TypeDoc (regenerável: bun run docs:api)
 docs/api

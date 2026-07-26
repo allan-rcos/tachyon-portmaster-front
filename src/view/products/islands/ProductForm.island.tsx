@@ -1,13 +1,9 @@
 import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
-import { zodValidator } from '@view/core/forms/zod-adapter';
 import { ConfirmDialog } from '@view/core/islands/ConfirmDialog.island';
 import { bindMutation } from '@view/core/observable/bind-mutation';
-import { cn } from '@view/core/utils/ui';
-import { errText } from '@view/core/utils/ui';
-import { RISK_CLASS, type RiskClass } from '@viewmodel/core/domain';
-import { RISK_CLASS_LABEL } from '@viewmodel/core/i18n/labels';
 import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
+import type { SelectOption } from '@viewmodel/core/page/options';
 import type { ProductFormText } from '@viewmodel/products/i18n/text-contracts';
 import { createProduct } from '@viewmodel/products/mutations/create-product.mutation';
 import { deleteProduct } from '@viewmodel/products/mutations/delete-product.mutation';
@@ -17,17 +13,22 @@ import { For, Show, type JSX } from 'solid-js';
 
 import styles from './ProductForm.island.module.scss';
 
+/** Valores do formulário — tudo texto, que é o que um `<input>` produz.
+ *  `risk_class` é `string` porque a View não conhece o enum: quem cobra que o
+ *  valor seja uma classe de risco válida é o schema, na submissão. */
 interface FormValues {
   name: string;
   density: string;
-  risk_class: RiskClass;
+  risk_class: string;
 }
 
 export interface ProductFormProps {
   mode: 'create' | 'edit';
   t: ProductFormText;
+  /** Classes de risco disponíveis, com rótulo já traduzido pelo ViewModel. */
+  riskOptions: readonly SelectOption[];
   productId?: string;
-  defaultValues?: { name: string; density: number; risk_class: RiskClass };
+  defaultValues?: { name: string; density: number; risk_class: string };
 }
 
 function Inner(props: ProductFormProps): JSX.Element {
@@ -53,7 +54,7 @@ function Inner(props: ProductFormProps): JSX.Element {
       density: props.defaultValues?.density != null ? String(props.defaultValues.density) : '',
       risk_class: props.defaultValues?.risk_class ?? 'None',
     } as FormValues,
-    validators: { onChange: zodValidator<FormValues>(createProductSchema(props.t)) },
+    validators: { onChange: createProductSchema(props.t) },
     onSubmit: ({ value }) => mutation.mutate(value),
   }));
 
@@ -71,10 +72,15 @@ function Inner(props: ProductFormProps): JSX.Element {
 
         <form.Field name="name">
           {(field) => (
-            <FormField label={props.t.name} for="name" error={errText(field().state.meta.errors)}>
+            <FormField
+              label={props.t.name}
+              for="name"
+              error={field().state.meta.errors[0]?.message}
+            >
               <input
                 id="name"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -89,14 +95,15 @@ function Inner(props: ProductFormProps): JSX.Element {
             <FormField
               label={props.t.density}
               for="density"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="density"
                 type="number"
                 step="0.01"
                 min="0"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -113,10 +120,10 @@ function Inner(props: ProductFormProps): JSX.Element {
                 id="risk_class"
                 class={styles.input}
                 value={field().state.value}
-                onChange={(e) => field().handleChange(e.currentTarget.value as RiskClass)}
+                onChange={(e) => field().handleChange(e.currentTarget.value)}
               >
-                <For each={RISK_CLASS}>
-                  {(rc) => <option value={rc}>{RISK_CLASS_LABEL[rc]}</option>}
+                <For each={props.riskOptions}>
+                  {(option) => <option value={option.value}>{option.label}</option>}
                 </For>
               </select>
             </FormField>
@@ -132,7 +139,8 @@ function Inner(props: ProductFormProps): JSX.Element {
         <li>
           <button
             type="submit"
-            class={cn(styles.submit, mutation.isPending() && styles.loading)}
+            class={styles.submit}
+            classList={{ [styles.loading]: mutation.isPending() }}
             disabled={mutation.isPending()}
           >
             {props.mode === 'create' ? props.t.create : props.t.save}

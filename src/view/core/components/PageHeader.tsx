@@ -12,7 +12,9 @@ export interface PageHeaderProps {
 export function PageHeader(props: PageHeaderProps): JSX.Element {
   return (
     <header class={styles.bar}>
-      <div class={styles.text}>
+      {/* Agrupa título e subtítulo num único item flex do `.bar` — sem regra
+          própria, por isso sem classe. */}
+      <div>
         <h1 class={styles.title}>{props.title}</h1>
         {props.subtitle && <p class={styles.subtitle}>{props.subtitle}</p>}
       </div>

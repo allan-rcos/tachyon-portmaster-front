@@ -7,16 +7,13 @@
 //   • encode: cada recurso constrói seu *T explicitamente (tipos planos);
 //     aqui ficam só os helpers de serialização e os índices de enum.
 // ============================================================
+import type { RiskClass, Permission } from '@model/common/dto';
 import * as flatbuffers from 'flatbuffers';
 
-import {
-  CONTAINER_STATUS,
-  RISK_CLASS,
-  TELEMETRY_EVENT,
-  PERMISSION,
-  type RiskClass,
-  type Permission,
-} from '../common/dto';
+import { ContainerStatus as FbContainerStatus } from '@/fbs/api/fbs/common/container-status';
+import { Permission as FbPermission } from '@/fbs/api/fbs/common/permission';
+import { RiskClass as FbRiskClass } from '@/fbs/api/fbs/common/risk-class';
+import { TelemetryEvent as FbTelemetryEvent } from '@/fbs/api/fbs/common/telemetry-event';
 
 /**
  * Serializa um objeto gerado pelo flatc em bytes prontos para envio.
@@ -40,13 +37,20 @@ export function buf(bytes: Uint8Array): flatbuffers.ByteBuffer {
 }
 
 // Enums resolvidos por nome de campo (camelCase da classe *T).
-const ENUM_BY_FIELD: Record<string, readonly string[]> = {
-  status: CONTAINER_STATUS,
-  riskClass: RISK_CLASS,
-  event: TELEMETRY_EVENT,
+//
+// A fonte dos valores numéricos são os enums que o `flatc` gera a partir do
+// `.fbs` — nunca uma lista mantida à mão. Enum numérico do TS tem mapeamento
+// reverso embutido (`FbRiskClass[0] === 'Class1Explosives'`), que é exatamente
+// o índice→nome que o decode precisa. Antes isto era `indexOf` sobre os arrays
+// de `common/dto`, o que obrigava aquela ordem a espelhar o schema de fio: uma
+// reordenação inocente lá corromperia o wire em silêncio.
+const ENUM_BY_FIELD: Record<string, Record<number, string>> = {
+  status: FbContainerStatus,
+  riskClass: FbRiskClass,
+  event: FbTelemetryEvent,
 };
-const ENUM_LIST_BY_FIELD: Record<string, readonly string[]> = {
-  permissions: PERMISSION,
+const ENUM_LIST_BY_FIELD: Record<string, Record<number, string>> = {
+  permissions: FbPermission,
 };
 
 function camelToSnake(k: string): string {
@@ -92,9 +96,9 @@ export function fromT(value: any): any {
  * Índice numérico de uma classe de risco (string → enum FBS).
  * @param s Classe de risco.
  */
-export const riskIndex = (s: RiskClass): number => RISK_CLASS.indexOf(s);
+export const riskIndex = (s: RiskClass): number => FbRiskClass[s];
 /**
  * Índices numéricos de permissões (string[] → enum FBS[]).
  * @param ps Permissões a converter.
  */
-export const permIndexes = (ps: Permission[]): number[] => ps.map((p) => PERMISSION.indexOf(p));
+export const permIndexes = (ps: Permission[]): number[] => ps.map((p) => FbPermission[p]);

@@ -38,13 +38,31 @@ jobs:
         with:
           bun-version: latest
 
+      # Os bindings do FlatBuffers saíram do repositório (são saída de
+      # compilador, não fonte), então o `flatc` passou a ser obrigatório aqui.
+      # Binário oficial do release, para não compilar o projeto inteiro.
+      - name: Instalar flatc
+        env:
+          FLATC_VERSION: '25.12.19'
+        run: |
+          curl -fsSL -o /tmp/flatc.zip \
+            "https://github.com/google/flatbuffers/releases/download/v${FLATC_VERSION}/Linux.flatc.binary.g++-13.zip"
+          unzip -q /tmp/flatc.zip -d /usr/local/bin
+          chmod +x /usr/local/bin/flatc
+          flatc --version
+
       - name: Instalar dependências
         run: bun install --frozen-lockfile
 
-      # O Paraglide precisa rodar antes de tudo: lint, tipos e testes importam
-      # `@/paraglide/messages`, que é saída de compilador e não existe no repo.
+      # Paraglide e flatc precisam rodar antes de tudo: lint, tipos e testes
+      # importam `@/paraglide/messages` e `@/fbs/*`, ambos saída de compilador
+      # que não existe no repo. (`gen:fbs` também é pré-passo dos scripts, mas
+      # explicitá-lo aqui faz a falha aparecer no passo certo.)
       - name: Compilar i18n
         run: bun run i18n:compile
+
+      - name: Gerar bindings FlatBuffers
+        run: bun run gen:fbs
 
       - name: Contrato de i18n
         run: bun run i18n:check

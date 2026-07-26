@@ -1,5 +1,6 @@
 import { getProduct as apiGetProduct, listProducts as apiListProducts } from '@model/products';
-import { paged, productFactory } from '@testing/factories/model.factory';
+import { paged } from '@viewmodel/core/testing/factory-support';
+import { productFactory } from '@viewmodel/products/testing/product.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getProduct } from './get-product.query';

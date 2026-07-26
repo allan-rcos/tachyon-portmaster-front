@@ -38,10 +38,25 @@ describe('user schemas', () => {
     ).toBe(false);
   });
 
-  it('update valida nome/email/perfis', () => {
+  it('update mantém a forma do formulário e não cobra senha', () => {
+    // A senha inicial não é editável (nem é enviada), então entra como texto
+    // livre — mas continua na FORMA, que é única nos dois modos.
     expect(
-      userUpdateSchema.safeParse({ name: 'João', email: 'joao@x.com', role_ids: ['r1'] }).success,
+      userUpdateSchema.safeParse({
+        name: 'João',
+        email: 'joao@x.com',
+        initial_password: '',
+        role_ids: ['r1'],
+      }).success,
     ).toBe(true);
+    expect(
+      userUpdateSchema.safeParse({
+        name: 'João',
+        email: 'nope',
+        initial_password: '',
+        role_ids: ['r1'],
+      }).success,
+    ).toBe(false);
   });
 
   it('reset de senha exige mínimo de 6', () => {

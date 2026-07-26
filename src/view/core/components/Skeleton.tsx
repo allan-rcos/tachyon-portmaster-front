@@ -2,8 +2,13 @@ import { For, type JSX } from 'solid-js';
 
 import styles from './Skeleton.module.scss';
 
+export interface SkeletonProps {
+  height?: string;
+  width?: string;
+}
+
 /** Placeholder de carregamento (fallback de islands). */
-export function Skeleton(props: { height?: string; width?: string }): JSX.Element {
+export function Skeleton(props: SkeletonProps): JSX.Element {
   return (
     <span
       class={styles.bar}
@@ -12,8 +17,12 @@ export function Skeleton(props: { height?: string; width?: string }): JSX.Elemen
   );
 }
 
+export interface FormSkeletonProps {
+  rows?: number;
+}
+
 /** Esqueleto de formulário (usado no fallback do ClientOnly). */
-export function FormSkeleton(props: { rows?: number }): JSX.Element {
+export function FormSkeleton(props: FormSkeletonProps): JSX.Element {
   return (
     <div class={styles.form} aria-hidden="true">
       <For each={Array.from({ length: props.rows ?? 3 })}>

@@ -12,8 +12,26 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-// Permite `import styles from './x.module.scss'` com tipagem básica.
+// Rede de segurança para `import styles from './x.module.scss'`.
+//
+// O tipo REAL de cada módulo vem do `x.module.scss.d.ts` que o `gen:css`
+// escreve ao lado do arquivo, declarando exatamente as classes que ele define:
+// resolução relativa vence o curinga, então é aquele que o TypeScript usa.
+// Isso é o que permite `classList={{ [styles.invalid]: … }}` compilar (com
+// `noUncheckedIndexedAccess`, um `Record` daria `string | undefined`, que não
+// serve como chave computada) e o que transforma um nome de classe errado em
+// erro de compilação.
+//
+// Esta declaração só entra em cena se o codegen não tiver rodado.
 declare module '*.module.scss' {
   const classes: Record<string, string>;
   export default classes;
+}
+
+// Os arquivos de idioma do numbro não têm tipos: o pacote só declara a API
+// principal. São dados de locale (separadores, abreviações) que só passam por
+// `numbro.registerLanguage`, então a forma exata não acrescenta segurança.
+declare module 'numbro/languages/*.js' {
+  const language: import('numbro').NumbroLanguage;
+  export default language;
 }

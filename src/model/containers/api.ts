@@ -1,3 +1,6 @@
+import type { ApiClient } from '@model/core/http';
+import { wire } from '@model/core/wire';
+
 import type {
   Container,
   ContainerCreateRequest,
@@ -18,8 +21,6 @@ import {
   decContainerSummaryList,
   decManifestResult,
 } from './fbs';
-import type { ApiClient } from '../core/http';
-import { wire } from '../core/wire';
 
 export const listContainers = (
   c: ApiClient,

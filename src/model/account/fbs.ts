@@ -1,8 +1,10 @@
+import { toBytes, buf, fromT } from '@model/core/fbs-runtime';
+
 import type { AccountProfile, AccountUpdateRequest, AccountPasswordChangeRequest } from './dto';
-import { toBytes, buf, fromT } from '../core/fbs-runtime';
-import { AccountPasswordChangeRequestT } from '../generated/fbs/api/fbs/account/account-password-change-request';
-import { AccountProfileResponse as FbAccountProfileResponse } from '../generated/fbs/api/fbs/account/account-profile-response';
-import { AccountUpdateRequestT } from '../generated/fbs/api/fbs/account/account-update-request';
+
+import { AccountPasswordChangeRequestT } from '@/fbs/api/fbs/account/account-password-change-request';
+import { AccountProfileResponse as FbAccountProfileResponse } from '@/fbs/api/fbs/account/account-profile-response';
+import { AccountUpdateRequestT } from '@/fbs/api/fbs/account/account-update-request';
 
 export const encAccountUpdate = (v: AccountUpdateRequest): Uint8Array =>
   toBytes(new AccountUpdateRequestT(v.name, v.email));

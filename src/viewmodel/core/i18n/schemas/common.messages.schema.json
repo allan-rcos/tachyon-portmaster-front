@@ -19,7 +19,9 @@
     "common_back",
     "common_logout",
     "common_previous",
-    "common_next"
+    "common_next",
+    "common_load_more",
+    "common_id"
   ],
   "patternProperties": {
     "^common_": {

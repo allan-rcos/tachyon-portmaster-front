@@ -1,19 +1,13 @@
 import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
-import { zodValidator } from '@view/core/forms/zod-adapter';
 import { bindMutation } from '@view/core/observable/bind-mutation';
-import { cn } from '@view/core/utils/ui';
-import { errText } from '@view/core/utils/ui';
 import { PermissionMatrix } from '@view/roles/components/PermissionMatrix';
-import type { Permission } from '@viewmodel/core/domain';
 import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
+import type { OptionGroup } from '@viewmodel/core/page/options';
 import type { RoleFormText } from '@viewmodel/roles/i18n/text-contracts';
 import { createRole } from '@viewmodel/roles/mutations/create-role.mutation';
 import { updateRolePermissions } from '@viewmodel/roles/mutations/update-role-permissions.mutation';
-import {
-  createRoleSchema,
-  createRolePermissionsSchema,
-} from '@viewmodel/roles/schemas/role.schema';
+import { createRoleSchema } from '@viewmodel/roles/schemas/role.schema';
 import { Show, type JSX } from 'solid-js';
 
 import styles from './RoleForm.island.module.scss';
@@ -21,24 +15,30 @@ import styles from './RoleForm.island.module.scss';
 export interface RoleFormProps {
   mode: 'create' | 'permissions';
   t: RoleFormText;
+  /** Matriz de permissões, com rótulos já resolvidos pelo ViewModel. */
+  permissionGroups: readonly OptionGroup[];
   roleId?: string;
   defaultName?: string;
-  defaultPermissions?: Permission[];
+  defaultPermissions?: readonly string[];
 }
 
+/** Valores do formulário. `permissions` é `string[]` porque a View não conhece
+ *  o enum: quem cobra que sejam permissões válidas é o schema, na submissão. */
 interface FormValues {
   name: string;
-  permissions: Permission[];
+  permissions: string[];
 }
 
 function Inner(props: RoleFormProps): JSX.Element {
   const mutation = bindMutation(
     createMutationSignal(
       (value: FormValues) => {
-        if (props.mode === 'create') {
-          return createRole({ name: value.name, permissions: value.permissions });
-        }
-        return updateRolePermissions(props.roleId!, value.permissions);
+        // O parse é quem estreita `string[]` para `Permission[]` — daqui para
+        // baixo o valor já é do enum.
+        const body = createRoleSchema(props.mode, props.t).parse(value);
+        return props.mode === 'create'
+          ? createRole(body)
+          : updateRolePermissions(props.roleId!, body.permissions);
       },
       {
         onSuccess: () => {
@@ -51,13 +51,9 @@ function Inner(props: RoleFormProps): JSX.Element {
   const form = createForm(() => ({
     defaultValues: {
       name: props.defaultName ?? '',
-      permissions: props.defaultPermissions ?? [],
+      permissions: [...(props.defaultPermissions ?? [])],
     } as FormValues,
-    validators: {
-      onChange: zodValidator<FormValues>(
-        props.mode === 'create' ? createRoleSchema(props.t) : createRolePermissionsSchema(props.t),
-      ),
-    },
+    validators: { onChange: createRoleSchema(props.mode, props.t) },
     onSubmit: ({ value }) => mutation.mutate(value),
   }));
 
@@ -83,11 +79,12 @@ function Inner(props: RoleFormProps): JSX.Element {
             <FormField
               label={props.t.name}
               for="role-name"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="role-name"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -103,6 +100,7 @@ function Inner(props: RoleFormProps): JSX.Element {
           <fieldset class={styles.matrixWrap} disabled={mutation.isPending()}>
             <legend class={styles.matrixLabel}>{props.t.permissions}</legend>
             <PermissionMatrix
+              groups={props.permissionGroups}
               selected={new Set(field().state.value)}
               onToggle={(perm, checked) => {
                 const set = new Set(field().state.value);
@@ -113,7 +111,7 @@ function Inner(props: RoleFormProps): JSX.Element {
               disabled={mutation.isPending()}
             />
             <p class={styles.error} role="alert" hidden={field().state.meta.errors.length === 0}>
-              {errText(field().state.meta.errors)}
+              {field().state.meta.errors[0]?.message}
             </p>
           </fieldset>
         )}
@@ -127,7 +125,8 @@ function Inner(props: RoleFormProps): JSX.Element {
         <li>
           <button
             type="submit"
-            class={cn(styles.submit, mutation.isPending() && styles.loading)}
+            class={styles.submit}
+            classList={{ [styles.loading]: mutation.isPending() }}
             disabled={mutation.isPending()}
           >
             {props.mode === 'create' ? props.t.create : props.t.save}

@@ -9,9 +9,13 @@
     "nav_produtos",
     "nav_usuarios",
     "nav_perfis",
-    "nav_conta"
+    "nav_conta",
+    "nav_administration"
   ],
   "patternProperties": {
-    "^nav_": { "type": "string", "minLength": 1 }
+    "^nav_": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

@@ -1,9 +1,11 @@
 @use '@ds/glass' as glass;
+@use '@ds/responsive' as rp;
 @use '@ds/ui' as ui;
 
 .trigger {
   @include ui.button-base;
   @include ui.button-sm;
+  @include rp.touch-target;
 }
 .primary {
   @include ui.button-primary;
@@ -22,7 +24,11 @@
   pointer-events: none;
 }
 
+// O VÉU, não um scrim preto: tingimento teal-ink + glow + blur. Continua dando
+// para LER a página por trás do diálogo, que é o comportamento do protótipo.
 .scrim {
+  @include glass.overlay-veil;
+  @include rp.scrim-to-bottom;
   position: fixed;
   inset: 0;
   z-index: var(--z-overlay);
@@ -30,14 +36,12 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
-  background: var(--overlay-veil);
-  -webkit-backdrop-filter: blur(10px) saturate(115%);
-  backdrop-filter: blur(10px) saturate(115%);
   animation: fade 0.2s ease;
 }
 
 .dialog {
   @include glass.glass-l3;
+  @include rp.dialog-to-bottom-sheet;
   z-index: var(--z-dialog);
   width: 100%;
   max-width: 26rem;
@@ -45,25 +49,36 @@
   animation: pop 0.3s var(--ease-spring);
 }
 .title {
+  margin: 0 0 var(--space-3);
   font-size: var(--text-lg);
-  margin-bottom: var(--space-3);
+  font-weight: var(--fw-medium);
 }
 .message {
   margin: 0 0 var(--space-4);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 .error {
   margin: 0 0 var(--space-4);
   color: var(--red-400);
   font-size: var(--text-sm);
 }
+
+// No mobile as ações empilham com a primária EM CIMA — daí o `column-reverse`,
+// já que no HTML ela vem por último.
 .actions {
+  @include rp.dialog-actions-stacked;
   display: flex;
   justify-content: flex-end;
   gap: var(--space-3);
   list-style: none;
   margin: 0;
   padding: 0;
+
+  @include rp.mobile {
+    .trigger {
+      width: 100%;
+    }
+  }
 }
 
 @keyframes fade {
@@ -75,25 +90,5 @@
   from {
     opacity: 0;
     transform: translateY(14px) scale(0.97);
-  }
-}
-
-@media (max-width: 640px) {
-  .scrim {
-    align-items: flex-end;
-    padding: 0;
-  }
-  .dialog {
-    max-width: none;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  }
-  .actions {
-    flex-direction: column-reverse;
-  }
-  .actions > li {
-    width: 100%;
-  }
-  .actions > li > .trigger {
-    width: 100%;
   }
 }

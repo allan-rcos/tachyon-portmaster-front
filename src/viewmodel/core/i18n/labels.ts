@@ -1,7 +1,8 @@
 // ============================================================
 //  Rótulos pt-BR e "tom" (cor de badge) dos enums do domínio.
 // ============================================================
-import type { ContainerStatus, RiskClass, TelemetryEvent, Permission } from '@model/common';
+import { RiskClass, type ContainerStatus, type TelemetryEvent, type Permission } from '@model/common';
+import type { OptionGroup, SelectOption } from '@viewmodel/core/page/options';
 
 export type Tone = 'gold' | 'sage' | 'teal' | 'orange' | 'danger' | 'neutral';
 
@@ -53,6 +54,14 @@ export const TELEMETRY_EVENT_LABEL: Record<TelemetryEvent, string> = {
   Dispatch: 'Despacho',
 };
 
+export const TELEMETRY_EVENT_TONE: Record<TelemetryEvent, Tone> = {
+  Create: 'neutral',
+  Load: 'gold',
+  Unload: 'orange',
+  Seal: 'sage',
+  Dispatch: 'teal',
+};
+
 export const PERMISSION_LABEL: Record<Permission, string> = {
   ProductRead: 'Ver produtos',
   ProductCreate: 'Criar produtos',
@@ -79,6 +88,16 @@ export const PERMISSION_LABEL: Record<Permission, string> = {
   RoleUpdatePermissions: 'Editar permissões',
   MetricsRead: 'Ver métricas',
 };
+
+/**
+ * Opções do seletor de classe de risco, na ordem do enum.
+ *
+ * A View recebe pares `{ value, label }` em vez do enum: quem garante que o
+ * valor escolhido é uma `RiskClass` é o schema do formulário, na submissão.
+ */
+export const RISK_CLASS_OPTIONS: readonly SelectOption[] = Object.values(RiskClass).map(
+  (value) => ({ value, label: RISK_CLASS_LABEL[value] }),
+);
 
 /** Agrupa permissões por recurso para a matriz de perfis. */
 export const PERMISSION_GROUPS: { label: string; perms: Permission[] }[] = [
@@ -111,3 +130,14 @@ export const PERMISSION_GROUPS: { label: string; perms: Permission[] }[] = [
   { label: 'Perfis', perms: ['RoleList', 'RoleCreate', 'RoleUpdatePermissions'] },
   { label: 'Métricas', perms: ['MetricsRead'] },
 ];
+
+/**
+ * A matriz de permissões como dado de apresentação, pronta para o `PageInput`.
+ *
+ * Mesma razão do `RISK_CLASS_OPTIONS`: a View renderiza grupos de caixas com
+ * valores opacos; o schema é quem cobra que sejam `Permission`.
+ */
+export const PERMISSION_OPTION_GROUPS: readonly OptionGroup[] = PERMISSION_GROUPS.map((group) => ({
+  label: group.label,
+  options: group.perms.map((value) => ({ value, label: PERMISSION_LABEL[value] })),
+}));

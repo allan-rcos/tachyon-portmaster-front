@@ -71,6 +71,18 @@ jobs:
         with:
           bun-version: latest
 
+      # Os bindings do FlatBuffers saíram do repositório: sem `flatc` aqui, o
+      # `gen:fbs` embutido nos scripts abaixo falha. Ver ci.yml.
+      - name: Instalar flatc
+        env:
+          FLATC_VERSION: '25.12.19'
+        run: |
+          curl -fsSL -o /tmp/flatc.zip \
+            "https://github.com/google/flatbuffers/releases/download/v${FLATC_VERSION}/Linux.flatc.binary.g++-13.zip"
+          unzip -q /tmp/flatc.zip -d /usr/local/bin
+          chmod +x /usr/local/bin/flatc
+          flatc --version
+
       - name: Instalar dependências
         run: bun install --frozen-lockfile
 
@@ -79,6 +91,7 @@ jobs:
       - name: Verificar antes de publicar
         run: |
           bun run i18n:compile
+          bun run gen:fbs
           bun run i18n:check
           bun run lint
           bun run typecheck

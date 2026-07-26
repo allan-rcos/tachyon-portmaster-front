@@ -1,6 +1,5 @@
 import { deleteContainer as apiDeleteContainer } from '@model/containers';
-
-import { browserClient } from '../../core/client/api-client';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Remove um contêiner do pátio.

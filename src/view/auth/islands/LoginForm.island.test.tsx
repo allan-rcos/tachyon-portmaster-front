@@ -3,9 +3,9 @@
 //  o ViewModel. Por isso o teste mocka a mutação e verifica a CHAMADA — não
 //  sobe uma API falsa para conferir o que o backend faria com ela.
 // ============================================================
-import { render, waitFor } from '@solidjs/testing-library';
-import { setInput, stubLocation } from '@testing/dom';
+import { fireEvent, render, waitFor } from '@solidjs/testing-library';
 import userEvent from '@testing-library/user-event';
+import { stubLocation } from '@view/core/testing/stub-location';
 import { loginMessages } from '@viewmodel/auth/i18n/login-page.messages';
 import { signIn } from '@viewmodel/auth/mutations/sign-in.mutation';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -29,8 +29,8 @@ describe('LoginForm', () => {
     const user = userEvent.setup();
     const { getByLabelText, getByRole } = render(() => <LoginForm t={t} />);
 
-    setInput(getByLabelText(t.email), 'ana@portmaster.test');
-    setInput(getByLabelText(t.password), 'admin123');
+    fireEvent.input(getByLabelText(t.email), { target: { value: 'ana@portmaster.test' } });
+    fireEvent.input(getByLabelText(t.password), { target: { value: 'admin123' } });
     await user.click(getByRole('button', { name: t.submit }));
 
     await waitFor(() =>
@@ -47,8 +47,8 @@ describe('LoginForm', () => {
     const user = userEvent.setup();
     const { getByLabelText, getByRole } = render(() => <LoginForm t={t} />);
 
-    setInput(getByLabelText(t.email), 'ana@portmaster.test');
-    setInput(getByLabelText(t.password), 'errada');
+    fireEvent.input(getByLabelText(t.email), { target: { value: 'ana@portmaster.test' } });
+    fireEvent.input(getByLabelText(t.password), { target: { value: 'errada' } });
     await user.click(getByRole('button', { name: t.submit }));
 
     await waitFor(() => expect(getByRole('alert')).toHaveTextContent(t.invalid));
@@ -59,8 +59,8 @@ describe('LoginForm', () => {
     const user = userEvent.setup();
     const { getByLabelText, getByRole } = render(() => <LoginForm t={t} />);
 
-    setInput(getByLabelText(t.email), 'nao-e-email');
-    setInput(getByLabelText(t.password), '123');
+    fireEvent.input(getByLabelText(t.email), { target: { value: 'nao-e-email' } });
+    fireEvent.input(getByLabelText(t.password), { target: { value: '123' } });
     await user.click(getByRole('button', { name: t.submit }));
 
     await waitFor(() => expect(mockedSignIn).not.toHaveBeenCalled());

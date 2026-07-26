@@ -11,8 +11,7 @@
 import { getAccount, type AccountProfile } from '@model/account';
 import type { Permission } from '@model/common';
 import { serverClient } from '@viewmodel/core/client/api-client';
-
-import type { PageRequest } from '../page/page-request';
+import type { PageRequest } from '@viewmodel/core/page/page-request';
 
 const cache = new WeakMap<object, Promise<AccountProfile>>();
 

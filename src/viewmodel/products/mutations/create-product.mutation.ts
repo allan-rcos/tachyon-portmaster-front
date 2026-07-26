@@ -1,8 +1,7 @@
 import { createProduct as apiCreateProduct } from '@model/products';
-
-import { browserClient } from '../../core/client/api-client';
-import type { Product } from '../domain';
-import type { ProductFormData } from '../schemas/product.schema';
+import type { Product } from '@model/products/dto';
+import { browserClient } from '@viewmodel/core/client/api-client';
+import type { ProductFormData } from '@viewmodel/products/schemas/product.schema';
 
 /**
  * Cadastra um produto no catálogo.

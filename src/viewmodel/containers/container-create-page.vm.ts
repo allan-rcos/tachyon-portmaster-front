@@ -1,34 +1,66 @@
 // ============================================================
-//  ViewModel da rota. Observável: a tela assina os sinais e reage.
-//  Roda no navegador (VMContext sem `headers`); passar os headers do request
-//  dentro de um `+data.ts` devolve a rota ao SSR sem tocar nada aqui.
+//  Rota /painel/conteineres/nova.
+//
+//  A rota não busca nada: só autoriza e resolve texto. Ver
+//  `@viewmodel/products/product-list-page.vm` para os dois papéis.
 // ============================================================
-//  Esta rota não busca nada: só resolve texto. O formulário em si é uma island
-//  que fala com o ViewModel de mutação.
-import { containerNewMessages } from './i18n/container-create-page.messages';
-import type { ContainerNewText } from './i18n/container-create-page.messages';
-import type { PageMeta } from '../core/page/page-request';
-import { contextLocale, type VMContext } from '../core/page/vm-context';
+import { Permission } from '@model/common';
+import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import { authorize } from '@viewmodel/core/page/authorize';
+import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
+import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
+
+import { containerNewMessages, type ContainerNewText } from './i18n/container-create-page.messages';
+
+/** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
+export const CONTAINER_CREATE_PERMISSIONS = [Permission.ContainerCreate] as const;
+
+/** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
+export interface ContainerCreatePageInput {
+  /** `<title>`/`<description>` da rota. */
+  meta: PageMeta;
+  /** Identidade que o rodapé da barra lateral mostra. */
+  shell: ShellIdentity;
+  /** Texto da tela, já no locale do request. */
+  t: ContainerNewText;
+  /** Volta para a listagem — a View não monta rota. */
+  listHref: string;
+}
+
+/**
+ * O trabalho de servidor da rota: autorização e i18n.
+ *
+ * @param request Requisição de página, neutra de framework.
+ * @throws {UnauthorizedError} Sem sessão válida.
+ * @throws {ForbiddenError} Sem a permissão `ContainerCreate`.
+ */
+export async function createContainerCreatePageInput(
+  request: PageRequest,
+): Promise<ContainerCreatePageInput> {
+  const account = await authorize(request, CONTAINER_CREATE_PERMISSIONS);
+  const t = containerNewMessages(resolveLocale(request.headers));
+
+  return {
+    meta: { title: t.new, description: t.subtitle },
+    shell: shellIdentity(account),
+    t,
+    listHref: '/painel/conteineres',
+  };
+}
 
 /** Superfície do formulário de criação. */
 export interface ContainerCreateVM {
+  /** Texto da tela. */
   t: ContainerNewText;
+  /** Volta para a listagem. */
+  listHref: string;
 }
 
 /**
- * Cria o ViewModel do formulário de criação.
+ * Cria o ViewModel da criação a partir do dado já resolvido.
  *
- * @param context Contexto de execução — navegador quando omitido.
+ * @param input Dado da rota, vindo do `+data`.
  */
-export function createContainerCreateVM(context: VMContext = {}): ContainerCreateVM {
-  return { t: containerNewMessages(contextLocale(context)) };
-}
-
-/**
- * Título e descrição da rota, para o `<head>`.
- * @param context Contexto de execução — só o locale importa aqui.
- */
-export function containerCreateMeta(context: VMContext = {}): PageMeta {
-  const t = containerNewMessages(contextLocale(context));
-  return { title: t.new, description: t.subtitle };
+export function createContainerCreateVM(input: ContainerCreatePageInput): ContainerCreateVM {
+  return { t: input.t, listHref: input.listHref };
 }

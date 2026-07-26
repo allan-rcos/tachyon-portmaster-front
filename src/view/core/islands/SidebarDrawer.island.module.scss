@@ -1,24 +1,19 @@
+@use '@ds/glass' as glass;
+@use '@ds/ui' as ui;
+
 .burger {
+  @include ui.icon-button;
   display: none;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--glass-border-soft);
-  background: var(--glass-fill);
-  color: var(--color-text);
-  cursor: pointer;
 }
 
+// O mesmo VÉU dos diálogos, não um scrim preto: o glow da marca continua
+// visível por trás do drawer, que é o que o protótipo mostra.
 .overlay {
+  @include glass.overlay-veil;
   display: none;
   position: fixed;
   inset: 0;
   z-index: var(--z-drawer);
-  background: var(--overlay-veil);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
 }
 
 @media (max-width: 860px) {

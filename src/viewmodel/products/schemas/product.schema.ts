@@ -1,4 +1,5 @@
-import { RISK_CLASS } from '@model/common';
+import { RiskClass } from '@model/common';
+import { positiveNumberField } from '@viewmodel/core/schemas/numeric-string';
 import { z } from 'zod';
 
 /** Chaves de erro que este schema consome (contrato local — a página resolve). */
@@ -6,6 +7,7 @@ export interface ProductSchemaText {
   nameShort: string;
   nameLong: string;
   densityPositive: string;
+  densityFormat: string;
 }
 
 /**
@@ -23,8 +25,11 @@ export function createProductSchema(t?: ProductSchemaText) {
       .trim()
       .min(2, t?.nameShort ?? 'Nome muito curto')
       .max(120, t?.nameLong ?? 'Nome muito longo'),
-    density: z.coerce.number().positive(t?.densityPositive ?? 'A densidade deve ser positiva'),
-    risk_class: z.enum(RISK_CLASS),
+    density: positiveNumberField(
+      t?.densityFormat ?? 'Informe um número, ex.: 0,58',
+      t?.densityPositive ?? 'A densidade deve ser positiva',
+    ),
+    risk_class: z.enum(RiskClass),
   });
 }
 

@@ -1,4 +1,4 @@
-import type { Permission, Paged } from '../common/dto';
+import type { Permission, Paged } from '@model/common/dto';
 
 /** Perfil de acesso: um nome e o conjunto de permissões que concede. */
 export interface Role {

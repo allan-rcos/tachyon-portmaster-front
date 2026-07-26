@@ -1,14 +1,10 @@
 import { ContainerCreateScreen } from '@view/containers/screens/ContainerCreateScreen';
-import { createContainerCreateVM } from '@viewmodel/containers/container-create-page.vm';
-import { ClientOnly } from 'vike-solid/ClientOnly';
-import { usePageContext } from 'vike-solid/usePageContext';
+import { createContainerCreateVM, type ContainerCreatePageInput } from '@viewmodel/containers/container-create-page.vm';
+import type { JSX } from 'solid-js';
+import { useData } from 'vike-solid/useData';
 
-export default function Page() {
-  const pageContext = usePageContext();
-  const vm = createContainerCreateVM({ url: pageContext.urlOriginal });
-  return (
-    <ClientOnly fallback={<div />}>
-      <ContainerCreateScreen vm={vm} />
-    </ClientOnly>
-  );
+/** Único ponto de composição da rota. */
+export default function Page(): JSX.Element {
+  const input = useData<ContainerCreatePageInput>();
+  return <ContainerCreateScreen vm={createContainerCreateVM(input)} />;
 }

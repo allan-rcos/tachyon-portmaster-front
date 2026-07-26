@@ -1,16 +1,25 @@
 import { EmptyState } from '@view/core/components/EmptyState';
-import type { CargoManifestItem } from '@viewmodel/containers/domain';
-import { formatNumber, formatWeight } from '@viewmodel/core/utils/formatters';
+import type { ManifestRowData } from '@viewmodel/containers/container-detail-page.vm';
+import type { ContainerDetailPageText } from '@viewmodel/containers/i18n/container-detail-page.messages';
 import { For, Show, type JSX } from 'solid-js';
 
-import type { ContainerDetailText } from './ContainerSummary';
 import styles from './ManifestTable.module.scss';
 
-/** Manifesto de carga (SSR). */
-export function ManifestTable(props: {
-  items: CargoManifestItem[];
-  t: ContainerDetailText;
-}): JSX.Element {
+/** Props do manifesto de carga. */
+export interface ManifestTableProps {
+  /** Linhas já formatadas pelo ViewModel. */
+  items: readonly ManifestRowData[];
+  /** Texto do cluster de detalhe. */
+  t: ContainerDetailPageText;
+}
+
+/**
+ * Manifesto de carga (SSR). Quantidade e peso já chegam formatados.
+ *
+ * @param props.items Linhas do manifesto.
+ * @param props.t     Texto do cluster de detalhe.
+ */
+export function ManifestTable(props: ManifestTableProps): JSX.Element {
   return (
     <Show
       when={props.items.length > 0}
@@ -26,12 +35,12 @@ export function ManifestTable(props: {
           </tr>
         </thead>
         <tbody>
-          <For each={props.items}>
+          <For each={[...props.items]}>
             {(item) => (
               <tr>
-                <td>{item.product_name}</td>
-                <td data-align="end">{formatNumber(item.quantity)}</td>
-                <td data-align="end">{formatWeight(item.weight)}</td>
+                <td>{item.productName}</td>
+                <td data-align="end">{item.quantity}</td>
+                <td data-align="end">{item.weight}</td>
               </tr>
             )}
           </For>

@@ -1,0 +1,24 @@
+@use '@ds/responsive' as rp;
+
+// Coluna de cartões — contêineres e perfis. Medidas do protótipo (`pm-scroll`).
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  @include rp.mobile {
+    gap: 12px;
+  }
+}
+
+// Duas colunas quando há largura para elas; no mobile vira coluna única.
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 14px;
+
+  @include rp.mobile {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

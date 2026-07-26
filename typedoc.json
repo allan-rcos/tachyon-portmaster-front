@@ -14,7 +14,7 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     // Saída do flatc: 40 arquivos de serialização que ninguém lê à mão.
-    "src/model/generated/**",
+    "dist/fbs/**",
     "src/model/contract/**"
   ],
   "excludeExternals": true,

@@ -3,7 +3,7 @@
 //  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
 //  morar no ViewModel.
 // ============================================================
-import type { LoginSchemaText } from '../schemas/login.schema';
+import type { LoginSchemaText } from '@viewmodel/auth/schemas/login.schema';
 
 /** Chaves de texto do formulário de login. */
 export interface LoginFormText extends LoginSchemaText {

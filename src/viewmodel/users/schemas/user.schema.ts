@@ -27,37 +27,30 @@ function msgs(t?: UserSchemaText) {
   };
 }
 
-/**
- * Schema da criação de usuário, com senha inicial e perfis.
- *
- * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
- * a mesma regra de validação falar o idioma da requisição.
- *
- * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
- */
-export function createUserCreateSchema(t?: UserSchemaText) {
-  const m = msgs(t);
-  return z.object({
-    name: z.string().trim().min(2, m.nameShort).max(120, m.nameLong),
-    email: z.string().trim().min(1, m.emailRequired).email(m.emailInvalid),
-    initial_password: z.string().min(6, m.passwordMin),
-    role_ids: z.array(z.string()).min(1, m.rolesRequired),
-  });
-}
+/** Modo do formulário — a senha inicial só existe na criação. */
+export type UserFormMode = 'create' | 'edit';
 
 /**
- * Schema da edição de usuário (sem senha).
+ * Schema do formulário de usuário.
  *
  * Recebe o texto de erro por parâmetro em vez de embuti-lo: é o que permite
  * a mesma regra de validação falar o idioma da requisição.
  *
- * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
+ * O modo muda as REGRAS, nunca a FORMA: `initial_password` continua declarado
+ * na edição (como texto livre, já que ali ele nem é enviado) porque o
+ * formulário tem uma única forma de valores nos dois modos. Antes eram dois
+ * schemas de formas diferentes, e a View reconciliava os dois com um cast —
+ * que apagava a checagem inteira do slot de validação.
+ *
+ * @param mode Criação ou edição.
+ * @param t    Mensagens de erro já resolvidas; omitir cai no pt-BR.
  */
-export function createUserUpdateSchema(t?: UserSchemaText) {
+export function createUserSchema(mode: UserFormMode, t?: UserSchemaText) {
   const m = msgs(t);
   return z.object({
     name: z.string().trim().min(2, m.nameShort).max(120, m.nameLong),
     email: z.string().trim().min(1, m.emailRequired).email(m.emailInvalid),
+    initial_password: mode === 'create' ? z.string().min(6, m.passwordMin) : z.string(),
     role_ids: z.array(z.string()).min(1, m.rolesRequired),
   });
 }
@@ -77,9 +70,11 @@ export function createPasswordResetSchema(t?: PasswordResetSchemaText) {
 }
 
 // Versões estáticas (pt-BR) para server/testes.
-export const userCreateSchema = createUserCreateSchema();
-export const userUpdateSchema = createUserUpdateSchema();
+export const userCreateSchema = createUserSchema('create');
+export const userUpdateSchema = createUserSchema('edit');
 export const passwordResetSchema = createPasswordResetSchema();
 
+/** Corpo do POST de criação. */
 export type UserCreateData = z.infer<typeof userCreateSchema>;
-export type UserUpdateData = z.infer<typeof userUpdateSchema>;
+/** Corpo do PATCH — a senha não trafega na edição. */
+export type UserUpdateData = Omit<UserCreateData, 'initial_password'>;

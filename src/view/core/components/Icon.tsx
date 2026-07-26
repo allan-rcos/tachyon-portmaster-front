@@ -4,6 +4,7 @@ import { type JSX } from 'solid-js';
 //  Ícones SVG inline (traço 2px, cantos arredondados), no estilo
 //  Lucide. Sem lib/CDN — compatível com txiki/CSP. `currentColor`
 //  herda a cor do texto. Adicione novos glifos em PATHS.
+//  `sun`/`moon` saíram junto com o seletor de tema — o produto é escuro.
 // ============================================================
 
 export type IconName =
@@ -31,9 +32,7 @@ export type IconName =
   | 'mail'
   | 'menu'
   | 'rotate'
-  | 'flask'
-  | 'sun'
-  | 'moon';
+  | 'flask';
 
 const PATHS: Record<IconName, JSX.Element> = {
   painel: (
@@ -189,20 +188,6 @@ const PATHS: Record<IconName, JSX.Element> = {
       <path d="M7 16h10" />
     </>
   ),
-  sun: (
-    <>
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2" />
-      <path d="M12 20v2" />
-      <path d="m4.9 4.9 1.4 1.4" />
-      <path d="m17.7 17.7 1.4 1.4" />
-      <path d="M2 12h2" />
-      <path d="M20 12h2" />
-      <path d="m6.3 17.7-1.4 1.4" />
-      <path d="m19.1 4.9-1.4 1.4" />
-    </>
-  ),
-  moon: <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />,
 };
 
 export interface IconProps {

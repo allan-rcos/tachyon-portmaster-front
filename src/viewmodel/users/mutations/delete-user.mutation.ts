@@ -1,6 +1,5 @@
 import { deleteUser as apiDeleteUser } from '@model/users';
-
-import { browserClient } from '../../core/client/api-client';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Remove um usuário.

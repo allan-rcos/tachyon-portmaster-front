@@ -14,9 +14,13 @@
     "painel_status_loading",
     "painel_status_sealed",
     "painel_status_in_transit",
-    "painel_status_empty"
+    "painel_status_empty",
+    "metrics_eyebrow"
   ],
   "patternProperties": {
-    "^painel_": { "type": "string", "minLength": 1 }
+    "^painel_": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

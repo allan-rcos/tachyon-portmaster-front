@@ -1,7 +1,12 @@
-import { loadSystemInfoPage, type SystemInfoPageData } from '@viewmodel/system/system-info-page.vm';
-import type { PageContextServer } from 'vike/types';
+import { createSystemInfoPageInput } from '@viewmodel/system/system-info-page.vm';
+import type { PageContext } from 'vike/types';
 
-export type DataProps = SystemInfoPageData;
+import { toPageInput } from '@/pages/pageInput';
 
-/** Casca do Vike: delega ao ViewModel (esta rota não usa o PageContext). */
-export const data = (_pageContext: PageContextServer): DataProps => loadSystemInfoPage();
+export { data };
+
+async function data(pageContext: PageContext) {
+  return toPageInput(pageContext, (request) =>
+    Promise.resolve(createSystemInfoPageInput(request)),
+  );
+}

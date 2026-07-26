@@ -1,8 +1,7 @@
 import { updateContainer as apiUpdateContainer } from '@model/containers';
-
-import { browserClient } from '../../core/client/api-client';
-import type { Container } from '../domain';
-import type { ContainerUpdateData } from '../schemas/container.schema';
+import type { Container } from '@model/containers/dto';
+import type { ContainerUpdateData } from '@viewmodel/containers/schemas/container.schema';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Atualiza a capacidade máxima de um contêiner.

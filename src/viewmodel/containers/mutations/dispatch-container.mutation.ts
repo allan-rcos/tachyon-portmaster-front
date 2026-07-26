@@ -1,6 +1,5 @@
 import { dispatchContainer as apiDispatchContainer } from '@model/containers';
-
-import { browserClient } from '../../core/client/api-client';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Despacha um contêiner lacrado, colocando-o em trânsito.

@@ -1,8 +1,10 @@
+import { toBytes, buf, fromT, permIndexes } from '@model/core/fbs-runtime';
+
 import type { Role, RoleCreateRequest, RoleList } from './dto';
-import { toBytes, buf, fromT, permIndexes } from '../core/fbs-runtime';
-import { RoleResponse as FbRoleResponse } from '../generated/fbs/api/fbs/account/role-response';
-import { RoleCreateRequestT } from '../generated/fbs/api/fbs/admin/role-create-request';
-import { RoleListResponse as FbRoleListResponse } from '../generated/fbs/api/fbs/admin/role-list-response';
+
+import { RoleResponse as FbRoleResponse } from '@/fbs/api/fbs/account/role-response';
+import { RoleCreateRequestT } from '@/fbs/api/fbs/admin/role-create-request';
+import { RoleListResponse as FbRoleListResponse } from '@/fbs/api/fbs/admin/role-list-response';
 
 export const encRoleCreate = (v: RoleCreateRequest): Uint8Array =>
   toBytes(new RoleCreateRequestT(v.name, permIndexes(v.permissions)));

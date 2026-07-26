@@ -3,16 +3,24 @@
   "$id": "https://portmaster.app/i18n/route/usuarios.json",
   "title": "i18n da rota /painel/usuarios (usersListMessages)",
   "type": "object",
-  "allOf": [{ "$ref": "https://portmaster.app/i18n/common.json" }],
+  "allOf": [
+    {
+      "$ref": "https://portmaster.app/i18n/common.json"
+    }
+  ],
   "required": [
     "users_title",
     "users_subtitle",
     "users_new",
     "users_name",
     "users_email",
-    "users_roles"
+    "users_roles",
+    "users_eyebrow"
   ],
   "patternProperties": {
-    "^users_": { "type": "string", "minLength": 1 }
+    "^users_": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

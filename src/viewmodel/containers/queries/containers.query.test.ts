@@ -7,7 +7,11 @@
 //  desde que o clone da API concordasse com o erro.
 // ============================================================
 import { listContainerSummaries, listContainers as apiListContainers } from '@model/containers';
-import { containerFactory, containerSummaryFactory, paged } from '@testing/factories/model.factory';
+import {
+  containerFactory,
+  containerSummaryFactory,
+} from '@viewmodel/containers/testing/container.factory';
+import { paged } from '@viewmodel/core/testing/factory-support';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getContainerSummary } from './get-container-summary.query';

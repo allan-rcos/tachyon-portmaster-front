@@ -1,0 +1,63 @@
+@use '@ds/glass' as glass;
+@use '@ds/responsive' as rp;
+
+// Pílulas segmentadas. O contêiner é um well; a pílula ativa é ouro sólido.
+.tabs {
+  @include glass.glass-inset;
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+
+  // Quando não cabem, rolam na horizontal em vez de quebrar a linha.
+  @include rp.mobile {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.tab {
+  flex: 0 0 auto;
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.14s,
+    color 0.14s;
+
+  &:hover {
+    background: var(--glass-fill);
+    color: var(--color-text);
+  }
+
+  @include rp.mobile {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+.active {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--fw-medium);
+
+  &:hover {
+    background: var(--color-accent-hover);
+    color: var(--color-on-accent);
+  }
+}

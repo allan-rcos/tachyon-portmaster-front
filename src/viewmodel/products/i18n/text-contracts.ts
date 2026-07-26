@@ -10,10 +10,14 @@
 //  O `tsc` fecha o ciclo: se um catálogo esquecer uma chave, a atribuição ao
 //  contrato falha no build — não na tela.
 // ============================================================
-import type { ProductSchemaText } from '../schemas/product.schema';
+import type { ProductSchemaText } from '@viewmodel/products/schemas/product.schema';
 
 /** Chaves de texto que a listagem de produtos consome. */
 export interface ProductListText {
+  /** Linha de contexto em caixa alta, acima do título. */
+  eyebrow: string;
+  /** Rótulo da coluna de identificador. */
+  id: string;
   title: string;
   subtitle: string;
   new: string;
@@ -23,6 +27,8 @@ export interface ProductListText {
   actions: string;
   edit: string;
   empty: string;
+  /** Rótulo do botão que traz a próxima página do cursor. */
+  loadMore: string;
 }
 
 /** Chaves de texto do formulário de produto (criação e edição). */

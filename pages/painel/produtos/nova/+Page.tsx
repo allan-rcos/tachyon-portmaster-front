@@ -1,14 +1,13 @@
 import { ProductCreateScreen } from '@view/products/screens/ProductCreateScreen';
-import { createProductCreateVM } from '@viewmodel/products/product-create-page.vm';
-import { ClientOnly } from 'vike-solid/ClientOnly';
-import { usePageContext } from 'vike-solid/usePageContext';
+import {
+  createProductCreateVM,
+  type ProductCreatePageInput,
+} from '@viewmodel/products/product-create-page.vm';
+import type { JSX } from 'solid-js';
+import { useData } from 'vike-solid/useData';
 
-export default function Page() {
-  const pageContext = usePageContext();
-  const vm = createProductCreateVM({ url: pageContext.urlOriginal });
-  return (
-    <ClientOnly fallback={<div />}>
-      <ProductCreateScreen vm={vm} />
-    </ClientOnly>
-  );
+/** Único ponto de composição da rota. */
+export default function Page(): JSX.Element {
+  const input = useData<ProductCreatePageInput>();
+  return <ProductCreateScreen vm={createProductCreateVM(input)} />;
 }

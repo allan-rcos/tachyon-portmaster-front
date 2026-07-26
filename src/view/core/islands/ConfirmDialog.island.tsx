@@ -1,5 +1,4 @@
 import { Icon, type IconName } from '@view/core/components/Icon';
-import { cn } from '@view/core/utils/ui';
 import { createSignal, Show, type JSX } from 'solid-js';
 
 import styles from './ConfirmDialog.island.module.scss';
@@ -43,7 +42,7 @@ export function ConfirmDialog(props: ConfirmDialogProps): JSX.Element {
     <>
       <button
         type="button"
-        class={cn(styles.trigger, styles[props.triggerVariant ?? 'secondary'])}
+        class={`${styles.trigger} ${styles[props.triggerVariant ?? 'secondary']}`}
         onClick={() => setOpen(true)}
       >
         {props.triggerIcon && <Icon name={props.triggerIcon} size={16} />}
@@ -68,7 +67,7 @@ export function ConfirmDialog(props: ConfirmDialogProps): JSX.Element {
               <li>
                 <button
                   type="button"
-                  class={cn(styles.trigger, styles.secondary)}
+                  class={`${styles.trigger} ${styles.secondary}`}
                   onClick={() => setOpen(false)}
                   disabled={pending()}
                 >
@@ -78,11 +77,8 @@ export function ConfirmDialog(props: ConfirmDialogProps): JSX.Element {
               <li>
                 <button
                   type="button"
-                  class={cn(
-                    styles.trigger,
-                    styles[props.confirmVariant ?? 'primary'],
-                    pending() && styles.loading,
-                  )}
+                  class={`${styles.trigger} ${styles[props.confirmVariant ?? 'primary']}`}
+                  classList={{ [styles.loading]: pending() }}
                   onClick={run}
                   disabled={pending()}
                 >

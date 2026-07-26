@@ -1,14 +1,10 @@
 import { RoleCreateScreen } from '@view/roles/screens/RoleCreateScreen';
-import { createRoleCreateVM } from '@viewmodel/roles/role-create-page.vm';
-import { ClientOnly } from 'vike-solid/ClientOnly';
-import { usePageContext } from 'vike-solid/usePageContext';
+import { createRoleCreateVM, type RoleCreatePageInput } from '@viewmodel/roles/role-create-page.vm';
+import type { JSX } from 'solid-js';
+import { useData } from 'vike-solid/useData';
 
-export default function Page() {
-  const pageContext = usePageContext();
-  const vm = createRoleCreateVM({ url: pageContext.urlOriginal });
-  return (
-    <ClientOnly fallback={<div />}>
-      <RoleCreateScreen vm={vm} />
-    </ClientOnly>
-  );
+/** Único ponto de composição da rota. */
+export default function Page(): JSX.Element {
+  const input = useData<RoleCreatePageInput>();
+  return <RoleCreateScreen vm={createRoleCreateVM(input)} />;
 }

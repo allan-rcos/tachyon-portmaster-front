@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/info.json",
+  "title": "i18n da rota /info (systemInfoMessages)",
+  "type": "object",
+  "required": [
+    "info_eyebrow",
+    "info_title",
+    "info_subtitle",
+    "info_frontend",
+    "info_version",
+    "info_environment",
+    "info_runtime",
+    "info_memory",
+    "info_backend",
+    "info_backend_pending"
+  ],
+  "patternProperties": {
+    "^info_": { "type": "string", "minLength": 1 }
+  }
+}

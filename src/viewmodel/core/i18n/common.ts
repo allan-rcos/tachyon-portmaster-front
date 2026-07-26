@@ -38,6 +38,8 @@ export function commonText(locale: Locale) {
     logout: m.common_logout({}, { locale }),
     previous: m.common_previous({}, { locale }),
     next: m.common_next({}, { locale }),
+    loadMore: m.common_load_more({}, { locale }),
+    id: m.common_id({}, { locale }),
   };
 }
 
@@ -62,8 +64,11 @@ export function valText(locale: Locale) {
     codeLong: m.val_code_long({}, { locale }),
     codeFormat: m.val_code_format({}, { locale }),
     capacityPositive: m.val_capacity_positive({}, { locale }),
+    capacityFormat: m.val_capacity_format({}, { locale }),
     densityPositive: m.val_density_positive({}, { locale }),
+    densityFormat: m.val_density_format({}, { locale }),
     quantityPositive: m.val_quantity_positive({}, { locale }),
+    quantityFormat: m.val_quantity_format({}, { locale }),
     productRequired: m.val_product_required({}, { locale }),
   };
 }
@@ -80,5 +85,6 @@ export function navText(locale: Locale) {
     usuarios: m.nav_usuarios({}, { locale }),
     perfis: m.nav_perfis({}, { locale }),
     conta: m.nav_conta({}, { locale }),
+    administration: m.nav_administration({}, { locale }),
   };
 }

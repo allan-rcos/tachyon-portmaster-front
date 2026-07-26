@@ -1,0 +1,50 @@
+@use '@ds/responsive' as rp;
+@use '@ds/ui' as ui;
+
+.name {
+  grid-area: user;
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-link);
+  }
+
+  @include rp.mobile {
+    font-size: var(--text-base);
+  }
+}
+
+.email {
+  grid-area: email;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.roles {
+  grid-area: roles;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.action {
+  grid-area: action;
+  text-align: right;
+}
+
+.edit {
+  @include ui.icon-button;
+  @include ui.icon-button-sm;
+  display: inline-flex;
+  color: var(--color-text-muted);
+
+  @include rp.mobile {
+    width: 38px;
+    height: 38px;
+  }
+}

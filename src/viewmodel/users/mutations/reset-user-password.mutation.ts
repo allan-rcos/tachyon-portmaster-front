@@ -1,6 +1,5 @@
 import { resetUserPassword as apiResetUserPassword } from '@model/users';
-
-import { browserClient } from '../../core/client/api-client';
+import { browserClient } from '@viewmodel/core/client/api-client';
 
 /**
  * Define uma nova senha para um usuário (ação administrativa).

@@ -1,17 +1,11 @@
 import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
-import { zodValidator } from '@view/core/forms/zod-adapter';
 import { bindMutation } from '@view/core/observable/bind-mutation';
-import { cn } from '@view/core/utils/ui';
-import { errText } from '@view/core/utils/ui';
 import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
 import type { UserFormText } from '@viewmodel/users/i18n/text-contracts';
 import { createUser } from '@viewmodel/users/mutations/create-user.mutation';
 import { updateUser } from '@viewmodel/users/mutations/update-user.mutation';
-import {
-  createUserCreateSchema,
-  createUserUpdateSchema,
-} from '@viewmodel/users/schemas/user.schema';
+import { createUserSchema } from '@viewmodel/users/schemas/user.schema';
 import { For, Show, type JSX } from 'solid-js';
 
 import styles from './UserForm.island.module.scss';
@@ -37,8 +31,7 @@ interface FormValues {
 }
 
 function Inner(props: UserFormProps): JSX.Element {
-  const schema = () =>
-    props.mode === 'create' ? createUserCreateSchema(props.t) : createUserUpdateSchema(props.t);
+  const schema = () => createUserSchema(props.mode, props.t);
 
   const mutation = bindMutation(
     createMutationSignal(
@@ -72,7 +65,7 @@ function Inner(props: UserFormProps): JSX.Element {
       initial_password: '',
       role_ids: props.defaultValues?.role_ids ?? [],
     } as FormValues,
-    validators: { onChange: zodValidator<FormValues>(schema()) },
+    validators: { onChange: schema() },
     onSubmit: ({ value }) => mutation.mutate(value),
   }));
 
@@ -93,11 +86,12 @@ function Inner(props: UserFormProps): JSX.Element {
             <FormField
               label={props.t.name}
               for="user-name"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="user-name"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -111,12 +105,13 @@ function Inner(props: UserFormProps): JSX.Element {
             <FormField
               label={props.t.email}
               for="user-email"
-              error={errText(field().state.meta.errors)}
+              error={field().state.meta.errors[0]?.message}
             >
               <input
                 id="user-email"
                 type="email"
-                class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                class={styles.input}
+                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                 value={field().state.value}
                 onInput={(e) => field().handleChange(e.currentTarget.value)}
                 onBlur={field().handleBlur}
@@ -131,12 +126,13 @@ function Inner(props: UserFormProps): JSX.Element {
               <FormField
                 label={props.t.initialPassword}
                 for="user-pass"
-                error={errText(field().state.meta.errors)}
+                error={field().state.meta.errors[0]?.message}
               >
                 <input
                   id="user-pass"
                   type="password"
-                  class={cn(styles.input, field().state.meta.errors.length > 0 && styles.invalid)}
+                  class={styles.input}
+                  classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
                   value={field().state.value}
                   onInput={(e) => field().handleChange(e.currentTarget.value)}
                   onBlur={field().handleBlur}
@@ -168,7 +164,7 @@ function Inner(props: UserFormProps): JSX.Element {
                 )}
               </For>
               <p class={styles.error} role="alert" hidden={field().state.meta.errors.length === 0}>
-                {errText(field().state.meta.errors)}
+                {field().state.meta.errors[0]?.message}
               </p>
             </fieldset>
           )}
@@ -183,7 +179,8 @@ function Inner(props: UserFormProps): JSX.Element {
         <li>
           <button
             type="submit"
-            class={cn(styles.submit, mutation.isPending() && styles.loading)}
+            class={styles.submit}
+            classList={{ [styles.loading]: mutation.isPending() }}
             disabled={mutation.isPending()}
           >
             {props.mode === 'create' ? props.t.create : props.t.save}

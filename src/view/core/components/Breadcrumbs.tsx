@@ -7,8 +7,12 @@ export interface Crumb {
   href?: string;
 }
 
+export interface BreadcrumbsProps {
+  items: Crumb[];
+}
+
 /** Trilha de navegação. Presente em toda página autenticada. */
-export function Breadcrumbs(props: { items: Crumb[] }): JSX.Element {
+export function Breadcrumbs(props: BreadcrumbsProps): JSX.Element {
   return (
     <nav class={styles.nav} aria-label="Trilha de navegação">
       <ol class={styles.list}>

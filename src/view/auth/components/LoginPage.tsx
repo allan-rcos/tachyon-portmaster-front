@@ -1,18 +1,21 @@
 import { LoginForm } from '@view/auth/islands/LoginForm.island';
+import styles from '@view/auth/styles/LoginPage.module.scss';
 import { Brand } from '@view/core/components/Brand';
+import { ClientOnly } from '@view/core/components/ClientOnly';
 import { FormSkeleton } from '@view/core/components/Skeleton';
 import type { LoginPageText } from '@viewmodel/auth/i18n/login-page.messages';
 import type { JSX } from 'solid-js';
-import { ClientOnly } from 'vike-solid/ClientOnly';
 
-import styles from '../styles/LoginPage.module.scss';
+export interface LoginPageProps {
+  t: LoginPageText;
+}
 
 /**
  * Tela de login: painel promocional (SSR) + formulário hidratado no cliente.
  *
  * @param props.t Texto já resolvido para o locale da requisição.
  */
-export function LoginPage(props: { t: LoginPageText }): JSX.Element {
+export function LoginPage(props: LoginPageProps): JSX.Element {
   return (
     <main class={styles.page}>
       <section class={styles.promo} aria-labelledby="promo-title">
