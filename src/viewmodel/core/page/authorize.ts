@@ -1,12 +1,14 @@
-// ============================================================
-//  Autorização de rota, declarada pelo ViewModel da própria rota.
-//
-//  Antes isto vivia em 15 arquivos `+permissions.js` lidos por um
-//  `pages/+guard.ts`: a regra de acesso de uma tela ficava num arquivo do
-//  framework de roteamento, longe do código que a implementa. Agora cada
-//  `createXPageInput` começa chamando `authorize(request, [...])` e a permissão
-//  fica ao lado do resto do trabalho de servidor da rota.
-// ============================================================
+/**
+ * Autorização de rota, declarada pelo ViewModel da própria rota.
+ *
+ * Antes isto vivia em 15 arquivos `+permissions.js` lidos por um
+ * `pages/+guard.ts`: a regra de acesso de uma tela ficava num arquivo do
+ * framework de roteamento, longe do código que a implementa. Agora cada
+ * `createXPageInput` começa chamando `authorize(request, [...])` e a permissão
+ * fica ao lado do resto do trabalho de servidor da rota.
+ *
+ * @packageDocumentation
+ */
 import type { AccountProfile } from '@model/account';
 import type { Permission } from '@model/common';
 import { ForbiddenError, UnauthorizedError } from '@viewmodel/core/page/page-errors';

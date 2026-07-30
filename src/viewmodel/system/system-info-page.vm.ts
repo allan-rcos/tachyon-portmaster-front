@@ -1,14 +1,16 @@
-// ============================================================
-//  Rota /info — diagnóstico de runtime.
-//
-//  É a única parte do ViewModel que inspeciona o ambiente de execução, e o faz
-//  por detecção de capacidade (`globalThis.tjs`, `globalThis.Bun`), sem importar
-//  nada específico de runtime, para continuar válida sob txiki, Bun ou Node.
-//
-//  Segue o mesmo par das demais rotas (`createXPageInput` + `createXVM`), com
-//  duas diferenças: é pública (não chama `authorize`, logo não tem `shell`) e
-//  não faz E/S — o dado nasce do próprio processo.
-// ============================================================
+/**
+ * Rota /info — diagnóstico de runtime.
+ *
+ * É a única parte do ViewModel que inspeciona o ambiente de execução, e o faz
+ * por detecção de capacidade (`globalThis.tjs`, `globalThis.Bun`), sem importar
+ * nada específico de runtime, para continuar válida sob txiki, Bun ou Node.
+ *
+ * Segue o mesmo par das demais rotas (`createXPageInput` + `createXVM`), com
+ * duas diferenças: é pública (não chama `authorize`, logo não tem `shell`) e
+ * não faz E/S — o dado nasce do próprio processo.
+ *
+ * @packageDocumentation
+ */
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 

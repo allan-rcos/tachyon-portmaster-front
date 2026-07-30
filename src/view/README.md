@@ -3,9 +3,9 @@
 Recebe dados prontos e desenha. **Nunca importa `@model`** e nunca fala com a
 rede — o lint reprova.
 
-TypeScript puro com **[Lit](https://lit.dev)**: `html\`\`` é _tagged template_, não
+TypeScript puro com **[Lit](https://lit.dev)**: `html\`\``é _tagged template_, não
 sintaxe. Não há compilador de interface no caminho — o que se importa é o que
-roda. **Nenhum `.tsx` no projeto.**
+roda. **Nenhum`.tsx` no projeto.**
 
 ```
 view/
@@ -26,11 +26,11 @@ view/
 
 ## Os três papéis
 
-|               | busca dados?         | guarda estado?      | recebe        |
-| ------------- | -------------------- | ------------------- | ------------- |
-| **component** | não                  | não                 | props prontas |
-| **island**    | não (chama o VM)     | só estado de UI     | o ViewModel   |
-| **screen**    | não                  | não                 | o ViewModel   |
+|               | busca dados?     | guarda estado?  | recebe        |
+| ------------- | ---------------- | --------------- | ------------- |
+| **component** | não              | não             | props prontas |
+| **island**    | não (chama o VM) | só estado de UI | o ViewModel   |
+| **screen**    | não              | não             | o ViewModel   |
 
 Nenhum dos três busca dados: quando a tela renderiza, o `+data` da rota já
 resolveu tudo. E nenhum dos três formata: pesos, datas e percentuais chegam como
@@ -56,15 +56,15 @@ elemento intermediário nem ciclo de vida — a função executa e acaba.
 
 Tradução do que era Solid:
 
-| Solid                       | Lit                                    |
-| --------------------------- | -------------------------------------- |
-| `<Show when={x}>`           | ternário + `nothing`                   |
-| `<For each={xs}>`           | `xs.map(…)`                            |
-| `<Dynamic component={tag}>` | `literal` do `lit/static-html.js`      |
-| `classList={{ a: cond }}`   | `classMap({ a: cond })`                |
-| `style={{ width }}`         | `styleMap({ width })`                  |
-| `onClick=` / `disabled=`    | `@click=` / `?disabled=`               |
-| `value=` (controlado)       | `.value=${live(…)}`                    |
+| Solid                       | Lit                                     |
+| --------------------------- | --------------------------------------- |
+| `<Show when={x}>`           | ternário + `nothing`                    |
+| `<For each={xs}>`           | `xs.map(…)`                             |
+| `<Dynamic component={tag}>` | `literal` do `lit/static-html.js`       |
+| `classList={{ a: cond }}`   | `classMap({ a: cond })`                 |
+| `style={{ width }}`         | `styleMap({ width })`                   |
+| `onClick=` / `disabled=`    | `@click=` / `?disabled=`                |
+| `value=` (controlado)       | `.value=${live(…)}`                     |
 | `children: JSX.Element`     | `children: Renderable` (`./core/types`) |
 
 `class=${…}` continua igual. Atenção a uma diferença de HTML: `<span />` é válido
@@ -85,7 +85,7 @@ export class SidebarDrawer extends Island<void> {
 Monta-se pela diretiva, nunca por `new`:
 
 ```ts
-html`${island(ConfirmDialog, { title: t.delete, onConfirm: vm.remove })}`
+html`${island(ConfirmDialog, { title: t.delete, onConfirm: vm.remove })}`;
 ```
 
 O `lit-html` mantém **uma instância de diretiva por posição de template**, e é

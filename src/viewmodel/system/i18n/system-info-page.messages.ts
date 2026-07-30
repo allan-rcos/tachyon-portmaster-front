@@ -1,5 +1,9 @@
-// Catálogo i18n da rota /info. Antes o texto estava fixo em pt-BR dentro do
-// JSX — a tela era a única do produto que não falava o idioma da requisição.
+/**
+ * Catálogo i18n da rota /info. Antes o texto estava fixo em pt-BR dentro do
+ * JSX — a tela era a única do produto que não falava o idioma da requisição.
+ *
+ * @packageDocumentation
+ */
 import type { Locale } from '@viewmodel/core/i18n/locale';
 
 import { m } from '@/paraglide/messages';

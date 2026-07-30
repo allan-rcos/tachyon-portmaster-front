@@ -33,17 +33,17 @@ export function PermissionMatrix(props: PermissionMatrixProps): TemplateResult {
         html`<fieldset class=${styles.group} ?disabled=${props.disabled}>
           <legend class=${styles.legend}>${group.label}</legend>
           ${group.options.map(
-          (option) =>
-            html`<label class=${styles.item}>
-              <input
-                type="checkbox"
-                .checked=${live(props.isSelected(option.value))}
-                @change=${(e: Event) =>
-                props.onToggle(option.value, (e.currentTarget as HTMLInputElement).checked)}
-              />
-              <span>${option.label}</span>
-            </label>`,
-        )}
+            (option) =>
+              html`<label class=${styles.item}>
+                <input
+                  type="checkbox"
+                  .checked=${live(props.isSelected(option.value))}
+                  @change=${(e: Event) =>
+                    props.onToggle(option.value, (e.currentTarget as HTMLInputElement).checked)}
+                />
+                <span>${option.label}</span>
+              </label>`,
+          )}
         </fieldset>`,
     )}
   </div>`;

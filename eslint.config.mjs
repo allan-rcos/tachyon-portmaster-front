@@ -3,6 +3,32 @@ import importPlugin from 'eslint-plugin-import';
 import jsdoc from 'eslint-plugin-jsdoc';
 import prettier from 'eslint-config-prettier';
 
+// Tags que o TypeDoc entende e o eslint-plugin-jsdoc não conhece — sem
+// declará-las aqui, `check-tag-names` as acusa como tag inválida.
+//
+// `@module` NÃO está na lista de propósito: o plugin o classifica como
+// redundante fora de contexto ambiente quando há um sistema de tipos, e essa
+// checagem não é desligável por tag. `@packageDocumentation` faz o mesmo
+// trabalho no TypeDoc (marca o comentário como sendo do ARQUIVO, e não da
+// declaração seguinte), é a tag do TSDoc, e é a que o exemplo oficial usa.
+// A única coisa que ela não faz é renomear o módulo — que não é o que
+// queremos: o nome deve continuar espelhando o caminho.
+const typedocTags = [
+  'packageDocumentation',
+  'category',
+  'categoryDescription',
+  'group',
+  'groupDescription',
+  'document',
+  'hidden',
+  'expand',
+  'inline',
+  'remarks',
+  'privateRemarks',
+  'defaultValue',
+  'typeParam',
+];
+
 export default tseslint.config(
   // Ignorados globais (código gerado, build, workspaces, ferramentas)
   {
@@ -123,12 +149,16 @@ export default tseslint.config(
   //  Na View o JSDoc é opcional: uma função que recebe props se documenta pela
   //  própria assinatura. Ali as regras só garantem que o que EXISTE está
   //  correto e completo.
+  //
+  //  As tags do TypeDoc que o eslint-plugin-jsdoc não conhece entram em
+  //  `definedTags` (ver `typedocTags` no topo do arquivo).
   // ============================================================
   {
     files: ['src/model/**/*.ts', 'src/viewmodel/**/*.ts'],
     ignores: ['**/*.test.ts'],
     extends: [jsdoc.configs['flat/recommended-typescript-error']],
     rules: {
+      'jsdoc/check-tag-names': ['error', { typed: true, definedTags: typedocTags }],
       'jsdoc/require-jsdoc': [
         'error',
         {
@@ -153,6 +183,7 @@ export default tseslint.config(
     ignores: ['**/*.test.ts'],
     extends: [jsdoc.configs['flat/recommended-typescript']],
     rules: {
+      'jsdoc/check-tag-names': ['warn', { typed: true, definedTags: typedocTags }],
       'jsdoc/require-jsdoc': 'off',
       'jsdoc/require-param': 'off',
       'jsdoc/require-param-type': 'off',

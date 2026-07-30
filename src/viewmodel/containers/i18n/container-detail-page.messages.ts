@@ -1,6 +1,10 @@
-// Catálogo da rota /painel/conteineres/@id (detalhe). Um único `t` alimenta o
-// cluster do detalhe (ContainerSummary + tabela/telemetria + ações/editor de
-// manifesto). `summary` é usado só pelo +data (meta). Erros de manifesto via valText.
+/**
+ * Catálogo da rota /painel/conteineres/@id (detalhe). Um único `t` alimenta o
+ * cluster do detalhe (ContainerSummary + tabela/telemetria + ações/editor de
+ * manifesto). `summary` é usado só pelo +data (meta). Erros de manifesto via valText.
+ *
+ * @packageDocumentation
+ */
 import { commonText, valText, type CommonText, type ValText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 

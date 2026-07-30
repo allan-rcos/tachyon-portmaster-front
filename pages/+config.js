@@ -1,4 +1,15 @@
-// pages/+config.js
+/**
+ * Configuração global do Vike — o que vale para toda rota.
+ *
+ * As três decisões que moram aqui, e por que não moram em 15 `+config.js` de
+ * rota: `lang: 'pt-BR'` (o produto é pt-BR; o padrão do adaptador é `en`),
+ * `stream: false` (por escolha — o `renderToString` do vike-lit resolve as
+ * Promises do template antes de fechar a string, para qualquer User-Agent) e
+ * `meta.data.env`, que roda o hook `data` nos dois lados. O `env` é o mesmo
+ * para todas as rotas, então repeti-lo por rota só duplicaria a decisão.
+ *
+ * @packageDocumentation
+ */
 import vikeLit from 'vike-lit/config';
 
 export default {

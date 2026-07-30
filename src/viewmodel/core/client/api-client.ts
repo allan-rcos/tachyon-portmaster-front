@@ -1,17 +1,19 @@
-// ============================================================
-//  Clients HTTP configurados para o app. O Model é puro; aqui injetamos o que
-//  ele não conhece: baseURL vinda do ENV, o cookie de sessão (SSR) e o formato
-//  de wire (JSON dev / FBS prod).
-//
-//   • browserClient — navegador → Nginx → Rust via `/api`.
-//   • serverClient(headers) — txiki → Rust em loopback; encaminha o Cookie do
-//     request e captura Set-Cookie para relay no SSR.
-//   • resolveClient(headers) — escolhe entre os dois pela PRESENÇA de headers.
-//
-//  `resolveClient` é o que torna as queries indiferentes ao lado em que rodam:
-//  com headers é servidor, sem headers é navegador. Mover uma tela de SSR para
-//  o cliente deixa de tocar a query — só deixa de passar os headers.
-// ============================================================
+/**
+ * Clients HTTP configurados para o app. O Model é puro; aqui injetamos o que
+ * ele não conhece: baseURL vinda do ENV, o cookie de sessão (SSR) e o formato
+ * de wire (JSON dev / FBS prod).
+ *
+ * • browserClient — navegador → Nginx → Rust via `/api`.
+ * • serverClient(headers) — txiki → Rust em loopback; encaminha o Cookie do
+ *   request e captura Set-Cookie para relay no SSR.
+ * • resolveClient(headers) — escolhe entre os dois pela PRESENÇA de headers.
+ *
+ * `resolveClient` é o que torna as queries indiferentes ao lado em que rodam:
+ * com headers é servidor, sem headers é navegador. Mover uma tela de SSR para
+ * o cliente deixa de tocar a query — só deixa de passar os headers.
+ *
+ * @packageDocumentation
+ */
 import { createClient, type ApiClient } from '@model/core';
 
 /** JSON em dev/teste, FlatBuffers binário em produção. */

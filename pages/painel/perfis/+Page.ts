@@ -1,3 +1,11 @@
+/**
+ * Composição de `/painel/perfis` — Listagem de perfis de acesso.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { RoleListScreen } from '@view/roles/screens/RoleListScreen';
 import { createRoleListVM, type RoleListPageInput } from '@viewmodel/roles/role-list-page.vm';
 import type { PageContext } from 'vike/types';

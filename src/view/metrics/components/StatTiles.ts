@@ -21,12 +21,12 @@ export function StatTiles(props: StatTilesProps): TemplateResult {
       (tile) =>
         html`<li>
           ${StatTile({
-          icon: tile.icon,
-          tone: tile.tone,
-          value: tile.value,
-          unit: tile.unit,
-          label: tile.label,
-        })}
+            icon: tile.icon,
+            tone: tile.tone,
+            value: tile.value,
+            unit: tile.unit,
+            label: tile.label,
+          })}
         </li>`,
     )}
   </ul>`;

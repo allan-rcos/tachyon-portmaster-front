@@ -1,28 +1,11 @@
 import { FormField } from '@view/core/components/FormField';
-import type { ProfileField } from '@viewmodel/account/account-page.vm';
 import type { AccountFormText } from '@viewmodel/account/i18n/text-contracts';
+import type { AccountFormVM, ProfileField } from '@viewmodel/account/vm-contracts';
 import { html, type TemplateResult } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 
 import styles from './AccountForm.island.module.scss';
-
-/**
- * O que o formulário precisa do ViewModel da rota.
- *
- * Ver `@view/products/islands/ProductForm.island` para por que o tipo mora na
- * View e não é importado pelo VM.
- */
-export interface AccountFormVM {
-  t: AccountFormText;
-  profileValue: (field: ProfileField) => string;
-  profileError: (field: ProfileField) => string | undefined;
-  savingProfile: () => boolean;
-  profileFailed: () => boolean;
-  setProfile: (field: ProfileField, value: string) => void;
-  blurProfile: (field: ProfileField) => void;
-  saveProfile: () => Promise<boolean>;
-}
 
 export interface AccountFormProps {
   /** ViewModel da rota — dono do estado do formulário. */

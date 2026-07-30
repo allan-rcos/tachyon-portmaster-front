@@ -1,16 +1,18 @@
-// ============================================================
-//  Casca única entre o Vike e os carregadores de página do ViewModel.
-//
-//  Substitui o `pages/+guard.ts` e os 15 `+permissions.js`: a decisão de
-//  autorização passou a viver no `createXPageInput` da própria rota (que a
-//  declara e a avalia), e aqui só se TRADUZ o resultado para o vocabulário do
-//  framework — `redirect` para quem não tem sessão, `render(403)` para quem tem
-//  sessão e não tem permissão, `render(404)` para recurso inexistente.
-//
-//  A separação importa: `bun run test` exercita a autorização chamando o
-//  `createXPageInput` direto, sem levantar Vike nenhum, porque o que ele produz
-//  é um erro de domínio e não uma resposta HTTP.
-// ============================================================
+/**
+ * Casca única entre o Vike e os carregadores de página do ViewModel.
+ *
+ * Substitui o `pages/+guard.ts` e os 15 `+permissions.js`: a decisão de
+ * autorização passou a viver no `createXPageInput` da própria rota (que a
+ * declara e a avalia), e aqui só se TRADUZ o resultado para o vocabulário do
+ * framework — `redirect` para quem não tem sessão, `render(403)` para quem tem
+ * sessão e não tem permissão, `render(404)` para recurso inexistente.
+ *
+ * A separação importa: `bun run test` exercita a autorização chamando o
+ * `createXPageInput` direto, sem levantar Vike nenhum, porque o que ele produz
+ * é um erro de domínio e não uma resposta HTTP.
+ *
+ * @packageDocumentation
+ */
 import { ForbiddenError, UnauthorizedError } from '@viewmodel/core/page/page-errors';
 import { PageNotFoundError, toPageRequest } from '@viewmodel/core/page/page-request';
 import type { PageRequest } from '@viewmodel/core/page/page-request';

@@ -1,3 +1,9 @@
+/**
+ * A `<meta name="description">` de cada rota. Mesma origem do
+ * {@link "pages/+title" | +title}: o `data.meta` resolvido pelo ViewModel.
+ *
+ * @packageDocumentation
+ */
 import type { PageMeta } from '@viewmodel/core/page/page-request';
 import type { PageContext } from 'vike/types';
 

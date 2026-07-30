@@ -1,23 +1,9 @@
 import { Badge } from '@view/core/components/Badge';
 import { Card } from '@view/core/components/Card';
-import type { AccountIdentity, AccountRoleData } from '@viewmodel/account/account-page.vm';
-import type { AccountProfileText } from '@viewmodel/account/i18n/text-contracts';
+import type { AccountProfileVM } from '@viewmodel/account/vm-contracts';
 import { html, type TemplateResult } from 'lit';
 
 import styles from './AccountProfile.module.scss';
-
-/**
- * O que o resumo precisa do ViewModel da rota — só leitura, nada do estado dos
- * formulários que dividem a tela com ele.
- *
- * Ver `@view/products/islands/ProductForm.island` para por que o tipo mora na
- * View e não é importado pelo VM.
- */
-export interface AccountProfileVM {
-  t: AccountProfileText;
-  identity: AccountIdentity;
-  roles: readonly AccountRoleData[];
-}
 
 /** Props do resumo do perfil autenticado. */
 export interface AccountProfileProps {

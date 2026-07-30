@@ -1,9 +1,10 @@
 {
   "$schema": "https://typedoc.org/schema.json",
 
-  // Um entry point por camada do MVVM: o índice gerado espelha a arquitetura,
-  // então navegar a documentação é navegar as camadas.
-  "entryPoints": ["src/model", "src/viewmodel", "src/view"],
+  // Um entry point por camada, mais o composition root. Com mais de um entry
+  // point os nomes de módulo saem do diretório COMUM (a raiz do repo), então a
+  // camada aparece no nome; com um só, as três colidiriam numa árvore.
+  "entryPoints": ["src/model", "src/viewmodel", "src/view", "pages"],
   "entryPointStrategy": "expand",
 
   "out": "docs/api",
@@ -12,16 +13,33 @@
 
   "exclude": [
     "**/*.test.ts",
-    "**/*.test.tsx",
-    // Saída do flatc: 40 arquivos de serialização que ninguém lê à mão.
-    "dist/fbs/**",
-    "src/model/contract/**"
+    "dist/fbs/**", // saída do flatc
+    "src/model/contract/**",
+    "**/*.module.scss.d.ts" // saída do typed-scss-modules: 60 módulos idênticos
   ],
   "excludeExternals": true,
   "excludePrivate": true,
   "excludeInternal": true,
 
+  // O typecheck é `bun run typecheck`. Sem isto, um erro de tipo em qualquer
+  // arquivo — mesmo fora da documentação — aborta a geração.
+  "skipErrorChecking": true,
+
   "categorizeByGroup": true,
+  // `includeFolders`: os `/` do nome viram nós da árvore, espelhando a arquitetura.
+  // `excludeReferences` aqui e não na raiz: os `export *` cascateiam e enchiam a
+  // barra lateral (`src/viewmodel` chegava a 315 entradas), soterrando as
+  // subpastas. Na raiz também apagaria a seção "References" do corpo da página.
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": false,
+    "includeFolders": true,
+    "excludeReferences": true
+  },
+  "sort": ["kind", "alphabetical"],
+
+  "highlightLanguages": ["typescript", "javascript", "json", "jsonc", "scss", "bash", "markdown"],
+
   "navigationLinks": {
     "Repositório": "https://github.com/allan-rcos/portmaster"
   },

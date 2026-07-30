@@ -1,3 +1,11 @@
+/**
+ * Composição de `/painel/perfis/nova` — Criação de perfil.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { RoleCreateScreen } from '@view/roles/screens/RoleCreateScreen';
 import { createRoleCreateVM, type RoleCreatePageInput } from '@viewmodel/roles/role-create-page.vm';
 import type { PageContext } from 'vike/types';

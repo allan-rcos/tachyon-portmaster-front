@@ -1,11 +1,13 @@
-// ============================================================
-//  Rota /painel/conteineres/@id/editar.
-//
-//  O contêiner é buscado no `+data`, então o formulário chega preenchido no
-//  HTML da primeira requisição. O estado do formulário mora aqui — ver
-//  `@viewmodel/products/product-create-page.vm` para o desenho, e
-//  `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
+/**
+ * Rota /painel/conteineres/@id/editar.
+ *
+ * O contêiner é buscado no `+data`, então o formulário chega preenchido no
+ * HTML da primeira requisição. O estado do formulário mora aqui — ver
+ * `@viewmodel/products/product-create-page.vm` para o desenho, e
+ * `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
@@ -19,11 +21,11 @@ import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
 import { computed, signal } from 'alien-signals';
 import { z } from 'zod';
 
-import type { ContainerField } from './container-create-page.vm';
 import { containerEditMessages, type ContainerEditText } from './i18n/container-edit-page.messages';
 import { updateContainer } from './mutations/update-container.mutation';
 import { getContainer } from './queries/get-container.query';
 import { createContainerSchema } from './schemas/container.schema';
+import type { ContainerField, ContainerFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const CONTAINER_EDIT_PERMISSIONS = [
@@ -87,36 +89,20 @@ export async function createContainerEditPageInput(
   };
 }
 
-/** Superfície da edição de contêiner. */
-export interface ContainerEditVM {
-  /** Texto da tela. */
+/**
+ * Superfície da edição de contêiner.
+ *
+ * O grosso é o {@link ContainerFormVM}, o mesmo que o registro satisfaz.
+ */
+export interface ContainerEditVM extends ContainerFormVM {
+  /** Texto da tela — o do formulário, mais o cabeçalho da rota. */
   t: ContainerEditText;
   /** Identificador opaco do contêiner em edição. */
   id: string;
   /** Código do contêiner — só leitura: o PATCH não o aceita. */
   code: string;
-  /** Volta para a listagem. Quem navega é a View. */
-  listHref: string;
   /** `edit` decide o rótulo do botão e que o código vira `<output>`. */
   mode: 'edit';
-  /** Valor atual de um campo. */
-  value: (field: ContainerField) => string;
-  /** Erro de um campo, só depois de tocado (ou de uma tentativa de envio). */
-  error: (field: ContainerField) => string | undefined;
-  /** Uma submissão está em voo. */
-  submitting: () => boolean;
-  /** A última tentativa falhou na API. */
-  failed: () => boolean;
-  /** Escreve um campo. */
-  set: (field: ContainerField, value: string) => void;
-  /** Marca um campo como tocado, liberando o erro dele. */
-  blur: (field: ContainerField) => void;
-  /**
-   * Valida e salva. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se salvou; a View então navega para `listHref`.
-   */
-  submit: () => Promise<boolean>;
 }
 
 /** Valores enquanto se digita — tudo texto. Ver `./container-create-page.vm`. */

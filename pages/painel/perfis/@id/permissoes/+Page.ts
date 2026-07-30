@@ -1,3 +1,11 @@
+/**
+ * Composição de `/painel/perfis/@id/permissoes` — A matriz de permissões do perfil. A gravação substitui o conjunto inteiro.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { RolePermissionsScreen } from '@view/roles/screens/RolePermissionsScreen';
 import {
   createRolePermissionsVM,

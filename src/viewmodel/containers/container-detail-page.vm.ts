@@ -1,13 +1,15 @@
-// ============================================================
-//  Rota /painel/conteineres/@id.
-//
-//  A tela mais composta do produto: resumo do contêiner + manifesto de carga +
-//  telemetria + ações. Tudo é resolvido no `+data`, em duas buscas PARALELAS —
-//  o resumo e o catálogo de produtos que o editor de manifesto oferece são
-//  recursos independentes, e serializar as chamadas só somaria latência.
-//
-//  Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
+/**
+ * Rota /painel/conteineres/@id.
+ *
+ * A tela mais composta do produto: resumo do contêiner + manifesto de carga +
+ * telemetria + ações. Tudo é resolvido no `+data`, em duas buscas PARALELAS —
+ * o resumo e o catálogo de produtos que o editor de manifesto oferece são
+ * recursos independentes, e serializar as chamadas só somaria latência.
+ *
+ * Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { ContainerStatus, Permission } from '@model/common';
 import type { CargoManifestItem, TelemetryLogItem } from '@model/containers/dto';
 import {
@@ -45,20 +47,18 @@ import { sealContainer } from './mutations/seal-container.mutation';
 import { unloadManifestItem } from './mutations/unload-manifest-item.mutation';
 import { getContainerSummary } from './queries/get-container-summary.query';
 import { createLoadItemSchema, type LoadItemData } from './schemas/manifest.schema';
+import type {
+  ContainerActionsVM,
+  ManifestEditorVM,
+  ManifestField,
+  ProductOption,
+} from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const CONTAINER_DETAIL_PERMISSIONS = [
   Permission.ContainerRead,
   Permission.ContainerSummary,
 ] as const;
-
-/** Opção de produto oferecida no editor de manifesto. */
-export interface ProductOption {
-  /** Id opaco base62 do produto. */
-  id: string;
-  /** Nome exibido na opção. */
-  name: string;
-}
 
 /** Cabeçalho do contêiner, já em formato de apresentação. */
 export interface ContainerFacts {
@@ -212,10 +212,6 @@ export async function createContainerDetailPageInput(
   };
 }
 
-/** Superfície do detalhe de contêiner. */
-/** Campos do editor de manifesto. */
-export type ManifestField = 'product_id' | 'quantity';
-
 /** Valores enquanto se digita no editor de manifesto — tudo texto. */
 interface ManifestDraft {
   product_id: string;
@@ -225,9 +221,14 @@ interface ManifestDraft {
 const ALL_MANIFEST_FIELDS: readonly ManifestField[] = ['product_id', 'quantity'];
 
 /**
+ * Superfície do detalhe de contêiner.
  *
+ * A tela é um cluster de três peças, e o tipo diz isso: as ações de ciclo de
+ * vida ({@link ContainerActionsVM}), o editor de manifesto
+ * ({@link ManifestEditorVM}) e o cabeçalho/tabelas que só esta rota tem. Antes
+ * a composição só se descobria lendo os três componentes.
  */
-export interface ContainerDetailVM {
+export interface ContainerDetailVM extends ContainerActionsVM, ManifestEditorVM {
   /** Texto do cluster inteiro. */
   t: ContainerDetailPageText;
   /** Cabeçalho do contêiner. */
@@ -236,53 +237,6 @@ export interface ContainerDetailVM {
   manifest: readonly ManifestRowData[];
   /** Eventos recentes, já formatados. */
   logs: readonly TelemetryRowData[];
-  /** Catálogo oferecido pelo editor de manifesto. */
-  products: readonly ProductOption[];
-  /** Volta para a listagem. Quem navega é a View. */
-  listHref: string;
-
-  // --- Ações de estado. REJEITAM na falha: quem as chama é o `ConfirmDialog`,
-  // que tem estado de erro próprio e espera uma promise crua.
-
-  /** Lacra o contêiner. Só ofertada quando `facts.canSeal`. */
-  seal: () => Promise<void>;
-  /** Despacha o contêiner. Só ofertada quando `facts.canDispatch`. */
-  dispatch: () => Promise<void>;
-  /** Exclui o contêiner. */
-  remove: () => Promise<void>;
-
-  // --- Editor de manifesto. Mesmo desenho dos formulários das outras rotas,
-  // com dois botões de envio em vez de um: carregar e descarregar aplicam a
-  // MESMA entrada validada a mutations diferentes.
-
-  /** Valor atual de um campo do editor. */
-  manifestValue: (field: ManifestField) => string;
-  /** Erro de um campo do editor, só depois de tocado. */
-  manifestError: (field: ManifestField) => string | undefined;
-  /**
-   * Uma carga ou descarga está em voo.
-   *
-   * Não há `manifestFailed`: este editor nunca teve faixa de erro (nem o texto
-   * da tela tem a chave), então a falha continua só interrompendo o recarregar,
-   * como antes. Registrado aqui para não parecer esquecimento.
-   */
-  manifestPending: () => boolean;
-  /** Escreve um campo do editor. */
-  setManifest: (field: ManifestField, value: string) => void;
-  /** Marca um campo do editor como tocado. */
-  blurManifest: (field: ManifestField) => void;
-  /**
-   * Carrega o item no manifesto. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se carregou; a View então recarrega a rota.
-   */
-  load: () => Promise<boolean>;
-  /**
-   * Descarrega o item do manifesto. Nunca rejeita.
-   *
-   * @returns `true` se descarregou; a View então recarrega a rota.
-   */
-  unload: () => Promise<boolean>;
 }
 
 /**

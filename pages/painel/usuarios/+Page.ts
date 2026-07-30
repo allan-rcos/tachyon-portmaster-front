@@ -1,3 +1,11 @@
+/**
+ * Composição de `/painel/usuarios` — Listagem de usuários.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { UserListScreen } from '@view/users/screens/UserListScreen';
 import { createUserListVM, type UserListPageInput } from '@viewmodel/users/user-list-page.vm';
 import type { PageContext } from 'vike/types';

@@ -1,12 +1,14 @@
-// ============================================================
-//  Rota /painel — o painel operacional.
-//
-//  Os KPIs e a divisão de ocupação chegam JÁ FORMATADOS: número com separador,
-//  percentual com sufixo, rótulo e tom de cada status. A View só desenha —
-//  antes ela fazia `formatNumber`/`formatPercent` e montava os segmentos.
-//
-//  Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
+/**
+ * Rota /painel — o painel operacional.
+ *
+ * Os KPIs e a divisão de ocupação chegam JÁ FORMATADOS: número com separador,
+ * percentual com sufixo, rótulo e tom de cada status. A View só desenha —
+ * antes ela fazia `formatNumber`/`formatPercent` e montava os segmentos.
+ *
+ * Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import { type Tone } from '@viewmodel/core/i18n/labels';
 import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';

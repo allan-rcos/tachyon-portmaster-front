@@ -1,14 +1,16 @@
-// ============================================================
-//  Rota /painel/conteineres.
-//
-//  Mesmo desenho de `@viewmodel/products/product-list-page.vm`, que documenta
-//  os dois papéis. Duas diferenças próprias desta tela:
-//
-//   • a ocupação (peso ÷ capacidade) é calculada AQUI e entregue já em número
-//     para a barra e em string para o rótulo — a View não faz aritmética;
-//   • os filtros da query string viram opções prontas para o `<select>`, com o
-//     rótulo traduzido e a marcação de selecionado já resolvida.
-// ============================================================
+/**
+ * Rota /painel/conteineres.
+ *
+ * Mesmo desenho de `@viewmodel/products/product-list-page.vm`, que documenta
+ * os dois papéis. Duas diferenças próprias desta tela:
+ *
+ * • a ocupação (peso ÷ capacidade) é calculada AQUI e entregue já em número
+ *   para a barra e em string para o rótulo — a View não faz aritmética;
+ * • os filtros da query string viram opções prontas para o `<select>`, com o
+ *   rótulo traduzido e a marcação de selecionado já resolvida.
+ *
+ * @packageDocumentation
+ */
 import { ContainerStatus, Permission } from '@model/common';
 import type { Container } from '@model/containers/dto';
 import {

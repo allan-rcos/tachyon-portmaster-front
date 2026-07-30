@@ -1,12 +1,14 @@
-// ============================================================
-//  Runtime genérico da ponte JSON(DTO) ↔ FlatBuffers, compartilhado
-//  pelos codecs FBS de cada recurso. Só é exercido no wire FBS (prod).
-//
-//   • decode: reflexão recursiva sobre o objeto desempacotado (*T),
-//     convertendo camelCase → snake_case e enums numéricos → string.
-//   • encode: cada recurso constrói seu *T explicitamente (tipos planos);
-//     aqui ficam só os helpers de serialização e os índices de enum.
-// ============================================================
+/**
+ * Runtime genérico da ponte JSON(DTO) ↔ FlatBuffers, compartilhado
+ * pelos codecs FBS de cada recurso. Só é exercido no wire FBS (prod).
+ *
+ * • decode: reflexão recursiva sobre o objeto desempacotado (*T),
+ *   convertendo camelCase → snake_case e enums numéricos → string.
+ * • encode: cada recurso constrói seu *T explicitamente (tipos planos);
+ *   aqui ficam só os helpers de serialização e os índices de enum.
+ *
+ * @packageDocumentation
+ */
 import type { RiskClass, Permission } from '@model/common/dto';
 import * as flatbuffers from 'flatbuffers';
 

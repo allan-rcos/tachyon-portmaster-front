@@ -1,13 +1,15 @@
-// ============================================================
-//  Rota /painel/usuarios/@id/editar.
-//
-//  Usuário e perfis são buscados em PARALELO no `+data`: são recursos
-//  independentes, e serializar as chamadas só somaria latência ao SSR.
-//
-//  O estado do formulário e o do reset de senha moram aqui — ver
-//  `@viewmodel/products/product-create-page.vm` para o desenho, e
-//  `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
+/**
+ * Rota /painel/usuarios/@id/editar.
+ *
+ * Usuário e perfis são buscados em PARALELO no `+data`: são recursos
+ * independentes, e serializar as chamadas só somaria latência ao SSR.
+ *
+ * O estado do formulário e o do reset de senha moram aqui — ver
+ * `@viewmodel/products/product-create-page.vm` para o desenho, e
+ * `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
@@ -28,7 +30,7 @@ import { resetUserPassword } from './mutations/reset-user-password.mutation';
 import { updateUser } from './mutations/update-user.mutation';
 import { getUser } from './queries/get-user.query';
 import { createPasswordResetSchema, createUserSchema } from './schemas/user.schema';
-import type { RoleOption, UserField } from './user-create-page.vm';
+import type { RoleOption, UserAdminActionsVM, UserField, UserFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const USER_EDIT_PERMISSIONS = [Permission.UserGet, Permission.UserUpdate] as const;
@@ -109,70 +111,22 @@ interface Draft {
 
 const ALL_FIELDS: readonly UserField[] = ['name', 'email', 'initial_password'];
 
-/** Superfície da edição de usuário. */
-export interface UserEditVM {
-  /** Texto da tela. */
+/**
+ * Superfície da edição de usuário.
+ *
+ * A tela junta duas peças, e o tipo diz isso: o {@link UserFormVM} (o mesmo que
+ * a criação satisfaz) mais o {@link UserAdminActionsVM} que aparece ao lado.
+ * Só o que é próprio da edição fica declarado aqui.
+ */
+export interface UserEditVM extends UserFormVM, UserAdminActionsVM {
+  /** Texto da tela — cobre o formulário e as ações. */
   t: UserEditText;
   /** Identificador opaco do usuário em edição. */
   id: string;
   /** Nome do usuário, para o cabeçalho e a trilha. */
   userName: string;
-  /** Perfis disponíveis para vincular. */
-  roles: readonly RoleOption[];
-  /** Volta para a listagem. Quem navega é a View. */
-  listHref: string;
   /** `edit` decide o rótulo do botão e a ausência da senha inicial. */
   mode: 'edit';
-  /** Valor atual de um campo de texto. */
-  value: (field: UserField) => string;
-  /** Erro de um campo, só depois de tocado (ou de uma tentativa de envio). */
-  error: (field: UserField) => string | undefined;
-  /** Um perfil está vinculado? */
-  hasRole: (roleId: string) => boolean;
-  /** Erro da seleção de perfis — ver `./user-create-page.vm`. */
-  rolesError: () => string | undefined;
-  /** Uma submissão está em voo. */
-  submitting: () => boolean;
-  /** A última tentativa falhou na API. */
-  failed: () => boolean;
-  /** Escreve um campo de texto. */
-  set: (field: UserField, value: string) => void;
-  /** Marca um campo como tocado, liberando o erro dele. */
-  blur: (field: UserField) => void;
-  /** Liga ou desliga o vínculo com um perfil. */
-  toggleRole: (roleId: string, on: boolean) => void;
-  /**
-   * Valida e salva. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se salvou; a View então navega para `listHref`.
-   */
-  submit: () => Promise<boolean>;
-
-  // --- Ações administrativas, que a tela mostra ao lado do formulário.
-
-  /** Nova senha digitada no reset. */
-  newPassword: () => string;
-  /** Erro da nova senha, depois da primeira tentativa de reset. */
-  newPasswordError: () => string | undefined;
-  /** Um reset está em voo. */
-  resetting: () => boolean;
-  /** O último reset concluiu — é o que acende a confirmação na tela. */
-  resetDone: () => boolean;
-  /** Escreve a nova senha. */
-  setNewPassword: (value: string) => void;
-  /**
-   * Redefine a senha do usuário. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se redefiniu; o campo é limpo junto.
-   */
-  resetPassword: () => Promise<boolean>;
-  /**
-   * Exclui o usuário.
-   *
-   * REJEITA na falha: quem chama é o `ConfirmDialog`, que tem estado de erro
-   * próprio.
-   */
-  remove: () => Promise<void>;
 }
 
 /**

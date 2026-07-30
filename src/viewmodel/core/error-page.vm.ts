@@ -1,8 +1,10 @@
-// ============================================================
-//  Carregador da página de erro. Traduz o status abortado a montante
-//  (403 vindo do guard, 404 de rota inexistente, 500 no resto) para o texto
-//  exibido. Estático: não toca a API.
-// ============================================================
+/**
+ * Carregador da página de erro. Traduz o status abortado a montante
+ * (403 vindo do guard, 404 de rota inexistente, 500 no resto) para o texto
+ * exibido. Estático: não toca a API.
+ *
+ * @packageDocumentation
+ */
 import type { PageMeta, PageRequest } from './page/page-request';
 
 /** Dados que a página de erro entrega à View. */

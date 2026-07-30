@@ -1,19 +1,21 @@
-// ============================================================
-//  Rota /painel/produtos — as duas metades do MVVM desta tela.
-//
-//   • `createProductListPageInput` é o DATA: o papel de uma resposta de API
-//     JSON. Faz o trabalho de servidor (sessão, permissão, cookie, i18n, 1ª
-//     página) e devolve dado PURO e SERIALIZÁVEL — o Vike o atravessa com o
-//     `@brillout/json-serializer` para hidratar o cliente, então nada de
-//     função, signal ou instância de classe aqui dentro.
-//
-//   • `createProductListVM` é a REATIVIDADE: signals e handlers nomeados,
-//     construído no `+Page` a partir daquele dado puro. Roda igual nos dois
-//     lados — no 1º load a partir do input desserializado, na navegação
-//     client-side a partir do input que o `+data` produziu no navegador.
-//
-//  A tela (`ProductListScreen`) é stateless: só lê deste VM.
-// ============================================================
+/**
+ * Rota /painel/produtos — as duas metades do MVVM desta tela.
+ *
+ * • `createProductListPageInput` é o DATA: o papel de uma resposta de API
+ *   JSON. Faz o trabalho de servidor (sessão, permissão, cookie, i18n, 1ª
+ *   página) e devolve dado PURO e SERIALIZÁVEL — o Vike o atravessa com o
+ *   `@brillout/json-serializer` para hidratar o cliente, então nada de
+ *   função, signal ou instância de classe aqui dentro.
+ *
+ * • `createProductListVM` é a REATIVIDADE: signals e handlers nomeados,
+ *   construído no `+Page` a partir daquele dado puro. Roda igual nos dois
+ *   lados — no 1º load a partir do input desserializado, na navegação
+ *   client-side a partir do input que o `+data` produziu no navegador.
+ *
+ * A tela (`ProductListScreen`) é stateless: só lê deste VM.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import type { Product } from '@model/products/dto';
 import {

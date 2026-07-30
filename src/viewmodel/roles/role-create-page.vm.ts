@@ -1,10 +1,12 @@
-// ============================================================
-//  Rota /painel/perfis/nova.
-//
-//  A rota não busca nada de leitura: só autoriza e resolve texto. O estado do
-//  formulário mora aqui — ver `@viewmodel/products/product-create-page.vm` para
-//  o desenho, e `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
+/**
+ * Rota /painel/perfis/nova.
+ *
+ * A rota não busca nada de leitura: só autoriza e resolve texto. O estado do
+ * formulário mora aqui — ver `@viewmodel/products/product-create-page.vm` para
+ * o desenho, e `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import { PERMISSION_OPTION_GROUPS } from '@viewmodel/core/i18n/labels';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
@@ -18,6 +20,7 @@ import { z } from 'zod';
 import { roleNewMessages, type RoleNewText } from './i18n/role-create-page.messages';
 import { createRole } from './mutations/create-role.mutation';
 import { createRoleSchema } from './schemas/role.schema';
+import type { RoleFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const ROLE_CREATE_PERMISSIONS = [Permission.RoleCreate] as const;
@@ -58,45 +61,17 @@ export async function createRoleCreatePageInput(
   };
 }
 
-/** Superfície do formulário de criação. */
-export interface RoleCreateVM {
-  /** Texto da tela. */
+/**
+ * Superfície da criação de perfil.
+ *
+ * O grosso é o {@link RoleFormVM} — o mesmo contrato que a matriz de permissões
+ * satisfaz. Aqui só o que a criação estreita.
+ */
+export interface RoleCreateVM extends RoleFormVM {
+  /** Texto da tela — o do formulário, mais o cabeçalho da rota. */
   t: RoleNewText;
-  /** Volta para a listagem. Quem navega é a View. */
-  listHref: string;
-  /** A matriz de permissões. */
-  permissionGroups: readonly OptionGroup[];
   /** `create` decide o rótulo do botão e que o nome é campo, não `<output>`. */
   mode: 'create';
-  /** Nome digitado. */
-  name: () => string;
-  /** Erro do nome, só depois de tocado (ou de uma tentativa de envio). */
-  nameError: () => string | undefined;
-  /** Uma permissão está concedida? */
-  hasPermission: (value: string) => boolean;
-  /**
-   * Erro da matriz de permissões.
-   *
-   * Separado do nome porque não existe "tocar" uma matriz de caixas: o erro
-   * aparece depois da primeira tentativa de envio.
-   */
-  permissionsError: () => string | undefined;
-  /** Uma submissão está em voo. */
-  submitting: () => boolean;
-  /** A última tentativa falhou na API. */
-  failed: () => boolean;
-  /** Escreve o nome. */
-  setName: (value: string) => void;
-  /** Marca o nome como tocado, liberando o erro dele. */
-  blurName: () => void;
-  /** Liga ou desliga uma permissão. */
-  togglePermission: (value: string, on: boolean) => void;
-  /**
-   * Valida e cria. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se criou; a View então navega para `listHref`.
-   */
-  submit: () => Promise<boolean>;
 }
 
 /** Valores enquanto se edita. `permissions` é `string[]` porque a View não

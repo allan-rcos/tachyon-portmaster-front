@@ -1,3 +1,10 @@
+/**
+ * O `<title>` de cada rota. Lê `data.meta`, que o `createXPageInput` já
+ * resolveu no locale da requisição — o Vike exige valor de config serializável,
+ * por isso o código mora em arquivo próprio em vez de `+config.js`.
+ *
+ * @packageDocumentation
+ */
 import type { PageMeta } from '@viewmodel/core/page/page-request';
 import type { PageContext } from 'vike/types';
 

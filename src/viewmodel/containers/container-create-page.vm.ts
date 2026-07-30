@@ -1,10 +1,12 @@
-// ============================================================
-//  Rota /painel/conteineres/nova.
-//
-//  A rota não busca nada de leitura: só autoriza e resolve texto. O estado do
-//  formulário mora aqui — ver `@viewmodel/products/product-create-page.vm` para
-//  o desenho, e `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
+/**
+ * Rota /painel/conteineres/nova.
+ *
+ * A rota não busca nada de leitura: só autoriza e resolve texto. O estado do
+ * formulário mora aqui — ver `@viewmodel/products/product-create-page.vm` para
+ * o desenho, e `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
@@ -16,6 +18,7 @@ import { z } from 'zod';
 import { containerNewMessages, type ContainerNewText } from './i18n/container-create-page.messages';
 import { createContainer } from './mutations/create-container.mutation';
 import { createContainerSchema } from './schemas/container.schema';
+import type { ContainerField, ContainerFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const CONTAINER_CREATE_PERMISSIONS = [Permission.ContainerCreate] as const;
@@ -53,36 +56,18 @@ export async function createContainerCreatePageInput(
   };
 }
 
-/** Superfície do formulário de criação. */
-export interface ContainerCreateVM {
-  /** Texto da tela. */
+/**
+ * Superfície do registro de contêiner.
+ *
+ * O grosso é o {@link ContainerFormVM} — o mesmo contrato que a edição
+ * satisfaz. Aqui só o que o registro estreita.
+ */
+export interface ContainerCreateVM extends ContainerFormVM {
+  /** Texto da tela — o do formulário, mais o cabeçalho da rota. */
   t: ContainerNewText;
-  /** Volta para a listagem. Quem navega é a View. */
-  listHref: string;
-  /** `create` decide o rótulo do botão e se o código é editável. */
+  /** `create` decide o rótulo do botão e que o código é editável. */
   mode: 'create';
-  /** Valor atual de um campo. */
-  value: (field: ContainerField) => string;
-  /** Erro de um campo, só depois de tocado (ou de uma tentativa de envio). */
-  error: (field: ContainerField) => string | undefined;
-  /** Uma submissão está em voo. */
-  submitting: () => boolean;
-  /** A última tentativa falhou na API. */
-  failed: () => boolean;
-  /** Escreve um campo. */
-  set: (field: ContainerField, value: string) => void;
-  /** Marca um campo como tocado, liberando o erro dele. */
-  blur: (field: ContainerField) => void;
-  /**
-   * Valida e registra. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se registrou; a View então navega para `listHref`.
-   */
-  submit: () => Promise<boolean>;
 }
-
-/** Campos do formulário de contêiner. */
-export type ContainerField = 'code' | 'max_capacity';
 
 /** Valores enquanto se digita — tudo texto. Ver `@viewmodel/products/product-create-page.vm`. */
 interface Draft {

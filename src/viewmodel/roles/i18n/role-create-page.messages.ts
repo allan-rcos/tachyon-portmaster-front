@@ -1,4 +1,8 @@
-// Catálogo da rota /painel/perfis/nova: texto do form + chrome da página.
+/**
+ * Catálogo da rota /painel/perfis/nova: texto do form + chrome da página.
+ *
+ * @packageDocumentation
+ */
 import type { Locale } from '@viewmodel/core/i18n/locale';
 import { roleFormMessages } from '@viewmodel/roles/i18n/role-form.messages';
 

@@ -1,5 +1,9 @@
-// Catálogo da rota /painel/perfis/@id/permissoes: texto do form (RoleForm em
-// modo permissions) + chrome (título da lista e rótulo de sincronização).
+/**
+ * Catálogo da rota /painel/perfis/@id/permissoes: texto do form (RoleForm em
+ * modo permissions) + chrome (título da lista e rótulo de sincronização).
+ *
+ * @packageDocumentation
+ */
 import type { Locale } from '@viewmodel/core/i18n/locale';
 import { roleFormMessages } from '@viewmodel/roles/i18n/role-form.messages';
 

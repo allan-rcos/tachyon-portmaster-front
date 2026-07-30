@@ -1,17 +1,19 @@
-// ============================================================
-//  Rota /painel/produtos/@id/editar.
-//
-//  O produto é buscado no `+data`, então a tela de edição chega com o
-//  formulário já preenchido no HTML da primeira requisição — antes ela abria
-//  vazia e só preenchia depois que o navegador buscava. Não há mais
-//  `AsyncBoundary` de carga inicial porque não há mais carga inicial.
-//
-//  O ESTADO DO FORMULÁRIO mora aqui, como na criação — a diferença é que os
-//  valores iniciais vêm do produto buscado, e que existe `remove()`.
-//
-//  Ver `./product-list-page.vm` para a explicação dos dois papéis, e
-//  `./product-create-page.vm` para o desenho do formulário.
-// ============================================================
+/**
+ * Rota /painel/produtos/@id/editar.
+ *
+ * O produto é buscado no `+data`, então a tela de edição chega com o
+ * formulário já preenchido no HTML da primeira requisição — antes ela abria
+ * vazia e só preenchia depois que o navegador buscava. Não há mais
+ * `AsyncBoundary` de carga inicial porque não há mais carga inicial.
+ *
+ * O ESTADO DO FORMULÁRIO mora aqui, como na criação — a diferença é que os
+ * valores iniciais vêm do produto buscado, e que existe `remove()`.
+ *
+ * Ver `./product-list-page.vm` para a explicação dos dois papéis, e
+ * `./product-create-page.vm` para o desenho do formulário.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import { RISK_CLASS_OPTIONS } from '@viewmodel/core/i18n/labels';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
@@ -27,9 +29,9 @@ import { z } from 'zod';
 import { productEditMessages, type ProductEditText } from './i18n/product-edit-page.messages';
 import { deleteProduct } from './mutations/delete-product.mutation';
 import { updateProduct } from './mutations/update-product.mutation';
-import type { ProductField } from './product-create-page.vm';
 import { getProduct } from './queries/get-product.query';
 import { createProductSchema } from './schemas/product.schema';
+import type { ProductField, ProductFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const PRODUCT_EDIT_PERMISSIONS = [Permission.ProductRead, Permission.ProductUpdate] as const;
@@ -110,38 +112,21 @@ interface Draft {
 
 const ALL_FIELDS: readonly ProductField[] = ['name', 'density', 'risk_class'];
 
-/** Superfície da edição de produto. */
-export interface ProductEditVM {
-  /** Texto da tela. */
+/**
+ * Superfície da edição de produto.
+ *
+ * O grosso é o {@link ProductFormVM}, o mesmo que a criação satisfaz. Aqui só o
+ * que é próprio da edição — inclusive o `remove`, que ali é opcional.
+ */
+export interface ProductEditVM extends ProductFormVM {
+  /** Texto da tela — o do formulário, mais o cabeçalho da rota. */
   t: ProductEditText;
   /** Identificador opaco do produto em edição. */
   id: string;
   /** Nome do produto, para o cabeçalho e a trilha. */
   productName: string;
-  /** Volta para a listagem. Quem navega é a View. */
-  listHref: string;
-  /** Classes de risco do seletor. */
-  riskOptions: readonly SelectOption[];
   /** `edit` decide o rótulo do botão e a presença do "excluir". */
   mode: 'edit';
-  /** Valor atual de um campo — começa preenchido com o produto buscado. */
-  value: (field: ProductField) => string;
-  /** Erro de um campo, só depois de tocado (ou de uma tentativa de envio). */
-  error: (field: ProductField) => string | undefined;
-  /** Uma submissão está em voo. */
-  submitting: () => boolean;
-  /** A última tentativa falhou na API. */
-  failed: () => boolean;
-  /** Escreve um campo. */
-  set: (field: ProductField, value: string) => void;
-  /** Marca um campo como tocado, liberando o erro dele. */
-  blur: (field: ProductField) => void;
-  /**
-   * Valida e salva. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se salvou; a View então navega para `listHref`.
-   */
-  submit: () => Promise<boolean>;
   /**
    * Exclui o produto.
    *

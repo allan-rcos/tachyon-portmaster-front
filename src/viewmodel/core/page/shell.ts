@@ -1,11 +1,13 @@
-// ============================================================
-//  Identidade que o chrome autenticado (sidebar) mostra no rodapé.
-//
-//  Fica no `PageInput` — e não no layout — pela mesma razão que o `meta`: o
-//  `+Layout` não tem `+data` próprio no Vike, mas enxerga `pageContext.data`.
-//  Como TODA rota autenticada já chama `authorize()`, o perfil já está em mãos;
-//  o que falta é entregá-lo em formato de apresentação.
-// ============================================================
+/**
+ * Identidade que o chrome autenticado (sidebar) mostra no rodapé.
+ *
+ * Fica no `PageInput` — e não no layout — pela mesma razão que o `meta`: o
+ * `+Layout` não tem `+data` próprio no Vike, mas enxerga `pageContext.data`.
+ * Como TODA rota autenticada já chama `authorize()`, o perfil já está em mãos;
+ * o que falta é entregá-lo em formato de apresentação.
+ *
+ * @packageDocumentation
+ */
 import type { AccountProfile } from '@model/account';
 
 /** O que o rodapé da barra lateral desenha. Serializável. */

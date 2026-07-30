@@ -1,11 +1,13 @@
-// ============================================================
-//  Factories dos DTOs de contêiner, manifesto e telemetria.
-//
-//  Todo `id` sai de `sequence`, então dois `build()` nunca colidem; o resto vem
-//  do faker — o que expõe teste que depende, sem querer, de um valor específico
-//  do seed. Ver `@viewmodel/core/testing/factory-support` para `paged` e
-//  `seedFaker`.
-// ============================================================
+/**
+ * Factories dos DTOs de contêiner, manifesto e telemetria.
+ *
+ * Todo `id` sai de `sequence`, então dois `build()` nunca colidem; o resto vem
+ * do faker — o que expõe teste que depende, sem querer, de um valor específico
+ * do seed. Ver `@viewmodel/core/testing/factory-support` para `paged` e
+ * `seedFaker`.
+ *
+ * @packageDocumentation
+ */
 import { faker } from '@faker-js/faker';
 import { ContainerStatus, TelemetryEvent } from '@model/common/dto';
 import type {

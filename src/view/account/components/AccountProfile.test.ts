@@ -1,9 +1,10 @@
 import { getByText } from '@testing-library/dom';
 import { accountMessages } from '@viewmodel/account/i18n/account-page.messages';
+import type { AccountProfileVM } from '@viewmodel/account/vm-contracts';
 import { render } from 'lit';
 import { describe, expect, it } from 'vitest';
 
-import { AccountProfile, type AccountProfileVM } from './AccountProfile';
+import { AccountProfile } from './AccountProfile';
 
 /** VM de mentira: só os campos que o componente lê. */
 function vm(): AccountProfileVM {

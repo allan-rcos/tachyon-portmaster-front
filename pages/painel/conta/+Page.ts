@@ -1,3 +1,11 @@
+/**
+ * Composição de `/painel/conta` — A conta do próprio usuário: perfil e troca de senha.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { AccountScreen } from '@view/account/screens/AccountScreen';
 import { createAccountPageVM, type AccountPageInput } from '@viewmodel/account/account-page.vm';
 import type { PageContext } from 'vike/types';

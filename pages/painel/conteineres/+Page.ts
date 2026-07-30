@@ -1,3 +1,11 @@
+/**
+ * Composição de `/painel/conteineres` — Listagem de contêineres, paginada por cursor.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { ContainerListScreen } from '@view/containers/screens/ContainerListScreen';
 import {
   createContainerListVM,

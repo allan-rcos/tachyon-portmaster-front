@@ -1,6 +1,8 @@
-// ============================================================
-//  Factory do DTO de métricas do painel.
-// ============================================================
+/**
+ * Factory do DTO de métricas do painel.
+ *
+ * @packageDocumentation
+ */
 import { faker } from '@faker-js/faker';
 import type { Metrics } from '@model/metrics/dto';
 import { Factory } from 'fishery';

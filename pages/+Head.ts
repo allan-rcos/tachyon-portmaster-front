@@ -1,3 +1,10 @@
+/**
+ * O que sobra do `<head>` depois que `+title` e `+description` assumiram
+ * as tags que o `vike-lit` sabe emitir sozinho: favicon, viewport e o resto do
+ * que não tem config própria.
+ *
+ * @packageDocumentation
+ */
 import { html } from 'lit';
 import type { Renderable } from 'vike-lit/types';
 

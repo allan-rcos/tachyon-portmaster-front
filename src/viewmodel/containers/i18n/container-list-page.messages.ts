@@ -1,8 +1,12 @@
-// Catálogo i18n da rota /painel/conteineres (lista). Dono do texto é a
-// página; os componentes recebem `t` resolvido por prop. Termos de UI
-// transversais vêm de `commonText` (composição evita duplicar literais).
-// O tipo de retorno `ContainerListText` é o CONTRATO/schema das chaves que
-// esta rota consome — `tsc` acusa se alguma faltar no `messages/*.json`.
+/**
+ * Catálogo i18n da rota /painel/conteineres (lista). Dono do texto é a
+ * página; os componentes recebem `t` resolvido por prop. Termos de UI
+ * transversais vêm de `commonText` (composição evita duplicar literais).
+ * O tipo de retorno `ContainerListText` é o CONTRATO/schema das chaves que
+ * esta rota consome — `tsc` acusa se alguma faltar no `messages/*.json`.
+ *
+ * @packageDocumentation
+ */
 import { commonText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 

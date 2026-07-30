@@ -1,3 +1,11 @@
+/**
+ * Composição de `/entrar` — Login — a única rota pública. Renderiza fora do AppShell.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { LoginPage } from '@view/auth/components/LoginPage';
 import { createLoginVM } from '@viewmodel/auth/login-page.vm';
 import type { PageContext } from 'vike/types';

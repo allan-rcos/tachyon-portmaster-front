@@ -1,29 +1,11 @@
 import { FormField } from '@view/core/components/FormField';
-import type { PasswordField } from '@viewmodel/account/account-page.vm';
 import type { PasswordChangeText } from '@viewmodel/account/i18n/text-contracts';
+import type { PasswordChangeVM, PasswordField } from '@viewmodel/account/vm-contracts';
 import { html, type TemplateResult } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 
 import styles from './PasswordChange.island.module.scss';
-
-/**
- * O que a troca de senha precisa do ViewModel da rota.
- *
- * Ver `@view/products/islands/ProductForm.island` para por que o tipo mora na
- * View e não é importado pelo VM.
- */
-export interface PasswordChangeVM {
-  t: PasswordChangeText;
-  passwordValue: (field: PasswordField) => string;
-  passwordError: (field: PasswordField) => string | undefined;
-  changingPassword: () => boolean;
-  passwordFailed: () => boolean;
-  passwordChanged: () => boolean;
-  setPassword: (field: PasswordField, value: string) => void;
-  blurPassword: (field: PasswordField) => void;
-  changePassword: () => Promise<boolean>;
-}
 
 export interface PasswordChangeProps {
   /** ViewModel da rota — dono do estado do formulário. */

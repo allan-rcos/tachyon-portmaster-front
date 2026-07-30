@@ -1,8 +1,10 @@
-// ============================================================
-//  Contratos de texto do domínio de perfis (RBAC).
-//  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
-//  morar no ViewModel.
-// ============================================================
+/**
+ * Contratos de texto do domínio de perfis (RBAC).
+ * Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
+ * morar no ViewModel.
+ *
+ * @packageDocumentation
+ */
 import type { RoleSchemaText } from '@viewmodel/roles/schemas/role.schema';
 
 /** Chaves de texto que a listagem de perfis consome. */

@@ -1,7 +1,14 @@
-// ============================================================
-//  Rótulos pt-BR e "tom" (cor de badge) dos enums do domínio.
-// ============================================================
-import { RiskClass, type ContainerStatus, type TelemetryEvent, type Permission } from '@model/common';
+/**
+ * Rótulos pt-BR e "tom" (cor de badge) dos enums do domínio.
+ *
+ * @packageDocumentation
+ */
+import {
+  RiskClass,
+  type ContainerStatus,
+  type TelemetryEvent,
+  type Permission,
+} from '@model/common';
 import type { OptionGroup, SelectOption } from '@viewmodel/core/page/options';
 
 export type Tone = 'gold' | 'sage' | 'teal' | 'orange' | 'danger' | 'neutral';

@@ -1,12 +1,13 @@
-// ============================================================
-//  Stub de `window.location` para capturar redirects e reloads no jsdom.
-//
-//  Mora na View porque é a única camada que redireciona: o ViewModel sinaliza
-//  a intenção (um erro de domínio, um href pronto) e quem toca o navegador é o
-//  componente. Um helper de navegador não teria por que existir num diretório
-//  neutro de testes.
-// ============================================================
-
+/**
+ * Stub de `window.location` para capturar redirects e reloads no jsdom.
+ *
+ * Mora na View porque é a única camada que redireciona: o ViewModel sinaliza
+ * a intenção (um erro de domínio, um href pronto) e quem toca o navegador é o
+ * componente. Um helper de navegador não teria por que existir num diretório
+ * neutro de testes.
+ *
+ * @packageDocumentation
+ */
 /** Controles do stub de `window.location` instalado no teste. */
 export interface LocationStub {
   /** Hrefs atribuídos, na ordem — o último é o redirect efetivo. */

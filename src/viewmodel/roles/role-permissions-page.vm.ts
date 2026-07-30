@@ -1,13 +1,15 @@
-// ============================================================
-//  Rota /painel/perfis/@id/permissoes.
-//
-//  A API não expõe `GET /roles/{id}`, então o perfil é localizado na listagem —
-//  aceitável porque são poucos perfis. Um id que não resolve vira
-//  `PageNotFoundError`, e traduzir isso para 404 é papel do `pages/`.
-//
-//  O estado da matriz mora aqui — ver `./role-create-page.vm` para o desenho, e
-//  `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
+/**
+ * Rota /painel/perfis/@id/permissoes.
+ *
+ * A API não expõe `GET /roles/{id}`, então o perfil é localizado na listagem —
+ * aceitável porque são poucos perfis. Um id que não resolve vira
+ * `PageNotFoundError`, e traduzir isso para 404 é papel do `pages/`.
+ *
+ * O estado da matriz mora aqui — ver `./role-create-page.vm` para o desenho, e
+ * `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import { PERMISSION_OPTION_GROUPS } from '@viewmodel/core/i18n/labels';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
@@ -30,6 +32,7 @@ import {
 import { updateRolePermissions } from './mutations/update-role-permissions.mutation';
 import { listRoles } from './queries/list-roles.query';
 import { createRoleSchema } from './schemas/role.schema';
+import type { RoleFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const ROLE_PERMISSIONS_PERMISSIONS = [
@@ -88,44 +91,21 @@ export async function createRolePermissionsPageInput(
   };
 }
 
-/** Superfície da matriz de permissões de um perfil. */
-export interface RolePermissionsVM {
-  /** Texto da tela. */
+/**
+ * Superfície da matriz de permissões de um perfil.
+ *
+ * O grosso é o {@link RoleFormVM}, o mesmo que a criação satisfaz — a matriz é
+ * a mesma nos dois modos. Aqui só o que esta rota estreita ou acrescenta.
+ */
+export interface RolePermissionsVM extends RoleFormVM {
+  /** Texto da tela — o do formulário, mais o cabeçalho da rota. */
   t: RolePermissionsText;
   /** Identificador opaco do perfil. */
   id: string;
   /** Nome do perfil — só leitura: o `PUT` de permissões não o aceita. */
   roleName: string;
-  /** A matriz em si. */
-  permissionGroups: readonly OptionGroup[];
-  /** Volta para a listagem. Quem navega é a View. */
-  listHref: string;
   /** `permissions` decide o rótulo do botão e que o nome vira `<output>`. */
   mode: 'permissions';
-  /** O nome, para o `<output>`. */
-  name: () => string;
-  /** Nunca há erro de nome aqui — o campo não é editável. */
-  nameError: () => string | undefined;
-  /** Uma permissão está concedida? Começa marcado com o que o perfil já tem. */
-  hasPermission: (value: string) => boolean;
-  /** Erro da matriz — ver `./role-create-page.vm`. */
-  permissionsError: () => string | undefined;
-  /** Uma submissão está em voo. */
-  submitting: () => boolean;
-  /** A última tentativa falhou na API. */
-  failed: () => boolean;
-  /** Não faz nada: o nome não é editável neste modo. */
-  setName: (value: string) => void;
-  /** Idem. */
-  blurName: () => void;
-  /** Liga ou desliga uma permissão. */
-  togglePermission: (value: string, on: boolean) => void;
-  /**
-   * Valida e sincroniza as permissões. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se sincronizou; a View então navega para `listHref`.
-   */
-  submit: () => Promise<boolean>;
 }
 
 /**

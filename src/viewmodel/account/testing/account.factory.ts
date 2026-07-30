@@ -1,11 +1,13 @@
-// ============================================================
-//  Factories dos DTOs de conta.
-//
-//  `roleRefFactory` mora aqui porque `RoleRef` é do módulo de conta
-//  (`@model/account/dto`) — é a referência enxuta de perfil que vem embutida
-//  num usuário, não o perfil administrável de `@model/roles/dto`. As factories
-//  de usuário a reaproveitam.
-// ============================================================
+/**
+ * Factories dos DTOs de conta.
+ *
+ * `roleRefFactory` mora aqui porque `RoleRef` é do módulo de conta
+ * (`@model/account/dto`) — é a referência enxuta de perfil que vem embutida
+ * num usuário, não o perfil administrável de `@model/roles/dto`. As factories
+ * de usuário a reaproveitam.
+ *
+ * @packageDocumentation
+ */
 import { faker } from '@faker-js/faker';
 import type { AccountProfile, RoleRef } from '@model/account/dto';
 import { Permission } from '@model/common/dto';

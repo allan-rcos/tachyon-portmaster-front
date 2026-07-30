@@ -1,3 +1,11 @@
+/**
+ * Composição de `/painel/produtos/@id/editar` — Edição de produto.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { ProductEditScreen } from '@view/products/screens/ProductEditScreen';
 import {
   createProductEditVM,

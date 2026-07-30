@@ -1,3 +1,11 @@
+/**
+ * Composição de `/painel/produtos/nova` — Criação de produto.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { ProductCreateScreen } from '@view/products/screens/ProductCreateScreen';
 import {
   createProductCreateVM,

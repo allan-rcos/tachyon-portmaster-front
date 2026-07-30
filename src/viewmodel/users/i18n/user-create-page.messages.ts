@@ -1,4 +1,8 @@
-// Catálogo da rota /painel/usuarios/nova: texto do form + chrome da página.
+/**
+ * Catálogo da rota /painel/usuarios/nova: texto do form + chrome da página.
+ *
+ * @packageDocumentation
+ */
 import type { Locale } from '@viewmodel/core/i18n/locale';
 import { userFormMessages } from '@viewmodel/users/i18n/user-form.messages';
 

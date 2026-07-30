@@ -1,8 +1,10 @@
-// ============================================================
-//  Contratos de texto do domínio de conta (perfil próprio).
-//  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
-//  morar no ViewModel.
-// ============================================================
+/**
+ * Contratos de texto do domínio de conta (perfil próprio).
+ * Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
+ * morar no ViewModel.
+ *
+ * @packageDocumentation
+ */
 import type {
   AccountSchemaText,
   PasswordChangeSchemaText,

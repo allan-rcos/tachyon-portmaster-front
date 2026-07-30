@@ -60,6 +60,7 @@ src/viewmodel/
     schemas/              validação Zod
     i18n/                 catálogos de mensagem e contratos de texto
     testing/              factories
+    vm-contracts.ts       a superfície que cada PEÇA da tela consome
     <rota>.vm.ts          os DOIS papéis da rota: `createXPageInput` (data,
                           roda no servidor) + `createXVM` (reatividade)
 ```
@@ -94,14 +95,25 @@ compõe View e ViewModel, ou adapta o Vike ao contrato neutro do ViewModel.
 
 ## As decisões que sustentam isso
 
-### O contrato de texto mora no ViewModel
+### Todo contrato mora no ViewModel — texto e superfície
 
-Quem **produz** o texto (resolvendo um catálogo para um locale) é o ViewModel;
-quem **consome** é a View. Por isso as interfaces `*Text` vivem em
-`@viewmodel/<feature>/i18n/text-contracts` — se morassem no componente, o
-ViewModel dependeria da View para se tipar, invertendo a regra.
+Quem **produz** é o ViewModel; quem **consome** é a View. Vale para as duas
+coisas que atravessam a fronteira:
 
-O `tsc` fecha o ciclo: catálogo que esquece uma chave falha no build, não na tela.
+- as interfaces `*Text`, em `@viewmodel/<feature>/i18n/text-contracts`;
+- as interfaces `*VM`, em `@viewmodel/<feature>/vm-contracts`.
+
+Se morassem no componente, o ViewModel dependeria da View para se tipar,
+invertendo a regra.
+
+O `tsc` fecha o ciclo nas duas pontas: catálogo que esquece uma chave falha no
+build, não na tela — e VM que esquece um método falha na **declaração**, porque
+a superfície é declarada com `extends` e não só satisfeita por acaso.
+
+Um contrato por PEÇA da tela, não por rota. É o que deixa `/produtos/nova` e
+`/produtos/@id/editar` satisfazerem o mesmo `ProductFormVM` (e o formulário ser
+um componente só), e o que faz o tipo do detalhe de contêiner dizer, sozinho,
+que a tela é `ContainerActionsVM + ManifestEditorVM + o resto`.
 
 ### A View nunca importa `@model`
 

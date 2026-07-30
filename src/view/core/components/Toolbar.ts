@@ -53,8 +53,8 @@ export function Toolbar(props: ToolbarProps): TemplateResult {
       search
         ? html`<form class=${styles.side} method="get" role="search">
             ${Object.entries(search.keep ?? {}).map(
-            ([name, value]) => html`<input type="hidden" name=${name} value=${value} />`,
-          )}
+              ([name, value]) => html`<input type="hidden" name=${name} value=${value} />`,
+            )}
             <label class=${styles.search}>
               ${Icon({ name: 'search', size: 16 })}
               <span class="srOnly">${search.label}</span>

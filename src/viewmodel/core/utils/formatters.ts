@@ -1,29 +1,30 @@
-// ============================================================
-//  Formatação de números, peso, porcentagem e datas.
-//
-//  NÃO usa `Intl`. O comentário anterior deste arquivo dizia "usa Intl (Web
-//  Standard)" — o que era verdade e ainda assim inviável: o **txiki.js não
-//  implementa `Intl`** (nem o objeto global existe). Enquanto as telas de
-//  /painel eram `ClientOnly`, isso passou despercebido porque a formatação só
-//  rodava no navegador. Com o ViewModel entregando dado já formatado pelo
-//  `+data`, ela passou a rodar no SERVIDOR — e o módulo estourava no load,
-//  antes de qualquer render.
-//
-//  Ganho colateral de não usar `Intl`: servidor e cliente executam exatamente o
-//  mesmo código, então a string é idêntica dos dois lados e não há risco de
-//  divergência na hidratação.
-//
-//  O locale deixou de ser fixo em pt-BR: quem chama já o conhece (o
-//  `createXPageInput` o resolveu do cookie do request), então passá-lo é de
-//  graça e o texto finalmente acompanha os três locales do projeto.
-// ============================================================
+/**
+ * Formatação de números, peso, porcentagem e datas.
+ *
+ * NÃO usa `Intl`. O comentário anterior deste arquivo dizia "usa Intl (Web
+ * Standard)" — o que era verdade e ainda assim inviável: o **txiki.js não
+ * implementa `Intl`** (nem o objeto global existe). Enquanto as telas de
+ * /painel eram `ClientOnly`, isso passou despercebido porque a formatação só
+ * rodava no navegador. Com o ViewModel entregando dado já formatado pelo
+ * `+data`, ela passou a rodar no SERVIDOR — e o módulo estourava no load,
+ * antes de qualquer render.
+ *
+ * Ganho colateral de não usar `Intl`: servidor e cliente executam exatamente o
+ * mesmo código, então a string é idêntica dos dois lados e não há risco de
+ * divergência na hidratação.
+ *
+ * O locale deixou de ser fixo em pt-BR: quem chama já o conhece (o
+ * `createXPageInput` o resolveu do cookie do request), então passá-lo é de
+ * graça e o texto finalmente acompanha os três locales do projeto.
+ *
+ * @packageDocumentation
+ */
 import { DEFAULT_LOCALE, type Locale } from '@viewmodel/core/i18n/locale';
 import { format } from 'date-fns';
 import { enUS, es, ptBR } from 'date-fns/locale';
 import numbro from 'numbro';
 import esLanguage from 'numbro/languages/es-ES.js';
 import ptBRLanguage from 'numbro/languages/pt-BR.js';
-
 
 // O numbro embute apenas `en-US`; os demais são registrados uma vez, no load.
 numbro.registerLanguage(ptBRLanguage);

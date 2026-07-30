@@ -1,6 +1,9 @@
-// Texto do formulário de usuário (dono: o próprio form). Reusado por
-// /usuarios/nova e /usuarios/@id/editar. Erros vêm de valText.
-
+/**
+ * Texto do formulário de usuário (dono: o próprio form). Reusado por
+ * /usuarios/nova e /usuarios/@id/editar. Erros vêm de valText.
+ *
+ * @packageDocumentation
+ */
 import { commonText, valText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 

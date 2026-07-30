@@ -1,38 +1,13 @@
 import { FormField } from '@view/core/components/FormField';
 import { island } from '@view/core/island/mount';
 import { ConfirmDialog } from '@view/core/islands/ConfirmDialog.island';
-import type { SelectOption } from '@viewmodel/core/page/options';
 import type { ProductFormText } from '@viewmodel/products/i18n/text-contracts';
-import type { ProductField } from '@viewmodel/products/product-create-page.vm';
+import type { ProductField, ProductFormVM } from '@viewmodel/products/vm-contracts';
 import { html, nothing, type TemplateResult } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 
 import styles from './ProductForm.island.module.scss';
-
-/**
- * O que o formulário precisa do ViewModel da rota.
- *
- * Declarado aqui porque é a View que descreve o que desenha; os dois VMs que o
- * satisfazem (`ProductCreateVM` e `ProductEditVM`) não importam este tipo — o
- * casamento é estrutural, então a dependência continua indo só num sentido.
- */
-export interface ProductFormVM {
-  t: ProductFormText;
-  /** Destino do cancelar e da navegação após salvar. */
-  listHref: string;
-  riskOptions: readonly SelectOption[];
-  mode: 'create' | 'edit';
-  value: (field: ProductField) => string;
-  error: (field: ProductField) => string | undefined;
-  submitting: () => boolean;
-  failed: () => boolean;
-  set: (field: ProductField, value: string) => void;
-  blur: (field: ProductField) => void;
-  submit: () => Promise<boolean>;
-  /** Só em edição. */
-  remove?: () => Promise<void>;
-}
 
 export interface ProductFormProps {
   /** ViewModel da rota — dono do estado do formulário. */
@@ -137,19 +112,19 @@ export function ProductForm(props: ProductFormProps): TemplateResult {
         vm.mode === 'edit' && vm.remove
           ? html`<li class=${styles.spacer}>
               ${island(ConfirmDialog, {
-              triggerLabel: vm.t.delete,
-              triggerIcon: 'trash',
-              triggerVariant: 'danger',
-              confirmVariant: 'danger',
-              title: vm.t.delete,
-              message: vm.t.deleteConfirm,
-              confirmLabel: vm.t.delete,
-              cancelLabel: vm.t.cancel,
-              onConfirm: vm.remove,
-              onDone: () => {
-                window.location.href = vm.listHref;
-              },
-            })}
+                triggerLabel: vm.t.delete,
+                triggerIcon: 'trash',
+                triggerVariant: 'danger',
+                confirmVariant: 'danger',
+                title: vm.t.delete,
+                message: vm.t.deleteConfirm,
+                confirmLabel: vm.t.delete,
+                cancelLabel: vm.t.cancel,
+                onConfirm: vm.remove,
+                onDone: () => {
+                  window.location.href = vm.listHref;
+                },
+              })}
             </li>`
           : nothing
       }
@@ -157,4 +132,4 @@ export function ProductForm(props: ProductFormProps): TemplateResult {
   </form>`;
 }
 
-export type { ProductFormText };
+export type { ProductFormText, ProductFormVM };

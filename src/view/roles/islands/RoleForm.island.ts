@@ -1,37 +1,12 @@
 import { FormField } from '@view/core/components/FormField';
 import { PermissionMatrix } from '@view/roles/components/PermissionMatrix';
-import type { OptionGroup } from '@viewmodel/core/page/options';
 import type { RoleFormText } from '@viewmodel/roles/i18n/text-contracts';
+import type { RoleFormVM } from '@viewmodel/roles/vm-contracts';
 import { html, type TemplateResult } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 
 import styles from './RoleForm.island.module.scss';
-
-/**
- * O que o formulário precisa do ViewModel da rota.
- *
- * Ver `@view/products/islands/ProductForm.island` para por que o tipo mora na
- * View e não é importado pelos VMs.
- */
-export interface RoleFormVM {
-  t: RoleFormText;
-  /** Matriz de permissões, com rótulos já resolvidos pelo ViewModel. */
-  permissionGroups: readonly OptionGroup[];
-  /** Destino do cancelar e da navegação após salvar. */
-  listHref: string;
-  mode: 'create' | 'permissions';
-  name: () => string;
-  nameError: () => string | undefined;
-  hasPermission: (value: string) => boolean;
-  permissionsError: () => string | undefined;
-  submitting: () => boolean;
-  failed: () => boolean;
-  setName: (value: string) => void;
-  blurName: () => void;
-  togglePermission: (value: string, on: boolean) => void;
-  submit: () => Promise<boolean>;
-}
 
 export interface RoleFormProps {
   /** ViewModel da rota — dono do estado do formulário. */
@@ -113,4 +88,4 @@ export function RoleForm(props: RoleFormProps): TemplateResult {
   </form>`;
 }
 
-export type { RoleFormText };
+export type { RoleFormText, RoleFormVM };

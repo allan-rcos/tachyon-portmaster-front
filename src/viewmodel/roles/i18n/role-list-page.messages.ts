@@ -1,4 +1,8 @@
-// Catálogo i18n da rota /painel/perfis (lista).
+/**
+ * Catálogo i18n da rota /painel/perfis (lista).
+ *
+ * @packageDocumentation
+ */
 import { commonText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 

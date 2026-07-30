@@ -1,36 +1,11 @@
 import { FormField } from '@view/core/components/FormField';
 import type { UserFormText } from '@viewmodel/users/i18n/text-contracts';
-import type { RoleOption, UserField } from '@viewmodel/users/user-create-page.vm';
+import type { UserField, UserFormVM } from '@viewmodel/users/vm-contracts';
 import { html, nothing, type TemplateResult } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 
 import styles from './UserForm.island.module.scss';
-
-/**
- * O que o formulário precisa do ViewModel da rota.
- *
- * Ver `@view/products/islands/ProductForm.island` para por que o tipo mora na
- * View e não é importado pelos VMs.
- */
-export interface UserFormVM {
-  t: UserFormText;
-  /** Perfis disponíveis para vincular. */
-  roles: readonly RoleOption[];
-  /** Destino do cancelar e da navegação após salvar. */
-  listHref: string;
-  mode: 'create' | 'edit';
-  value: (field: UserField) => string;
-  error: (field: UserField) => string | undefined;
-  hasRole: (roleId: string) => boolean;
-  rolesError: () => string | undefined;
-  submitting: () => boolean;
-  failed: () => boolean;
-  set: (field: UserField, value: string) => void;
-  blur: (field: UserField) => void;
-  toggleRole: (roleId: string, on: boolean) => void;
-  submit: () => Promise<boolean>;
-}
 
 export interface UserFormProps {
   /** ViewModel da rota — dono do estado do formulário. */
@@ -94,7 +69,7 @@ export function UserForm(props: UserFormProps): TemplateResult {
                 type="checkbox"
                 .checked=${live(vm.hasRole(role.id))}
                 @change=${(e: Event) =>
-                vm.toggleRole(role.id, (e.currentTarget as HTMLInputElement).checked)}
+                  vm.toggleRole(role.id, (e.currentTarget as HTMLInputElement).checked)}
               />
               <span>${role.name}</span>
             </label>`,
@@ -120,4 +95,4 @@ export function UserForm(props: UserFormProps): TemplateResult {
   </form>`;
 }
 
-export type { UserFormText };
+export type { UserFormText, UserFormVM };

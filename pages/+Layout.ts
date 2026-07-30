@@ -1,3 +1,11 @@
+/**
+ * Layout raiz. Injeta o CSS global e envolve as rotas autenticadas no
+ * {@link "src/view/core/layouts" | AppShell}; `/entrar` renderiza sem o chrome.
+ *
+ * É composição pura — a lista de rotas públicas é a única regra que mora aqui.
+ *
+ * @packageDocumentation
+ */
 import type { ShellNavText } from '@view/core/components/Sidebar';
 import { AppShell } from '@view/core/layouts/AppShell';
 import type { IncomingHeaders } from '@viewmodel/core/client/api-client';

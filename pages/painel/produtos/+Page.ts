@@ -1,3 +1,11 @@
+/**
+ * Composição de `/painel/produtos` — Listagem de produtos.
+ *
+ * Único ponto onde View e ViewModel se encontram para esta rota: constrói o VM a
+ * partir do `pageContext.data` e devolve a tela. Sem markup, sem CSS, sem lógica.
+ *
+ * @packageDocumentation
+ */
 import { ProductListScreen } from '@view/products/screens/ProductListScreen';
 import {
   createProductListVM,

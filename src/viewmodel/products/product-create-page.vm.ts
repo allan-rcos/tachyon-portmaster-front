@@ -1,21 +1,23 @@
-// ============================================================
-//  Rota /painel/produtos/nova.
-//
-//  A rota não busca nada de leitura: só autoriza e resolve texto. Ainda assim
-//  tem o par `createXPageInput` + `createXVM`, porque a permissão de criar é
-//  trabalho de servidor — antes ela vivia em `+permissions.js` e era avaliada
-//  por um guard genérico, longe do código da tela.
-//
-//  O ESTADO DO FORMULÁRIO mora aqui, e não na island. Antes vivia na View, no
-//  `@tanstack/solid-form` + `createMutationSignal` — mas valores, campos
-//  tocados, "está enviando" e "falhou" são estado de aplicação. A consequência
-//  prática: validação e submissão são testáveis sem DOM, e a island vira
-//  desenho puro. Escrito à mão, com `signal`/`computed` e o schema Zod que já
-//  existia; sem helper compartilhado entre as telas de formulário.
-//
-//  Ver `./product-list-page.vm` para a explicação dos dois papéis, e
-//  `@viewmodel/auth/login-page.vm` para o mesmo desenho na primeira tela.
-// ============================================================
+/**
+ * Rota /painel/produtos/nova.
+ *
+ * A rota não busca nada de leitura: só autoriza e resolve texto. Ainda assim
+ * tem o par `createXPageInput` + `createXVM`, porque a permissão de criar é
+ * trabalho de servidor — antes ela vivia em `+permissions.js` e era avaliada
+ * por um guard genérico, longe do código da tela.
+ *
+ * O ESTADO DO FORMULÁRIO mora aqui, e não na island. Antes vivia na View, no
+ * `@tanstack/solid-form` + `createMutationSignal` — mas valores, campos
+ * tocados, "está enviando" e "falhou" são estado de aplicação. A consequência
+ * prática: validação e submissão são testáveis sem DOM, e a island vira
+ * desenho puro. Escrito à mão, com `signal`/`computed` e o schema Zod que já
+ * existia; sem helper compartilhado entre as telas de formulário.
+ *
+ * Ver `./product-list-page.vm` para a explicação dos dois papéis, e
+ * `@viewmodel/auth/login-page.vm` para o mesmo desenho na primeira tela.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import { RISK_CLASS_OPTIONS } from '@viewmodel/core/i18n/labels';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
@@ -29,6 +31,7 @@ import { z } from 'zod';
 import { productNewMessages, type ProductNewText } from './i18n/product-create-page.messages';
 import { createProduct } from './mutations/create-product.mutation';
 import { createProductSchema } from './schemas/product.schema';
+import type { ProductField, ProductFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const PRODUCT_CREATE_PERMISSIONS = [Permission.ProductCreate] as const;
@@ -69,9 +72,6 @@ export async function createProductCreatePageInput(
   };
 }
 
-/** Campos do formulário de produto. */
-export type ProductField = 'name' | 'density' | 'risk_class';
-
 /**
  * Valores enquanto se digita — TUDO texto, que é o que um `<input>` produz.
  *
@@ -86,34 +86,20 @@ interface Draft {
 
 const ALL_FIELDS: readonly ProductField[] = ['name', 'density', 'risk_class'];
 
-/** Superfície do formulário de criação. */
-export interface ProductCreateVM {
-  /** Texto da tela. */
+/**
+ * Superfície da criação de produto.
+ *
+ * O grosso é o {@link ProductFormVM} — o mesmo contrato que a edição satisfaz,
+ * e é por isso que o formulário é um componente só. Aqui só o que a criação
+ * estreita.
+ */
+export interface ProductCreateVM extends ProductFormVM {
+  /** Texto da tela — o do formulário, mais o cabeçalho da rota. */
   t: ProductNewText;
-  /** Volta para a listagem. Quem navega é a View. */
-  listHref: string;
-  /** Classes de risco do seletor. */
-  riskOptions: readonly SelectOption[];
   /** `create` decide o rótulo do botão e a ausência do "excluir". */
   mode: 'create';
-  /** Valor atual de um campo. */
-  value: (field: ProductField) => string;
-  /** Erro de um campo, só depois de tocado (ou de uma tentativa de envio). */
-  error: (field: ProductField) => string | undefined;
-  /** Uma submissão está em voo. */
-  submitting: () => boolean;
-  /** A última tentativa falhou na API. */
-  failed: () => boolean;
-  /** Escreve um campo. */
-  set: (field: ProductField, value: string) => void;
-  /** Marca um campo como tocado, liberando o erro dele. */
-  blur: (field: ProductField) => void;
-  /**
-   * Valida e cadastra. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se cadastrou; a View então navega para `listHref`.
-   */
-  submit: () => Promise<boolean>;
+  /** A criação não exclui. */
+  remove?: undefined;
 }
 
 /**

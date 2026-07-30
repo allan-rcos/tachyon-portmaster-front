@@ -2,25 +2,12 @@ import { FormField } from '@view/core/components/FormField';
 import { island } from '@view/core/island/mount';
 import { ConfirmDialog } from '@view/core/islands/ConfirmDialog.island';
 import type { UserAdminActionsText } from '@viewmodel/users/i18n/text-contracts';
+import type { UserAdminActionsVM } from '@viewmodel/users/vm-contracts';
 import { html, type TemplateResult } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 
 import styles from './UserAdminActions.island.module.scss';
-
-/** O que as ações administrativas precisam do ViewModel da rota. */
-export interface UserAdminActionsVM {
-  t: UserAdminActionsText;
-  /** Destino depois de excluir. */
-  listHref: string;
-  newPassword: () => string;
-  newPasswordError: () => string | undefined;
-  resetting: () => boolean;
-  resetDone: () => boolean;
-  setNewPassword: (value: string) => void;
-  resetPassword: () => Promise<boolean>;
-  remove: () => Promise<void>;
-}
 
 export interface UserAdminActionsProps {
   /** ViewModel da rota. */
@@ -92,4 +79,4 @@ export function UserAdminActions(props: UserAdminActionsProps): TemplateResult {
   </div>`;
 }
 
-export type { UserAdminActionsText };
+export type { UserAdminActionsText, UserAdminActionsVM };

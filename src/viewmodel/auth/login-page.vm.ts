@@ -1,21 +1,22 @@
-// ============================================================
-//  Rota /entrar — as duas metades do MVVM desta tela.
-//
-//   • `loadLoginPage` é o DATA: resolve texto e destino do redirect a partir da
-//     requisição, e devolve dado PURO e SERIALIZÁVEL.
-//
-//   • `createLoginVM` é a REATIVIDADE: o estado do formulário mora AQUI, e não
-//     no island. Antes ele vivia na View, no `@tanstack/solid-form` — mas o que
-//     um formulário guarda (valores, o que já foi tocado, se está enviando, se
-//     falhou) é estado de aplicação, e estado de aplicação é do ViewModel. A
-//     consequência prática: dá para testar validação e submissão sem DOM, e o
-//     island vira desenho puro.
-//
-//  Não há abstração de formulário no meio. As peças são as que já existiam:
-//  `signal`/`computed` do alien-signals, o schema Zod desta feature, e a
-//  mutation. É o mesmo `try/catch/finally` que os VMs de listagem já usam.
-// ============================================================
-
+/**
+ * Rota /entrar — as duas metades do MVVM desta tela.
+ *
+ * • `loadLoginPage` é o DATA: resolve texto e destino do redirect a partir da
+ *   requisição, e devolve dado PURO e SERIALIZÁVEL.
+ *
+ * • `createLoginVM` é a REATIVIDADE: o estado do formulário mora AQUI, e não
+ *   no island. Antes ele vivia na View, no `@tanstack/solid-form` — mas o que
+ *   um formulário guarda (valores, o que já foi tocado, se está enviando, se
+ *   falhou) é estado de aplicação, e estado de aplicação é do ViewModel. A
+ *   consequência prática: dá para testar validação e submissão sem DOM, e o
+ *   island vira desenho puro.
+ *
+ * Não há abstração de formulário no meio. As peças são as que já existiam:
+ * `signal`/`computed` do alien-signals, o schema Zod desta feature, e a
+ * mutation. É o mesmo `try/catch/finally` que os VMs de listagem já usam.
+ *
+ * @packageDocumentation
+ */
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 import { computed, signal } from 'alien-signals';

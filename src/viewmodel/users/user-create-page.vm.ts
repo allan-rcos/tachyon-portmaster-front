@@ -1,13 +1,15 @@
-// ============================================================
-//  Rota /painel/usuarios/nova.
-//
-//  Os perfis disponíveis são buscados no `+data`: o `<select>` chega populado
-//  no HTML da primeira requisição, em vez de aparecer vazio e preencher depois.
-//
-//  O estado do formulário mora aqui — ver
-//  `@viewmodel/products/product-create-page.vm` para o desenho, e
-//  `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
+/**
+ * Rota /painel/usuarios/nova.
+ *
+ * Os perfis disponíveis são buscados no `+data`: o `<select>` chega populado
+ * no HTML da primeira requisição, em vez de aparecer vazio e preencher depois.
+ *
+ * O estado do formulário mora aqui — ver
+ * `@viewmodel/products/product-create-page.vm` para o desenho, e
+ * `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
@@ -20,17 +22,10 @@ import { z } from 'zod';
 import { userNewMessages, type UserNewText } from './i18n/user-create-page.messages';
 import { createUser } from './mutations/create-user.mutation';
 import { createUserSchema } from './schemas/user.schema';
+import type { RoleOption, UserField, UserFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const USER_CREATE_PERMISSIONS = [Permission.UserCreate] as const;
-
-/** Opção de perfil oferecida no formulário. */
-export interface RoleOption {
-  /** Id opaco base62 do perfil. */
-  id: string;
-  /** Nome exibido na opção. */
-  name: string;
-}
 
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface UserCreatePageInput {
@@ -69,9 +64,6 @@ export async function createUserCreatePageInput(
   };
 }
 
-/** Campos de texto do formulário de usuário. Os perfis têm API própria. */
-export type UserField = 'name' | 'email' | 'initial_password';
-
 /** Valores enquanto se digita. Ver `@viewmodel/products/product-create-page.vm`. */
 interface Draft {
   name: string;
@@ -82,45 +74,18 @@ interface Draft {
 
 const ALL_FIELDS: readonly UserField[] = ['name', 'email', 'initial_password'];
 
-/** Superfície da criação de usuário. */
-export interface UserCreateVM {
-  /** Texto da tela. */
+/**
+ * Superfície da criação de usuário.
+ *
+ * O grosso da superfície é o {@link UserFormVM} — o mesmo contrato que a edição
+ * satisfaz, e é por isso que o formulário é um componente só. Aqui só entra o
+ * que a criação estreita.
+ */
+export interface UserCreateVM extends UserFormVM {
+  /** Texto da tela — o do formulário, mais o cabeçalho da rota. */
   t: UserNewText;
-  /** Perfis disponíveis para vincular. */
-  roles: readonly RoleOption[];
-  /** Volta para a listagem. Quem navega é a View. */
-  listHref: string;
   /** `create` decide o rótulo do botão e a presença da senha inicial. */
   mode: 'create';
-  /** Valor atual de um campo de texto. */
-  value: (field: UserField) => string;
-  /** Erro de um campo, só depois de tocado (ou de uma tentativa de envio). */
-  error: (field: UserField) => string | undefined;
-  /** Um perfil está vinculado? */
-  hasRole: (roleId: string) => boolean;
-  /**
-   * Erro da seleção de perfis.
-   *
-   * Separado dos campos de texto porque não há "tocar" um grupo de caixas: o
-   * erro aparece depois da primeira tentativa de envio.
-   */
-  rolesError: () => string | undefined;
-  /** Uma submissão está em voo. */
-  submitting: () => boolean;
-  /** A última tentativa falhou na API. */
-  failed: () => boolean;
-  /** Escreve um campo de texto. */
-  set: (field: UserField, value: string) => void;
-  /** Marca um campo como tocado, liberando o erro dele. */
-  blur: (field: UserField) => void;
-  /** Liga ou desliga o vínculo com um perfil. */
-  toggleRole: (roleId: string, on: boolean) => void;
-  /**
-   * Valida e cria. Nunca rejeita — o erro vira estado.
-   *
-   * @returns `true` se criou; a View então navega para `listHref`.
-   */
-  submit: () => Promise<boolean>;
 }
 
 /**

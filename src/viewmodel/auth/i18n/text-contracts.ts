@@ -1,8 +1,10 @@
-// ============================================================
-//  Contratos de texto do domínio de autenticação.
-//  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
-//  morar no ViewModel.
-// ============================================================
+/**
+ * Contratos de texto do domínio de autenticação.
+ * Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
+ * morar no ViewModel.
+ *
+ * @packageDocumentation
+ */
 import type { LoginSchemaText } from '@viewmodel/auth/schemas/login.schema';
 
 /** Chaves de texto do formulário de login. */

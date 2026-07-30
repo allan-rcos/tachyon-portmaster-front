@@ -1,7 +1,9 @@
-// ============================================================
-//  Factory do DTO de produto. Ver `@viewmodel/core/testing/factory-support`
-//  para `paged` e `seedFaker`.
-// ============================================================
+/**
+ * Factory do DTO de produto. Ver `@viewmodel/core/testing/factory-support`
+ * para `paged` e `seedFaker`.
+ *
+ * @packageDocumentation
+ */
 import { faker } from '@faker-js/faker';
 import { RiskClass } from '@model/common/dto';
 import type { Product } from '@model/products/dto';

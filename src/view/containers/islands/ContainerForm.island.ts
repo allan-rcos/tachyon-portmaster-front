@@ -1,31 +1,11 @@
 import { FormField } from '@view/core/components/FormField';
-import type { ContainerField } from '@viewmodel/containers/container-create-page.vm';
 import type { ContainerFormText } from '@viewmodel/containers/i18n/text-contracts';
+import type { ContainerFormVM } from '@viewmodel/containers/vm-contracts';
 import { html, type TemplateResult } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 
 import styles from './ContainerForm.island.module.scss';
-
-/**
- * O que o formulário precisa do ViewModel da rota.
- *
- * Ver `@view/products/islands/ProductForm.island` para por que o tipo mora na
- * View e não é importado pelos VMs.
- */
-export interface ContainerFormVM {
-  t: ContainerFormText;
-  /** Destino do cancelar e da navegação após salvar. */
-  listHref: string;
-  mode: 'create' | 'edit';
-  value: (field: ContainerField) => string;
-  error: (field: ContainerField) => string | undefined;
-  submitting: () => boolean;
-  failed: () => boolean;
-  set: (field: ContainerField, value: string) => void;
-  blur: (field: ContainerField) => void;
-  submit: () => Promise<boolean>;
-}
 
 export interface ContainerFormProps {
   /** ViewModel da rota — dono do estado do formulário. */
@@ -67,9 +47,9 @@ export function ContainerForm(props: ContainerFormProps): TemplateResult {
               children: html`<input
                 id="code"
                 class=${classMap({
-                [styles.input]: true,
-                [styles.invalid]: Boolean(vm.error('code')),
-              })}
+                  [styles.input]: true,
+                  [styles.invalid]: Boolean(vm.error('code')),
+                })}
                 .value=${live(vm.value('code'))}
                 placeholder="MSKU-4410"
                 @input=${(e: Event) => vm.set('code', (e.currentTarget as HTMLInputElement).value)}
@@ -119,4 +99,4 @@ export function ContainerForm(props: ContainerFormProps): TemplateResult {
   </form>`;
 }
 
-export type { ContainerFormText };
+export type { ContainerFormText, ContainerFormVM };

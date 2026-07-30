@@ -1,10 +1,12 @@
-// ============================================================
-//  Rota /painel/perfis.
-//
-//  Mesmo desenho de `@viewmodel/products/product-list-page.vm`, que documenta
-//  os dois papéis (o `PageInput` como "data" serializável e o VM como
-//  reatividade). Aqui só muda o recurso.
-// ============================================================
+/**
+ * Rota /painel/perfis.
+ *
+ * Mesmo desenho de `@viewmodel/products/product-list-page.vm`, que documenta
+ * os dois papéis (o `PageInput` como "data" serializável e o VM como
+ * reatividade). Aqui só muda o recurso.
+ *
+ * @packageDocumentation
+ */
 import { Permission } from '@model/common';
 import type { Role } from '@model/roles/dto';
 import {

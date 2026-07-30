@@ -1,12 +1,14 @@
-// ============================================================
-//  Texto da fronteira de carregamento — o que toda tela que busca dados no
-//  navegador precisa dizer quando a busca falha.
-//
-//  Catálogo próprio, e não mais chaves em `commonText`: só as telas assíncronas
-//  consomem estes termos, e metade dos catálogos de rota nem espalha
-//  `commonText`. Um fragmento dedicado mantém cada contrato com exatamente o
-//  que ele usa — que é a regra que o `i18n:check` faz valer.
-// ============================================================
+/**
+ * Texto da fronteira de carregamento — o que toda tela que busca dados no
+ * navegador precisa dizer quando a busca falha.
+ *
+ * Catálogo próprio, e não mais chaves em `commonText`: só as telas assíncronas
+ * consomem estes termos, e metade dos catálogos de rota nem espalha
+ * `commonText`. Um fragmento dedicado mantém cada contrato com exatamente o
+ * que ele usa — que é a regra que o `i18n:check` faz valer.
+ *
+ * @packageDocumentation
+ */
 import type { Locale } from './locale';
 
 import { m } from '@/paraglide/messages';

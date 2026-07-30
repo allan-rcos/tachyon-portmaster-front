@@ -1,8 +1,10 @@
-// ============================================================
-//  Factory do DTO de perfil administrável. A referência enxuta que vem dentro
-//  de um usuário é outra coisa — ver `roleRefFactory` em
-//  `@viewmodel/account/testing/account.factory`.
-// ============================================================
+/**
+ * Factory do DTO de perfil administrável. A referência enxuta que vem dentro
+ * de um usuário é outra coisa — ver `roleRefFactory` em
+ * `@viewmodel/account/testing/account.factory`.
+ *
+ * @packageDocumentation
+ */
 import { faker } from '@faker-js/faker';
 import { Permission } from '@model/common/dto';
 import type { Role } from '@model/roles/dto';

@@ -1,26 +1,11 @@
 import { FormField } from '@view/core/components/FormField';
 import { Icon } from '@view/core/components/Icon';
-import type { ManifestField, ProductOption } from '@viewmodel/containers/container-detail-page.vm';
-import type { ContainerDetailText } from '@viewmodel/containers/i18n/text-contracts';
+import type { ManifestEditorVM } from '@viewmodel/containers/vm-contracts';
 import { html, type TemplateResult } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { live } from 'lit/directives/live.js';
 
 import styles from './ManifestEditor.island.module.scss';
-
-/** O que o editor de manifesto precisa do ViewModel da rota. */
-export interface ManifestEditorVM {
-  t: ContainerDetailText;
-  /** Catálogo oferecido pelo seletor de produto. */
-  products: readonly ProductOption[];
-  manifestValue: (field: ManifestField) => string;
-  manifestError: (field: ManifestField) => string | undefined;
-  manifestPending: () => boolean;
-  setManifest: (field: ManifestField, value: string) => void;
-  blurManifest: (field: ManifestField) => void;
-  load: () => Promise<boolean>;
-  unload: () => Promise<boolean>;
-}
 
 export interface ManifestEditorProps {
   /** ViewModel da rota — dono do estado do editor. */

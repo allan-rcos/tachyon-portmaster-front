@@ -1,9 +1,10 @@
-// ============================================================
-//  DTOs proxy (JSON) transversais — enums e tipos comuns. Espelham
-//  o swagger/swagger.json. IDs são STRINGS base62 opacas no front
-//  (o backend converte para i64 só na infra).
-// ============================================================
-
+/**
+ * DTOs proxy (JSON) transversais — enums e tipos comuns. Espelham
+ * o swagger/swagger.json. IDs são STRINGS base62 opacas no front
+ * (o backend converte para i64 só na infra).
+ *
+ * @packageDocumentation
+ */
 // Enums como objeto `as const`, não `enum` do TS: o `enum` de string é
 // NOMINAL, então `Permission` deixaria de aceitar a string crua vinda do JSON
 // da API e exigiria cast em toda fronteira — além de não ser tree-shakeable.
