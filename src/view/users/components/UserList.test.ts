@@ -3,11 +3,12 @@
 //  monta um VM de mentira com linhas já prontas — que é o que o `+data` entrega
 //  em produção.
 // ============================================================
-import { fireEvent, render } from '@solidjs/testing-library';
+import { fireEvent, getByRole, getByText, queryByRole } from '@testing-library/dom';
 import { asyncBoundaryMessages } from '@viewmodel/core/i18n/async-boundary.messages';
 import { usersListMessages } from '@viewmodel/users/i18n/user-list-page.messages';
 import type { UserListVM, UserRowData } from '@viewmodel/users/user-list-page.vm';
-import { describe, it, expect, vi } from 'vitest';
+import { render } from 'lit';
+import { describe, expect, it, vi } from 'vitest';
 
 import { UserList } from './UserList';
 
@@ -23,11 +24,10 @@ const rows: UserRowData[] = [
 
 /** VM de mentira: só os campos que o componente lê. */
 function vmWith(overrides: Partial<UserListVM> = {}): UserListVM {
-  const items = Object.assign(() => rows, { set: () => {} });
   return {
     t: usersListMessages('pt-BR'),
     boundary: asyncBoundaryMessages('pt-BR'),
-    items,
+    items: () => rows,
     canCreate: true,
     newHref: '/painel/usuarios/nova',
     hasMore: () => false,
@@ -39,28 +39,35 @@ function vmWith(overrides: Partial<UserListVM> = {}): UserListVM {
   } as UserListVM;
 }
 
+function mount(vm: UserListVM): HTMLElement {
+  const el = document.createElement('div');
+  document.body.append(el);
+  render(UserList({ vm }), el);
+  return el;
+}
+
 describe('UserList', () => {
   it('lista usuários com perfis e link de edição', () => {
-    const { getByRole, getByText } = render(() => <UserList vm={vmWith()} />);
+    const el = mount(vmWith());
 
-    expect(getByRole('link', { name: 'Ana Marés' })).toHaveAttribute(
+    expect(getByRole(el, 'link', { name: 'Ana Marés' })).toHaveAttribute(
       'href',
       '/painel/usuarios/usr_1/editar',
     );
-    expect(getByText('Administrador')).toBeInTheDocument();
+    expect(getByText(el, 'Administrador')).toBeInTheDocument();
   });
 
   it('esconde a ação de criar quando falta permissão', () => {
-    const { queryByRole } = render(() => <UserList vm={vmWith({ canCreate: false })} />);
-    expect(queryByRole('link', { name: /novo/i })).not.toBeInTheDocument();
+    const el = mount(vmWith({ canCreate: false }));
+    expect(queryByRole(el, 'link', { name: /novo/i })).not.toBeInTheDocument();
   });
 
   it('chama o handler do ViewModel ao paginar', () => {
-    const loadMore = vi.fn();
+    const loadMore = vi.fn(async () => {});
     const vm = vmWith({ hasMore: () => true, loadMore });
-    const { getByRole } = render(() => <UserList vm={vm} />);
+    const el = mount(vm);
 
-    fireEvent.click(getByRole('button', { name: vm.t.loadMore }));
+    fireEvent.click(getByRole(el, 'button', { name: vm.t.loadMore }));
 
     expect(loadMore).toHaveBeenCalledOnce();
   });

@@ -1,6 +1,6 @@
 import { UserList } from '@view/users/components/UserList';
 import type { UserListVM } from '@viewmodel/users/user-list-page.vm';
-import type { JSX } from 'solid-js';
+import type { TemplateResult } from 'lit';
 
 /** Props da tela de listagem de usuários. */
 export interface UserListScreenProps {
@@ -14,6 +14,6 @@ export interface UserListScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function UserListScreen(props: UserListScreenProps): JSX.Element {
-  return <UserList vm={props.vm} />;
+export function UserListScreen(props: UserListScreenProps): TemplateResult {
+  return UserList({ vm: props.vm });
 }

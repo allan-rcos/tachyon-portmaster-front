@@ -2,7 +2,7 @@ import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { PageHeader } from '@view/core/components/PageHeader';
 import { UserForm } from '@view/users/islands/UserForm.island';
 import type { UserCreateVM } from '@viewmodel/users/user-create-page.vm';
-import type { JSX } from 'solid-js';
+import { html, type TemplateResult } from 'lit';
 
 /** Props da tela de criação de usuário. */
 export interface UserCreateScreenProps {
@@ -12,18 +12,15 @@ export interface UserCreateScreenProps {
 
 /**
  * Tela de criação de usuário. Stateless: os perfis já vieram pelo `+data`, e
- * com eles o `<select>` chega populado no HTML da primeira requisição.
+ * com eles as caixas de seleção chegam no HTML da primeira requisição.
  *
  * @param props.vm ViewModel da rota.
  */
-export function UserCreateScreen(props: UserCreateScreenProps): JSX.Element {
-  return (
-    <section>
-      <Breadcrumbs
-        items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
-      />
-      <PageHeader title={props.vm.t.new} />
-      <UserForm mode="create" roles={[...props.vm.roles]} t={props.vm.t} />
-    </section>
-  );
+export function UserCreateScreen(props: UserCreateScreenProps): TemplateResult {
+  const { vm } = props;
+
+  return html`<section>
+    ${Breadcrumbs({ items: [{ label: vm.t.title, href: vm.listHref }, { label: vm.t.new }] })}
+    ${PageHeader({ title: vm.t.new })} ${UserForm({ vm })}
+  </section>`;
 }
