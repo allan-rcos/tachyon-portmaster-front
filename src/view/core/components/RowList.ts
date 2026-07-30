@@ -1,4 +1,6 @@
-import { For, Show, type JSX } from 'solid-js';
+import type { Renderable } from '@view/core/types';
+import { html, nothing, type TemplateResult } from 'lit';
+import { styleMap } from 'lit/directives/style-map.js';
 
 import styles from './RowList.module.scss';
 
@@ -12,7 +14,7 @@ export interface RowListProps<T> {
   headers: readonly string[];
   items: readonly T[];
   /** Células de uma linha, na ordem das colunas. */
-  children: (item: T) => JSX.Element;
+  children: (item: T) => Renderable;
   /**
    * Grade alternativa do mobile — `grid-template-columns` + `grid-template-areas`.
    * Sem ela a linha só encolhe; com ela, ela se reorganiza em folha.
@@ -30,28 +32,22 @@ export interface RowListProps<T> {
  * As medidas de grade vêm por prop porque cada tela tem a sua: as do protótipo
  * estão registradas em `docs/guides/styling.md`.
  */
-export function RowList<T>(props: RowListProps<T>): JSX.Element {
-  return (
-    <div
-      class={styles.list}
-      style={{
-        '--row-columns': props.columns,
-        '--row-columns-mobile': props.mobile?.columns ?? props.columns,
-        '--row-areas-mobile': props.mobile?.areas ?? 'none',
-      }}
-    >
-      <Show when={props.headers.length > 0}>
-        <div class={styles.head}>
-          <For each={props.headers}>{(label) => <span>{label}</span>}</For>
-        </div>
-      </Show>
-      <For each={props.items}>
-        {(item) => (
-          <div class={styles.row}>
-            {props.children(item)}
-          </div>
-        )}
-      </For>
-    </div>
-  );
+export function RowList<T>(props: RowListProps<T>): TemplateResult {
+  return html`<div
+    class=${styles.list}
+    style=${styleMap({
+      '--row-columns': props.columns,
+      '--row-columns-mobile': props.mobile?.columns ?? props.columns,
+      '--row-areas-mobile': props.mobile?.areas ?? 'none',
+    })}
+  >
+    ${
+      props.headers.length > 0
+        ? html`<div class=${styles.head}>
+            ${props.headers.map((label) => html`<span>${label}</span>`)}
+          </div>`
+        : nothing
+    }
+    ${props.items.map((item) => html`<div class=${styles.row}>${props.children(item)}</div>`)}
+  </div>`;
 }
