@@ -7,6 +7,8 @@ coverage/
 packages/tachyon-design/
 packages/vike-txiki-adapter/
 packages/tachyon-portmaster-sdk/
+# Faltava: `bun run format` reformatava o swagger.json do submodule de contrato.
+src/model/contract/swagger/
 
 # Protótipo estático importado e referência de API gerada.
 docs/prototype/
