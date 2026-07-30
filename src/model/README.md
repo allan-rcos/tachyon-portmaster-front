@@ -1,6 +1,6 @@
 # Model — a camada de dados
 
-Sabe falar com as fontes de dados, e nada mais. **Não conhece** Vike, Solid,
+Sabe falar com as fontes de dados, e nada mais. **Não conhece** Vike, Lit,
 i18n nem DOM — o lint reprova qualquer um desses imports.
 
 ```

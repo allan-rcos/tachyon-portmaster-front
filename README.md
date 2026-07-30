@@ -2,9 +2,14 @@
 
 Frontend SSR do sistema de alocação de contêineres e carga. **[Vike](https://vike.dev)**
 
-- **[SolidJS](https://www.solidjs.com)**, servido em produção pelo
+- **[Lit](https://lit.dev)**, servido em produção pelo
   **[txiki.js](https://github.com/saghul/txiki.js)** (`tjs`) — um runtime minúsculo
   (QuickJS + libuv) que cumpre o padrão WinterTC.
+
+A integração de interface é nossa: `packages/vike-lit`, que espelha a arquitetura
+do `vike-solid` oficial. **Não há `.tsx` no projeto** — `html\`\`` do Lit é
+_tagged template_, então a View é TypeScript que se importa e roda, sem
+compilador de interface no caminho.
 
 O **Bun** é usado só para **gerenciar pacotes** e **compilar**. Ele não serve
 nada em produção.
@@ -25,17 +30,17 @@ Cada camada só enxerga a de baixo. A regra **não é convenção**: está aplic
 
 | Camada          | Responsabilidade                           | Não pode                              |
 | --------------- | ------------------------------------------ | ------------------------------------- |
-| `src/model`     | falar com as fontes de dados               | conhecer Vike, Solid, i18n ou DOM     |
-| `src/viewmodel` | lógica, estado observável, i18n, validação | conhecer JSX, Vike ou Solid           |
+| `src/model`     | falar com as fontes de dados               | conhecer Vike, Lit, i18n ou DOM       |
+| `src/viewmodel` | lógica, estado, i18n, validação, formatação | conhecer Vike, Lit ou DOM            |
 | `src/view`      | interface                                  | falar com a rede ou importar `@model` |
 | `pages`         | integrar o Vike (rotas, guard, `<head>`)   | ter CSS, markup ou lógica             |
 
 O que isso compra na prática:
 
-- **mover uma tela entre servidor e cliente é uma decisão de uma linha** — o
-  `VMContext` escolhe o lado pela presença de `headers`, e o ViewModel não muda;
+- **trocar o motor de interface não tocou a lógica** — a migração de Solid para
+  Lit passou pelos 190 testes de ViewModel sem alterar um deles;
 - **o ViewModel é testável sem DOM, sem Vike e sem rede** — recebe `PageRequest`,
-  um objeto literal;
+  um objeto literal, e isso vale até para os nove formulários;
 - **a interface não alcança a rede por construção** — ela só enxerga o submódulo
   `dto` do Model, que não contém funções.
 
@@ -47,13 +52,13 @@ Detalhes e o porquê de cada decisão em
 ```
 src/
   model/        camada de dados (recursos da API, contrato swagger, codecs)
-  viewmodel/    queries, mutations, schemas, i18n, observables
+  viewmodel/    queries, mutations, schemas, i18n, ViewModels de rota
   view/         componentes, islands, telas e estilos
-  testing/      factories e infra de teste
 pages/          composition root do Vike — só arquivos `+`
 packages/
   tachyon-design/           submodule: design system (SASS)
   tachyon-portmaster-i18n/  catálogos, projeto inlang e validador
+  vike-lit/                 integração de interface do Vike (nossa)
   vike-txiki-adapter/       submodule: adapter do Vike para o txiki
 docs/           arquitetura, guias e protótipo
 dist/           build (inclui a saída do compilador i18n)
@@ -187,7 +192,7 @@ Comece por [`docs/`](docs/README.md).
 
 Cada camada também tem README junto do código:
 [model](src/model/README.md) · [viewmodel](src/viewmodel/README.md) ·
-[view](src/view/README.md) · [testing](src/testing/README.md).
+[view](src/view/README.md) · [vike-lit](packages/vike-lit/README.md).
 
 ---
 

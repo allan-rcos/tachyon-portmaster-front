@@ -31,7 +31,7 @@ Quando a explicação pertence ao diretório, ela mora lá:
 - [`src/model`](../src/model/README.md) — a camada de dados
 - [`src/viewmodel`](../src/viewmodel/README.md) — a lógica da aplicação
 - [`src/view`](../src/view/README.md) — a interface
-- [`src/testing`](../src/testing/README.md) — infra de teste
+- [`packages/vike-lit`](../packages/vike-lit/README.md) — a integração de interface do Vike
 - [`packages/tachyon-portmaster-i18n`](../packages/tachyon-portmaster-i18n/README.md)
 
 ## Protótipo

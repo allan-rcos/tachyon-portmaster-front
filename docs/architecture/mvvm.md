@@ -15,7 +15,7 @@ no `eslint.config.mjs` e falha o build quando violada.
 
 ### Model — `src/model/`
 
-A camada de dados. Sabe falar com a API e nada mais: não conhece Vike, Solid,
+A camada de dados. Sabe falar com a API e nada mais: não conhece Vike, Lit,
 i18n nem DOM.
 
 ```
@@ -32,9 +32,9 @@ src/model/
 ```
 
 A separação **`api.ts` × `dto.ts`** não é cosmética: `dto` contém só tipos e
-constantes, `api` só funções que exigem um cliente. É o que permite a View
-receber o vocabulário de dados sem alcançar nenhuma chamada de rede (ver
-`domain.ts` no ViewModel).
+constantes, `api` só funções que exigem um cliente. É o que permite o ViewModel
+consumir o vocabulário de dados e repassar à View apenas o que já formatou, sem
+que nenhuma chamada de rede fique alcançável de lá.
 
 Precisa de outra fonte de dados — API externa, banco local no navegador,
 qualquer infraestrutura? Ela entra aqui, com a mesma forma. Ver
@@ -42,44 +42,47 @@ qualquer infraestrutura? Ela entra aqui, com a mesma forma. Ver
 
 ### ViewModel — `src/viewmodel/`
 
-A lógica da aplicação. TypeScript puro: **zero JSX, zero Vike, zero Solid** —
+A lógica da aplicação. TypeScript puro: **zero Vike, zero Lit, zero DOM** —
 verificado pelo lint.
 
 ```
 src/viewmodel/
   core/
-    client/       browserClient, serverClient e resolveClient
+    client/       browserClient, serverClient e api-client
     session/      sessão e cálculo de permissões
-    i18n/         locale, catálogos transversais e contratos de texto
-    observable/   async-signal e mutation-signal (alien-signals)
-    page/         PageRequest, VMContext e erros de domínio
+    i18n/         locale, catálogos transversais, contratos de texto, labels
+    page/         PageRequest, authorize, erros de domínio, shell, options
+    schemas/      peças de validação reusadas
     utils/        cookies e formatação
   <feature>/
-    domain.ts             reexporta o `dto` do Model para a View
     queries/              leitura   — *.query.ts
     mutations/            escrita   — *.mutation.ts
     schemas/              validação Zod
     i18n/                 catálogos de mensagem e contratos de texto
-    <rota>.vm.ts          ViewModel de tela (observável) + meta da rota
+    testing/              factories
+    <rota>.vm.ts          os DOIS papéis da rota: `createXPageInput` (data,
+                          roda no servidor) + `createXVM` (reatividade)
 ```
 
 ### View — `src/view/`
 
-A interface. Recebe dados prontos e não fala com a rede.
+A interface. Recebe dados prontos e não fala com a rede. TypeScript com **Lit**:
+`html``` é _tagged template_, então não há compilador de interface no caminho e
+**não existe `.tsx` no projeto**.
 
 ```
 src/view/
   core/
-    components/  design system
+    components/  design system — funções `(props) => TemplateResult`
     layouts/     AppShell
+    island/      Island (classe base) + island() (a diretiva que monta)
     islands/     interativos transversais
-    forms/       adaptador Zod → TanStack Form
-    observable/  ponte alien-signals → Solid
-    screens/     cola comum das telas assíncronas
     styles/      global.scss
+    testing/     stub-location (stub de domínio, não harness)
+    types.ts     Renderable
   <feature>/
     components/  SSR puros, recebem props
-    islands/     *.island.tsx — interativos
+    islands/     *.island.ts — interativos
     screens/     ligam o ViewModel aos componentes
     styles/      SCSS de página
 ```
@@ -102,9 +105,9 @@ O `tsc` fecha o ciclo: catálogo que esquece uma chave falha no build, não na t
 
 ### A View nunca importa `@model`
 
-Ela recebe o vocabulário de dados por `@viewmodel/<feature>/domain`, que
-reexporta **apenas** o submódulo `dto`. Como `dto` não tem funções, é
-estruturalmente impossível uma chamada de rede vazar para a interface.
+Ela recebe o vocabulário de dados pelos tipos que o ViewModel expõe — as
+`XRowData`/`XFacts` que o `createXPageInput` já formatou. Nenhuma função de API
+alcança a camada, por construção do lint.
 
 ### O ViewModel não conhece o roteador
 
@@ -115,29 +118,41 @@ objeto literal, e trocar o roteador toca só o adaptador em `pages/`.
 Do mesmo modo, "recurso não existe" é sinalizado com `PageNotFoundError`, não
 com `render(404)`: traduzir domínio em status HTTP é papel do composition root.
 
-### Servidor ou cliente é uma decisão de uma linha
+### Todo dado é resolvido antes do render
 
-`VMContext` decide o lado pela **presença de `headers`**:
+O `+data` de cada rota roda nos DOIS lados e chama o `createXPageInput`. No
+servidor isso acontece **antes** do render, então o HTML da primeira requisição
+sai completo para qualquer User-Agent — sem esqueleto e sem depender de JS. No
+cliente a mesma função vai no bundle, então a navegação client-side resolve no
+navegador e não gera requisição de página.
 
-```ts
-createProductListVM({ url }); // navegador
-createProductListVM({ url, headers }); // SSR
-```
+A consequência de desenho: quando uma tela renderiza, o dado já existe. Não há
+`AsyncBoundary`, não há `load()` no mount, e nenhum componente trata "carregando".
 
-`resolveClient(headers)` escolhe o cliente HTTP e `contextLocale` escolhe a
-origem do locale. Hoje as telas de `/painel` rodam no navegador — o servidor só
-executa o guard. Levar uma de volta ao SSR é chamar o mesmo ViewModel dentro de
-um `+data.ts`, passando os headers. Nenhum ViewModel muda.
+### Uma única reatividade: alien-signals
 
-As rotas públicas (`/entrar`, `/info`, `/_error`) seguem em SSR com dados, que é
-onde o SEO importa.
+`signal`/`computed`/`effect`, usados crus. O `onRenderClient` do `packages/vike-lit`
+liga **um** effect raiz que reavalia o template da página; ler um getter do
+ViewModel ali é o que registra a dependência, e o diff do `lit-html` decide o DOM.
 
-### O ViewModel trabalha sobre observables
+Não há ponte a manter. Os `observable/` genéricos e os arquivos `to-accessor.ts`
+e `bind-mutation.ts` existiam só para traduzir alien-signals no sistema do Solid
+— saíram junto com ele.
 
-`createAsyncSignal` e `createMutationSignal` usam **alien-signals**, e não os
-primitivos do Solid — é o que mantém a camada independente do framework de
-interface. A ponte (`toAccessor`, `bindMutation`) é o único ponto do projeto que
-conhece as duas bibliotecas.
+Estado de formulário também é alien-signals, no **ViewModel da rota**, escrito à
+mão. Ver [`src/viewmodel/README.md`](../../src/viewmodel/README.md).
+
+### A integração de interface é nossa: `packages/vike-lit`
+
+~500 linhas espelhando arquivo a arquivo o fonte do `vike-solid` oficial —
+inclusive o caminho de bot (`isbot-fast`) e todo o bloco de `<head>`. O que muda
+é o miolo de render: `hydrate()` + effect raiz no cliente, `collectResult` no
+servidor. O `README.md` do package registra o mapeamento contra o upstream, para
+que acompanhar mudança de contrato do Vike seja um diff, não arqueologia.
+
+Restrição de runtime que o ESLint aplica: do `@lit-labs/ssr` só valem
+`lib/render-lit-html.js` e `lib/render-result.js`. A raiz e os outros caminhos
+arrastam built-ins do Node, que o txiki não tem.
 
 ## Aliases
 
@@ -146,7 +161,6 @@ conhece as duas bibliotecas.
 | `@model/*`      | `src/model/*`                                 |
 | `@viewmodel/*`  | `src/viewmodel/*`                             |
 | `@view/*`       | `src/view/*`                                  |
-| `@testing/*`    | `src/testing/*`                               |
 | `@/paraglide/*` | `dist/paraglide/*` (saída do compilador i18n) |
 | `@ds`           | `packages/tachyon-design/scss`                |
 
@@ -158,4 +172,4 @@ precisam ficar em sincronia.
 - [Criar uma feature do zero](../guides/add-feature.md)
 - [Adicionar uma página](../guides/add-page.md)
 - [Adicionar uma fonte de dados ao Model](../guides/add-model-source.md)
-- [Como testar cada camada](../../src/testing/README.md)
+- [Como testar cada camada](../guides/testing.md)
