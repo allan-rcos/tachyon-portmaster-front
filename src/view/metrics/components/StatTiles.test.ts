@@ -1,6 +1,7 @@
-import { render } from '@solidjs/testing-library';
+import { getAllByRole, getByText } from '@testing-library/dom';
 import type { StatTileData } from '@viewmodel/metrics/dashboard-page.vm';
-import { describe, it, expect } from 'vitest';
+import { render } from 'lit';
+import { describe, expect, it } from 'vitest';
 
 import { StatTiles } from './StatTiles';
 
@@ -11,10 +12,12 @@ const tiles: StatTileData[] = [
 
 describe('StatTiles', () => {
   it('desenha um cartão por KPI, com o valor já formatado', () => {
-    const { getAllByRole, getByText } = render(() => <StatTiles tiles={tiles} />);
+    const el = document.createElement('div');
+    document.body.append(el);
+    render(StatTiles({ tiles }), el);
 
-    expect(getAllByRole('listitem')).toHaveLength(2);
-    expect(getByText('58,3%')).toBeInTheDocument();
-    expect(getByText('Contêineres ativos')).toBeInTheDocument();
+    expect(getAllByRole(el, 'listitem')).toHaveLength(2);
+    expect(getByText(el, '58,3%')).toBeInTheDocument();
+    expect(getByText(el, 'Contêineres ativos')).toBeInTheDocument();
   });
 });

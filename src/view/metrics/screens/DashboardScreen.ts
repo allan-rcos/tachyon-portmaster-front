@@ -1,7 +1,7 @@
 import { Toolbar } from '@view/core/components/Toolbar';
 import { MetricsPanel } from '@view/metrics/components/MetricsPanel';
 import type { DashboardVM } from '@viewmodel/metrics/dashboard-page.vm';
-import type { JSX } from 'solid-js';
+import { html, type TemplateResult } from 'lit';
 
 /** Props da tela do painel operacional. */
 export interface DashboardScreenProps {
@@ -18,15 +18,11 @@ export interface DashboardScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function DashboardScreen(props: DashboardScreenProps): JSX.Element {
-  return (
-    <>
-      <Toolbar
-        eyebrow={props.vm.t.eyebrow}
-        title={props.vm.t.title}
-        subtitle={props.vm.t.subtitle}
-      />
-      <MetricsPanel vm={props.vm} />
-    </>
-  );
+export function DashboardScreen(props: DashboardScreenProps): TemplateResult {
+  return html`${Toolbar({
+    eyebrow: props.vm.t.eyebrow,
+    title: props.vm.t.title,
+    subtitle: props.vm.t.subtitle,
+  })}
+  ${MetricsPanel({ vm: props.vm })}`;
 }

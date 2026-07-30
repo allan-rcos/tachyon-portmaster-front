@@ -1,7 +1,7 @@
 import { Badge } from '@view/core/components/Badge';
 import { Icon, type IconName } from '@view/core/components/Icon';
 import type { Tone } from '@viewmodel/core/i18n/labels';
-import { Show, type JSX } from 'solid-js';
+import { html, nothing, type TemplateResult } from 'lit';
 
 import styles from './StatTile.module.scss';
 
@@ -19,20 +19,15 @@ export interface StatTileProps {
 }
 
 /** Bloco de número do painel: ícone tingido, valor grande, rótulo. */
-export function StatTile(props: StatTileProps): JSX.Element {
-  return (
-    <article class={styles.tile} data-tone={props.tone}>
-      <div class={styles.head}>
-        <span class={styles.icon}>
-          <Icon name={props.icon} size={18} />
-        </span>
-        <Show when={props.badge}>{(text) => <Badge tone={props.tone}>{text()}</Badge>}</Show>
-      </div>
-      <p class={styles.value}>
-        {props.value}
-        <Show when={props.unit}>{(unit) => <span class={styles.unit}>{unit()}</span>}</Show>
-      </p>
-      <p class={styles.label}>{props.label}</p>
-    </article>
-  );
+export function StatTile(props: StatTileProps): TemplateResult {
+  return html`<article class=${styles.tile} data-tone=${props.tone}>
+    <div class=${styles.head}>
+      <span class=${styles.icon}>${Icon({ name: props.icon, size: 18 })}</span>
+      ${props.badge ? Badge({ tone: props.tone, children: props.badge }) : nothing}
+    </div>
+    <p class=${styles.value}>
+      ${props.value}${props.unit ? html`<span class=${styles.unit}>${props.unit}</span>` : nothing}
+    </p>
+    <p class=${styles.label}>${props.label}</p>
+  </article>`;
 }
