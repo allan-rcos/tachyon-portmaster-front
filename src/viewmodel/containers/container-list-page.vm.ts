@@ -15,7 +15,11 @@ import {
   asyncBoundaryMessages,
   type AsyncBoundaryText,
 } from '@viewmodel/core/i18n/async-boundary.messages';
-import { CONTAINER_STATUS_LABEL, CONTAINER_STATUS_TONE, type Tone } from '@viewmodel/core/i18n/labels';
+import {
+  CONTAINER_STATUS_LABEL,
+  CONTAINER_STATUS_TONE,
+  type Tone,
+} from '@viewmodel/core/i18n/labels';
 import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
@@ -181,7 +185,10 @@ export async function createContainerListPageInput(
     filters,
     statusOptions: [
       { value: '', label: t.allStatuses },
-      ...Object.values(ContainerStatus).map((s) => ({ value: s, label: CONTAINER_STATUS_LABEL[s] })),
+      ...Object.values(ContainerStatus).map((s) => ({
+        value: s,
+        label: CONTAINER_STATUS_LABEL[s],
+      })),
     ].map(({ value, label }) => ({
       value,
       label,

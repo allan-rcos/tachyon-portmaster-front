@@ -1,6 +1,6 @@
 import { ContainerList } from '@view/containers/components/ContainerList';
 import type { ContainerListVM } from '@viewmodel/containers/container-list-page.vm';
-import type { JSX } from 'solid-js';
+import type { TemplateResult } from 'lit';
 
 /** Props da tela de listagem de contêineres. */
 export interface ContainerListScreenProps {
@@ -14,6 +14,6 @@ export interface ContainerListScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function ContainerListScreen(props: ContainerListScreenProps): JSX.Element {
-  return <ContainerList vm={props.vm} />;
+export function ContainerListScreen(props: ContainerListScreenProps): TemplateResult {
+  return ContainerList({ vm: props.vm });
 }

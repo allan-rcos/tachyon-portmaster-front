@@ -1,6 +1,6 @@
 import { ContainerSummary } from '@view/containers/components/ContainerSummary';
 import type { ContainerDetailVM } from '@viewmodel/containers/container-detail-page.vm';
-import type { JSX } from 'solid-js';
+import type { TemplateResult } from 'lit';
 
 /** Props da tela de detalhe de contêiner. */
 export interface ContainerDetailScreenProps {
@@ -14,6 +14,6 @@ export interface ContainerDetailScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function ContainerDetailScreen(props: ContainerDetailScreenProps): JSX.Element {
-  return <ContainerSummary vm={props.vm} />;
+export function ContainerDetailScreen(props: ContainerDetailScreenProps): TemplateResult {
+  return ContainerSummary({ vm: props.vm });
 }

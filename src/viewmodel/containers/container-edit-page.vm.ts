@@ -2,8 +2,9 @@
 //  Rota /painel/conteineres/@id/editar.
 //
 //  O contêiner é buscado no `+data`, então o formulário chega preenchido no
-//  HTML da primeira requisição. Ver `@viewmodel/products/product-list-page.vm`
-//  para os dois papéis.
+//  HTML da primeira requisição. O estado do formulário mora aqui — ver
+//  `@viewmodel/products/product-create-page.vm` para o desenho, e
+//  `@viewmodel/products/product-list-page.vm` para os dois papéis.
 // ============================================================
 import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
@@ -15,9 +16,14 @@ import {
   type PageRequest,
 } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
+import { computed, signal } from 'alien-signals';
+import { z } from 'zod';
 
+import type { ContainerField } from './container-create-page.vm';
 import { containerEditMessages, type ContainerEditText } from './i18n/container-edit-page.messages';
+import { updateContainer } from './mutations/update-container.mutation';
 import { getContainer } from './queries/get-container.query';
+import { createContainerSchema } from './schemas/container.schema';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const CONTAINER_EDIT_PERMISSIONS = [
@@ -87,12 +93,36 @@ export interface ContainerEditVM {
   t: ContainerEditText;
   /** Identificador opaco do contêiner em edição. */
   id: string;
-  /** Código do contêiner. */
+  /** Código do contêiner — só leitura: o PATCH não o aceita. */
   code: string;
-  /** Valores que preenchem o formulário. */
-  values: ContainerFormValues;
-  /** Volta para a listagem. */
+  /** Volta para a listagem. Quem navega é a View. */
   listHref: string;
+  /** `edit` decide o rótulo do botão e que o código vira `<output>`. */
+  mode: 'edit';
+  /** Valor atual de um campo. */
+  value: (field: ContainerField) => string;
+  /** Erro de um campo, só depois de tocado (ou de uma tentativa de envio). */
+  error: (field: ContainerField) => string | undefined;
+  /** Uma submissão está em voo. */
+  submitting: () => boolean;
+  /** A última tentativa falhou na API. */
+  failed: () => boolean;
+  /** Escreve um campo. */
+  set: (field: ContainerField, value: string) => void;
+  /** Marca um campo como tocado, liberando o erro dele. */
+  blur: (field: ContainerField) => void;
+  /**
+   * Valida e salva. Nunca rejeita — o erro vira estado.
+   *
+   * @returns `true` se salvou; a View então navega para `listHref`.
+   */
+  submit: () => Promise<boolean>;
+}
+
+/** Valores enquanto se digita — tudo texto. Ver `./container-create-page.vm`. */
+interface Draft {
+  code: string;
+  max_capacity: string;
 }
 
 /**
@@ -101,11 +131,54 @@ export interface ContainerEditVM {
  * @param input Dado da rota, vindo do `+data`.
  */
 export function createContainerEditVM(input: ContainerEditPageInput): ContainerEditVM {
+  const schema = createContainerSchema('edit', input.t);
+  const values = signal<Draft>({
+    code: input.values.code,
+    max_capacity: String(input.values.max_capacity),
+  });
+  const touched = signal<ReadonlySet<ContainerField>>(new Set());
+  const submitting = signal(false);
+  const failed = signal(false);
+
+  const problems = computed(() => {
+    const result = schema.safeParse(values());
+    return result.success ? {} : z.flattenError(result.error).fieldErrors;
+  });
+
   return {
     t: input.t,
     id: input.id,
     code: input.code,
-    values: input.values,
     listHref: input.listHref,
+    mode: 'edit',
+    value: (field) => values()[field],
+    error: (field) => (touched().has(field) ? problems()[field]?.[0] : undefined),
+    submitting,
+    failed,
+    set: (field, value) => {
+      values({ ...values(), [field]: value });
+      failed(false);
+    },
+    blur: (field) => touched(new Set(touched()).add(field)),
+    submit: async () => {
+      const result = schema.safeParse(values());
+      if (!result.success) {
+        // Só a capacidade é editável aqui, então é o único erro a revelar.
+        touched(new Set<ContainerField>(['max_capacity']));
+        return false;
+      }
+      submitting(true);
+      failed(false);
+      try {
+        // O código não é editável: só a capacidade vai no PATCH.
+        await updateContainer(input.id, { max_capacity: result.data.max_capacity });
+        return true;
+      } catch {
+        failed(true);
+        return false;
+      } finally {
+        submitting(false);
+      }
+    },
   };
 }

@@ -2,7 +2,7 @@ import { ContainerForm } from '@view/containers/islands/ContainerForm.island';
 import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { PageHeader } from '@view/core/components/PageHeader';
 import type { ContainerCreateVM } from '@viewmodel/containers/container-create-page.vm';
-import type { JSX } from 'solid-js';
+import { html, type TemplateResult } from 'lit';
 
 /** Props da tela de registro de contêiner. */
 export interface ContainerCreateScreenProps {
@@ -15,14 +15,11 @@ export interface ContainerCreateScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function ContainerCreateScreen(props: ContainerCreateScreenProps): JSX.Element {
-  return (
-    <section>
-      <Breadcrumbs
-        items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
-      />
-      <PageHeader title={props.vm.t.new} />
-      <ContainerForm mode="create" t={props.vm.t} />
-    </section>
-  );
+export function ContainerCreateScreen(props: ContainerCreateScreenProps): TemplateResult {
+  const { vm } = props;
+
+  return html`<section>
+    ${Breadcrumbs({ items: [{ label: vm.t.title, href: vm.listHref }, { label: vm.t.new }] })}
+    ${PageHeader({ title: vm.t.new })} ${ContainerForm({ vm })}
+  </section>`;
 }
