@@ -2,11 +2,12 @@
 //  O componente recebe o ViewModel e só desenha — as contagens já chegam
 //  formatadas, que é o que o `+data` entrega em produção.
 // ============================================================
-import { fireEvent, render } from '@solidjs/testing-library';
+import { fireEvent, getByRole, getByText, queryByRole } from '@testing-library/dom';
 import { asyncBoundaryMessages } from '@viewmodel/core/i18n/async-boundary.messages';
 import { rolesListMessages } from '@viewmodel/roles/i18n/role-list-page.messages';
 import type { RoleListVM, RoleRowData } from '@viewmodel/roles/role-list-page.vm';
-import { describe, it, expect, vi } from 'vitest';
+import { render } from 'lit';
+import { describe, expect, it, vi } from 'vitest';
 
 import { RoleList } from './RoleList';
 
@@ -23,11 +24,10 @@ const rows: RoleRowData[] = [
 
 /** VM de mentira: só os campos que o componente lê. */
 function vmWith(overrides: Partial<RoleListVM> = {}): RoleListVM {
-  const items = Object.assign(() => rows, { set: () => {} });
   return {
     t: rolesListMessages('pt-BR'),
     boundary: asyncBoundaryMessages('pt-BR'),
-    items,
+    items: () => rows,
     canCreate: true,
     newHref: '/painel/perfis/nova',
     hasMore: () => false,
@@ -39,35 +39,42 @@ function vmWith(overrides: Partial<RoleListVM> = {}): RoleListVM {
   } as RoleListVM;
 }
 
+function mount(vm: RoleListVM): HTMLElement {
+  const el = document.createElement('div');
+  document.body.append(el);
+  render(RoleList({ vm }), el);
+  return el;
+}
+
 describe('RoleList', () => {
   it('lista perfis com link para permissões', () => {
     const vm = vmWith();
-    const { getByRole } = render(() => <RoleList vm={vm} />);
+    const el = mount(vm);
     // O nome do perfil é o título do cartão; quem leva às permissões é a ação.
-    expect(getByRole('heading', { name: 'Administrador' })).toBeInTheDocument();
-    expect(getByRole('link', { name: `${vm.t.edit} Administrador` })).toHaveAttribute(
+    expect(getByRole(el, 'heading', { name: 'Administrador' })).toBeInTheDocument();
+    expect(getByRole(el, 'link', { name: `${vm.t.edit} Administrador` })).toHaveAttribute(
       'href',
       '/painel/perfis/rol_1/permissoes',
     );
   });
 
   it('mostra as permissões concedidas como chips', () => {
-    const { getByText } = render(() => <RoleList vm={vmWith()} />);
-    expect(getByText('Ver produtos')).toBeInTheDocument();
-    expect(getByText('Criar produtos')).toBeInTheDocument();
+    const el = mount(vmWith());
+    expect(getByText(el, 'Ver produtos')).toBeInTheDocument();
+    expect(getByText(el, 'Criar produtos')).toBeInTheDocument();
   });
 
   it('esconde a ação de criar quando falta permissão', () => {
-    const { queryByRole } = render(() => <RoleList vm={vmWith({ canCreate: false })} />);
-    expect(queryByRole('link', { name: /novo/i })).not.toBeInTheDocument();
+    const el = mount(vmWith({ canCreate: false }));
+    expect(queryByRole(el, 'link', { name: /novo/i })).not.toBeInTheDocument();
   });
 
   it('chama o handler do ViewModel ao paginar', () => {
-    const loadMore = vi.fn();
+    const loadMore = vi.fn(async () => {});
     const vm = vmWith({ hasMore: () => true, loadMore });
-    const { getByRole } = render(() => <RoleList vm={vm} />);
+    const el = mount(vm);
 
-    fireEvent.click(getByRole('button', { name: vm.t.loadMore }));
+    fireEvent.click(getByRole(el, 'button', { name: vm.t.loadMore }));
 
     expect(loadMore).toHaveBeenCalledOnce();
   });

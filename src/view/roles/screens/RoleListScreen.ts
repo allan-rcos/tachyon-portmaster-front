@@ -1,6 +1,6 @@
 import { RoleList } from '@view/roles/components/RoleList';
 import type { RoleListVM } from '@viewmodel/roles/role-list-page.vm';
-import type { JSX } from 'solid-js';
+import type { TemplateResult } from 'lit';
 
 /** Props da tela de listagem de perfis. */
 export interface RoleListScreenProps {
@@ -14,6 +14,6 @@ export interface RoleListScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function RoleListScreen(props: RoleListScreenProps): JSX.Element {
-  return <RoleList vm={props.vm} />;
+export function RoleListScreen(props: RoleListScreenProps): TemplateResult {
+  return RoleList({ vm: props.vm });
 }

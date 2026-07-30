@@ -2,7 +2,7 @@ import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { PageHeader } from '@view/core/components/PageHeader';
 import { RoleForm } from '@view/roles/islands/RoleForm.island';
 import type { RolePermissionsVM } from '@viewmodel/roles/role-permissions-page.vm';
-import type { JSX } from 'solid-js';
+import { html, type TemplateResult } from 'lit';
 
 /** Props da tela de permissões de um perfil. */
 export interface RolePermissionsScreenProps {
@@ -16,21 +16,11 @@ export interface RolePermissionsScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function RolePermissionsScreen(props: RolePermissionsScreenProps): JSX.Element {
-  return (
-    <section>
-      <Breadcrumbs
-        items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.roleName }]}
-      />
-      <PageHeader title={props.vm.roleName} subtitle={props.vm.t.syncPermissions} />
-      <RoleForm
-        mode="permissions"
-        roleId={props.vm.id}
-        defaultName={props.vm.roleName}
-        defaultPermissions={props.vm.granted}
-        t={props.vm.t}
-        permissionGroups={props.vm.permissionGroups}
-      />
-    </section>
-  );
+export function RolePermissionsScreen(props: RolePermissionsScreenProps): TemplateResult {
+  const { vm } = props;
+
+  return html`<section>
+    ${Breadcrumbs({ items: [{ label: vm.t.title, href: vm.listHref }, { label: vm.roleName }] })}
+    ${PageHeader({ title: vm.roleName, subtitle: vm.t.syncPermissions })} ${RoleForm({ vm })}
+  </section>`;
 }

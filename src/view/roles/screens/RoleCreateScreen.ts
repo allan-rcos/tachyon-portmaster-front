@@ -2,7 +2,7 @@ import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { PageHeader } from '@view/core/components/PageHeader';
 import { RoleForm } from '@view/roles/islands/RoleForm.island';
 import type { RoleCreateVM } from '@viewmodel/roles/role-create-page.vm';
-import type { JSX } from 'solid-js';
+import { html, type TemplateResult } from 'lit';
 
 /** Props da tela de criação de perfil. */
 export interface RoleCreateScreenProps {
@@ -15,14 +15,11 @@ export interface RoleCreateScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function RoleCreateScreen(props: RoleCreateScreenProps): JSX.Element {
-  return (
-    <section>
-      <Breadcrumbs
-        items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
-      />
-      <PageHeader title={props.vm.t.new} subtitle={props.vm.t.subtitle} />
-      <RoleForm mode="create" t={props.vm.t} permissionGroups={props.vm.permissionGroups} />
-    </section>
-  );
+export function RoleCreateScreen(props: RoleCreateScreenProps): TemplateResult {
+  const { vm } = props;
+
+  return html`<section>
+    ${Breadcrumbs({ items: [{ label: vm.t.title, href: vm.listHref }, { label: vm.t.new }] })}
+    ${PageHeader({ title: vm.t.new, subtitle: vm.t.subtitle })} ${RoleForm({ vm })}
+  </section>`;
 }

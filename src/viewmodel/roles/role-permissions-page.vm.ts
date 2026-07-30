@@ -5,7 +5,8 @@
 //  aceitável porque são poucos perfis. Um id que não resolve vira
 //  `PageNotFoundError`, e traduzir isso para 404 é papel do `pages/`.
 //
-//  Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
+//  O estado da matriz mora aqui — ver `./role-create-page.vm` para o desenho, e
+//  `@viewmodel/products/product-list-page.vm` para os dois papéis.
 // ============================================================
 import { Permission } from '@model/common';
 import { PERMISSION_OPTION_GROUPS } from '@viewmodel/core/i18n/labels';
@@ -19,12 +20,16 @@ import {
   type PageRequest,
 } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
+import { computed, signal } from 'alien-signals';
+import { z } from 'zod';
 
 import {
   rolePermissionsMessages,
   type RolePermissionsText,
 } from './i18n/role-permissions-page.messages';
+import { updateRolePermissions } from './mutations/update-role-permissions.mutation';
 import { listRoles } from './queries/list-roles.query';
+import { createRoleSchema } from './schemas/role.schema';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const ROLE_PERMISSIONS_PERMISSIONS = [
@@ -89,14 +94,38 @@ export interface RolePermissionsVM {
   t: RolePermissionsText;
   /** Identificador opaco do perfil. */
   id: string;
-  /** Nome do perfil. */
+  /** Nome do perfil — só leitura: o `PUT` de permissões não o aceita. */
   roleName: string;
-  /** Permissões já concedidas. */
-  granted: readonly string[];
   /** A matriz em si. */
   permissionGroups: readonly OptionGroup[];
-  /** Volta para a listagem. */
+  /** Volta para a listagem. Quem navega é a View. */
   listHref: string;
+  /** `permissions` decide o rótulo do botão e que o nome vira `<output>`. */
+  mode: 'permissions';
+  /** O nome, para o `<output>`. */
+  name: () => string;
+  /** Nunca há erro de nome aqui — o campo não é editável. */
+  nameError: () => string | undefined;
+  /** Uma permissão está concedida? Começa marcado com o que o perfil já tem. */
+  hasPermission: (value: string) => boolean;
+  /** Erro da matriz — ver `./role-create-page.vm`. */
+  permissionsError: () => string | undefined;
+  /** Uma submissão está em voo. */
+  submitting: () => boolean;
+  /** A última tentativa falhou na API. */
+  failed: () => boolean;
+  /** Não faz nada: o nome não é editável neste modo. */
+  setName: (value: string) => void;
+  /** Idem. */
+  blurName: () => void;
+  /** Liga ou desliga uma permissão. */
+  togglePermission: (value: string, on: boolean) => void;
+  /**
+   * Valida e sincroniza as permissões. Nunca rejeita — o erro vira estado.
+   *
+   * @returns `true` se sincronizou; a View então navega para `listHref`.
+   */
+  submit: () => Promise<boolean>;
 }
 
 /**
@@ -105,12 +134,55 @@ export interface RolePermissionsVM {
  * @param input Dado da rota, vindo do `+data`.
  */
 export function createRolePermissionsVM(input: RolePermissionsPageInput): RolePermissionsVM {
+  const schema = createRoleSchema('permissions', input.t);
+  const permissions = signal<readonly string[]>([...input.granted]);
+  const tried = signal(false);
+  const submitting = signal(false);
+  const failed = signal(false);
+
+  const problems = computed(() => {
+    const result = schema.safeParse({ name: input.roleName, permissions: [...permissions()] });
+    return result.success ? {} : z.flattenError(result.error).fieldErrors;
+  });
+
   return {
     t: input.t,
     id: input.id,
     roleName: input.roleName,
-    granted: input.granted,
     permissionGroups: input.permissionGroups,
     listHref: input.listHref,
+    mode: 'permissions',
+    name: () => input.roleName,
+    nameError: () => undefined,
+    hasPermission: (value) => permissions().includes(value),
+    permissionsError: () => (tried() ? problems().permissions?.[0] : undefined),
+    submitting,
+    failed,
+    setName: () => {},
+    blurName: () => {},
+    togglePermission: (value, on) => {
+      const set = new Set(permissions());
+      if (on) set.add(value);
+      else set.delete(value);
+      permissions([...set]);
+      failed(false);
+    },
+    submit: async () => {
+      tried(true);
+      const result = schema.safeParse({ name: input.roleName, permissions: [...permissions()] });
+      if (!result.success) return false;
+      submitting(true);
+      failed(false);
+      try {
+        // Só as permissões vão no PUT — o nome do perfil não é editável aqui.
+        await updateRolePermissions(input.id, result.data.permissions);
+        return true;
+      } catch {
+        failed(true);
+        return false;
+      } finally {
+        submitting(false);
+      }
+    },
   };
 }
