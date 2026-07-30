@@ -2,7 +2,7 @@ import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { PageHeader } from '@view/core/components/PageHeader';
 import { ProductForm } from '@view/products/islands/ProductForm.island';
 import type { ProductEditVM } from '@viewmodel/products/product-edit-page.vm';
-import type { JSX } from 'solid-js';
+import { html, type TemplateResult } from 'lit';
 
 /** Props da tela de edição de produto. */
 export interface ProductEditScreenProps {
@@ -19,23 +19,13 @@ export interface ProductEditScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function ProductEditScreen(props: ProductEditScreenProps): JSX.Element {
-  return (
-    <section>
-      <Breadcrumbs
-        items={[
-          { label: props.vm.t.title, href: props.vm.listHref },
-          { label: props.vm.productName },
-        ]}
-      />
-      <PageHeader title={`${props.vm.t.edit} — ${props.vm.productName}`} />
-      <ProductForm
-        mode="edit"
-        productId={props.vm.id}
-        defaultValues={props.vm.values}
-        t={props.vm.t}
-        riskOptions={props.vm.riskOptions}
-      />
-    </section>
-  );
+export function ProductEditScreen(props: ProductEditScreenProps): TemplateResult {
+  const { vm } = props;
+
+  return html`<section>
+    ${Breadcrumbs({
+      items: [{ label: vm.t.title, href: vm.listHref }, { label: vm.productName }],
+    })}
+    ${PageHeader({ title: `${vm.t.edit} — ${vm.productName}` })} ${ProductForm({ vm })}
+  </section>`;
 }

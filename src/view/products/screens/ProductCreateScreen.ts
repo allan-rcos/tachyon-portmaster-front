@@ -2,7 +2,7 @@ import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { PageHeader } from '@view/core/components/PageHeader';
 import { ProductForm } from '@view/products/islands/ProductForm.island';
 import type { ProductCreateVM } from '@viewmodel/products/product-create-page.vm';
-import type { JSX } from 'solid-js';
+import { html, type TemplateResult } from 'lit';
 
 /** Props da tela de cadastro de produto. */
 export interface ProductCreateScreenProps {
@@ -19,14 +19,11 @@ export interface ProductCreateScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function ProductCreateScreen(props: ProductCreateScreenProps): JSX.Element {
-  return (
-    <section>
-      <Breadcrumbs
-        items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
-      />
-      <PageHeader title={props.vm.t.new} />
-      <ProductForm mode="create" t={props.vm.t} riskOptions={props.vm.riskOptions} />
-    </section>
-  );
+export function ProductCreateScreen(props: ProductCreateScreenProps): TemplateResult {
+  const { vm } = props;
+
+  return html`<section>
+    ${Breadcrumbs({ items: [{ label: vm.t.title, href: vm.listHref }, { label: vm.t.new }] })}
+    ${PageHeader({ title: vm.t.new })} ${ProductForm({ vm })}
+  </section>`;
 }

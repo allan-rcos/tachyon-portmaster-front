@@ -1,6 +1,6 @@
 import { ProductList } from '@view/products/components/ProductList';
 import type { ProductListVM } from '@viewmodel/products/product-list-page.vm';
-import type { JSX } from 'solid-js';
+import type { TemplateResult } from 'lit';
 
 /** Props da tela de listagem de produtos. */
 export interface ProductListScreenProps {
@@ -18,6 +18,6 @@ export interface ProductListScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function ProductListScreen(props: ProductListScreenProps): JSX.Element {
-  return <ProductList vm={props.vm} />;
+export function ProductListScreen(props: ProductListScreenProps): TemplateResult {
+  return ProductList({ vm: props.vm });
 }
