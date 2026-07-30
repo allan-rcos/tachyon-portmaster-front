@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
 import { Card } from '@view/core/components/Card';
 import { PageHeader } from '@view/core/components/PageHeader';
 import type { AccountPageVM } from '@viewmodel/account/account-page.vm';
-import type { JSX } from 'solid-js';
+import { html, type TemplateResult } from 'lit';
 
 /** Props da tela da conta própria. */
 export interface AccountPageProps {
@@ -20,26 +20,20 @@ export interface AccountPageProps {
  * Os `ClientOnly` em volta dos formulários saíram: o conteúdo vem do servidor e
  * as islands hidratam por cima, sem esqueleto piscando.
  *
+ * Os dois formulários leem o MESMO `vm`, cada um o subconjunto que declarou —
+ * antes recebiam `name`/`email`/`t` por prop e guardavam estado cada um.
+ *
  * @param props.vm ViewModel da rota.
  */
-export function AccountPage(props: AccountPageProps): JSX.Element {
-  return (
-    <section>
-      <Breadcrumbs items={[{ label: props.vm.t.title }]} />
-      <PageHeader title={props.vm.t.title} subtitle={props.vm.t.subtitle} />
-      <div class={styles.grid}>
-        <AccountProfile vm={props.vm} />
-        <Card title={props.vm.t.profile}>
-          <AccountForm
-            name={props.vm.identity.name}
-            email={props.vm.identity.email}
-            t={props.vm.t}
-          />
-        </Card>
-        <Card title={props.vm.t.security}>
-          <PasswordChange t={props.vm.t} />
-        </Card>
-      </div>
-    </section>
-  );
+export function AccountPage(props: AccountPageProps): TemplateResult {
+  const { vm } = props;
+
+  return html`<section>
+    ${Breadcrumbs({ items: [{ label: vm.t.title }] })}
+    ${PageHeader({ title: vm.t.title, subtitle: vm.t.subtitle })}
+    <div class=${styles.grid}>
+      ${AccountProfile({ vm })} ${Card({ title: vm.t.profile, children: AccountForm({ vm }) })}
+      ${Card({ title: vm.t.security, children: PasswordChange({ vm }) })}
+    </div>
+  </section>`;
 }

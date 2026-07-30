@@ -1,6 +1,6 @@
 import { AccountPage } from '@view/account/components/AccountPage';
 import type { AccountPageVM } from '@viewmodel/account/account-page.vm';
-import type { JSX } from 'solid-js';
+import type { TemplateResult } from 'lit';
 
 /** Props da tela da conta própria. */
 export interface AccountScreenProps {
@@ -13,6 +13,6 @@ export interface AccountScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
-export function AccountScreen(props: AccountScreenProps): JSX.Element {
-  return <AccountPage vm={props.vm} />;
+export function AccountScreen(props: AccountScreenProps): TemplateResult {
+  return AccountPage({ vm: props.vm });
 }

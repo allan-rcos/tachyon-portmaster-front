@@ -1,12 +1,12 @@
-import { render } from '@solidjs/testing-library';
-import type { AccountPageVM } from '@viewmodel/account/account-page.vm';
+import { getByText } from '@testing-library/dom';
 import { accountMessages } from '@viewmodel/account/i18n/account-page.messages';
-import { describe, it, expect } from 'vitest';
+import { render } from 'lit';
+import { describe, expect, it } from 'vitest';
 
-import { AccountProfile } from './AccountProfile';
+import { AccountProfile, type AccountProfileVM } from './AccountProfile';
 
 /** VM de mentira: só os campos que o componente lê. */
-function vm(): AccountPageVM {
+function vm(): AccountProfileVM {
   // `permissionsCount` é função e não atravessa o `PageInput` — o VM recebe o
   // texto sem ela, com a contagem já resolvida em `roles[].permissionsLabel`.
   const { permissionsCount, ...t } = accountMessages('pt-BR');
@@ -20,11 +20,13 @@ function vm(): AccountPageVM {
 
 describe('AccountProfile', () => {
   it('mostra identidade e perfis com a contagem já escrita', () => {
-    const { getByText } = render(() => <AccountProfile vm={vm()} />);
+    const el = document.createElement('div');
+    document.body.append(el);
+    render(AccountProfile({ vm: vm() }), el);
 
-    expect(getByText('Allan Costa')).toBeInTheDocument();
-    expect(getByText('allan@portmaster.test')).toBeInTheDocument();
-    expect(getByText('Administrador')).toBeInTheDocument();
-    expect(getByText('12 permissões')).toBeInTheDocument();
+    expect(getByText(el, 'Allan Costa')).toBeInTheDocument();
+    expect(getByText(el, 'allan@portmaster.test')).toBeInTheDocument();
+    expect(getByText(el, 'Administrador')).toBeInTheDocument();
+    expect(getByText(el, '12 permissões')).toBeInTheDocument();
   });
 });
