@@ -6,7 +6,5 @@ import { toPageInput } from '@/pages/pageInput';
 export { data };
 
 async function data(pageContext: PageContext) {
-  return toPageInput(pageContext, (request) =>
-    Promise.resolve(createSystemInfoPageInput(request)),
-  );
+  return toPageInput(pageContext, (request) => Promise.resolve(createSystemInfoPageInput(request)));
 }
