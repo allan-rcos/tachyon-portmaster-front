@@ -208,12 +208,11 @@ Um arquivo, duas metades: o **data** (trabalho de servidor, resolvido antes do
 render) e a **reatividade** (o que a tela assina).
 
 ```ts
-import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import type { Tone } from '@viewmodel/core/i18n/labels';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
-import { formatWeight } from '@viewmodel/core/utils/formatters';
 import { signal } from 'alien-signals';
 
 import { berthListMessages } from './i18n/berth-list-page.messages';
@@ -221,7 +220,7 @@ import type { BerthListText } from './i18n/text-contracts';
 import { listBerths } from './queries/list-berths.query';
 
 /** Permissões que a rota exige. */
-export const BERTH_LIST_PERMISSIONS = [Permission.BerthRead] as const;
+export const BERTH_LIST_PERMISSIONS = ['berth:read'] as const;
 
 /** Uma linha da listagem, JÁ FORMATADA. A View não formata nada. */
 export interface BerthRowData {
@@ -246,7 +245,7 @@ export interface BerthListPageInput {
  *
  * @param request Requisição de página, neutra de framework.
  * @throws {UnauthorizedError} Sem sessão válida.
- * @throws {ForbiddenError} Sem a permissão `BerthRead`.
+ * @throws {ForbiddenError} Sem a permissão `berth:read`.
  */
 export async function createBerthListPageInput(
   request: PageRequest,
@@ -284,6 +283,9 @@ export function createBerthListVM(input: BerthListPageInput): BerthListVM {
   /* … `loadMore` com try/catch/finally, como em product-list-page.vm … */
 }
 ```
+
+Permissão é **slug** (`'berth:read'`), servido em runtime por
+`GET /metadata/permissions` — não há enum a importar.
 
 Formulário nesta feature? O estado dele mora **aqui**, escrito à mão com
 `signal`/`computed` e o schema Zod. Ver

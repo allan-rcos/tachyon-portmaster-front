@@ -13,7 +13,7 @@ tela renderiza, o dado já existe.
 
 ```ts
 /** Permissões que a rota exige. */
-export const MINHA_ROTA_PERMISSIONS = [Permission.MinhaPermissao] as const;
+export const MINHA_ROTA_PERMISSIONS = ['recurso:acao'] as const;
 
 /** Tudo que a tela precisa. Resolvido ANTES do ViewModel, e serializável. */
 export interface MinhaRotaPageInput {
@@ -49,6 +49,11 @@ export function createMinhaRotaVM(input: MinhaRotaPageInput): MinhaRotaVM {
   /* … */
 }
 ```
+
+Permissão é **slug** `recurso:ação` em inglês, com hífen quando a ação tem mais
+de uma palavra (`'product:create'`, `'role:update-permissions'`), servido em
+runtime por `GET /metadata/permissions` — não há enum a importar. Ver
+[`src/model/README.md`](../../src/model/README.md).
 
 Rota com parâmetro? Use `routeParam(request, 'id')` — ele falha alto se o
 segmento não estiver declarado, em vez de propagar `undefined`.

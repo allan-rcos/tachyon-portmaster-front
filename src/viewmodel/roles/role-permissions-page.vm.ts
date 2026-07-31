@@ -34,8 +34,19 @@ import { listRoles } from './queries/list-roles.query';
 import { createRoleSchema } from './schemas/role.schema';
 import type { RoleFormVM } from './vm-contracts';
 
-/** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const ROLE_PERMISSIONS_PERMISSIONS = ['role:list', 'role:update_permissions'] as const;
+/**
+ * Permissões que a rota exige. Antes vivia em `+permissions.js`.
+ *
+ * `permission:list` entra porque a rota BUSCA o catálogo para montar a matriz, e
+ * esse endpoint tem guarda própria no backend. Sem declará-la aqui, quem tem
+ * `role:update-permissions` mas não `permission:list` passaria pelo `authorize`
+ * e tomaria o 403 lá adiante, no meio do SSR.
+ */
+export const ROLE_PERMISSIONS_PERMISSIONS = [
+  'role:list',
+  'role:update-permissions',
+  'permission:list',
+] as const;
 
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface RolePermissionsPageInput {
@@ -62,7 +73,7 @@ export interface RolePermissionsPageInput {
  *
  * @param request Requisição de página, neutra de framework.
  * @throws {UnauthorizedError} Sem sessão válida.
- * @throws {ForbiddenError} Sem `role:list` + `role:update_permissions`.
+ * @throws {ForbiddenError} Sem `role:list` + `role:update-permissions` + `permission:list`.
  * @throws {PageNotFoundError} Quando o id não corresponde a um perfil.
  */
 export async function createRolePermissionsPageInput(
