@@ -4,12 +4,15 @@
 #  A ordem é deliberada — as verificações baratas e mais específicas primeiro,
 #  para que um erro de lint não custe um build inteiro para aparecer.
 # ============================================================
-name: CI
+name: CI — lint, tipos, testes e build
 
 on:
   push:
     branches: [main]
   pull_request:
+  # Botão "Run workflow" na aba Actions. Sem isto não há como re-executar a
+  # verificação sem um commit novo — e apagar uma run leva junto o "Re-run".
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}

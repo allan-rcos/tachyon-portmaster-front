@@ -6,8 +6,9 @@ Frontend SSR do sistema de alocação de contêineres e carga. **[Vike](https://
   **[txiki.js](https://github.com/saghul/txiki.js)** (`tjs`) — um runtime minúsculo
   (QuickJS + libuv) que cumpre o padrão WinterTC.
 
-A integração de interface é nossa: `packages/vike-lit`, que espelha a arquitetura
-do `vike-solid` oficial. **Não há `.tsx` no projeto** — `html\`\`` do Lit é
+A integração de interface é nossa: [`vike-lit`](https://github.com/allan-rcos/vike-lit),
+que espelha a arquitetura do `vike-solid` oficial e entra aqui como submodule em
+`packages/vike-lit`. **Não há `.tsx` no projeto** — `html\`\`` do Lit é
 _tagged template_, então a View é TypeScript que se importa e roda, sem
 compilador de interface no caminho.
 

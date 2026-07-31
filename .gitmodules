@@ -10,3 +10,7 @@
 	path = packages/tachyon-design
 	url = git@github.com:allan-rcos/tachyon-design.git
 	branch = main
+[submodule "packages/vike-lit"]
+	path = packages/vike-lit
+	url = git@github.com:allan-rcos/vike-lit.git
+	branch = main

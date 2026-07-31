@@ -12,7 +12,7 @@
 #     via Dockerfile.dist. Buildar a aplicação uma vez só é o que garante que
 #     imagem e zip contêm exatamente o mesmo código.
 # ============================================================
-name: Release
+name: Release — zip e imagem GHCR ao mudar a versão
 
 on:
   push:

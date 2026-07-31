@@ -145,7 +145,7 @@ A consequência de desenho: quando uma tela renderiza, o dado já existe. Não h
 
 ### Uma única reatividade: alien-signals
 
-`signal`/`computed`/`effect`, usados crus. O `onRenderClient` do `packages/vike-lit`
+`signal`/`computed`/`effect`, usados crus. O `onRenderClient` do `vike-lit`
 liga **um** effect raiz que reavalia o template da página; ler um getter do
 ViewModel ali é o que registra a dependência, e o diff do `lit-html` decide o DOM.
 
@@ -156,17 +156,22 @@ e `bind-mutation.ts` existiam só para traduzir alien-signals no sistema do Soli
 Estado de formulário também é alien-signals, no **ViewModel da rota**, escrito à
 mão. Ver [`src/viewmodel/README.md`](../../src/viewmodel/README.md).
 
-### A integração de interface é nossa: `packages/vike-lit`
+### A integração de interface é nossa: `vike-lit`
 
-~500 linhas espelhando arquivo a arquivo o fonte do `vike-solid` oficial —
+~1.000 linhas espelhando arquivo a arquivo o fonte do `vike-solid` oficial —
 inclusive o caminho de bot (`isbot-fast`) e todo o bloco de `<head>`. O que muda
 é o miolo de render: `hydrate()` + effect raiz no cliente, `collectResult` no
-servidor. O `README.md` do package registra o mapeamento contra o upstream, para
-que acompanhar mudança de contrato do Vike seja um diff, não arqueologia.
+servidor.
 
-Restrição de runtime que o ESLint aplica: do `@lit-labs/ssr` só valem
-`lib/render-lit-html.js` e `lib/render-result.js`. A raiz e os outros caminhos
-arrastam built-ins do Node, que o txiki não tem.
+Mora em [repositório próprio](https://github.com/allan-rcos/vike-lit) e entra
+aqui como submodule, em `packages/vike-lit` — não é código deste projeto, e o
+lint daqui o ignora. A documentação dele é autônoma: o mapeamento contra o
+upstream fica em `docs/upstream.md` lá, para que acompanhar mudança de contrato
+do Vike seja um diff, não arqueologia.
+
+Restrição de runtime que o ESLint daqui também aplica: do `@lit-labs/ssr` só
+valem `lib/render-lit-html.js` e `lib/render-result.js`. A raiz e os outros
+caminhos arrastam built-ins do Node, que o txiki não tem.
 
 ## Aliases
 
