@@ -91,11 +91,12 @@ export const PERMISSION_LABEL: Record<string, string> = {
   'user:create': 'Criar usuários',
   'user:update': 'Editar usuários',
   'user:delete': 'Excluir usuários',
-  'user:change_password': 'Alterar senha de usuários',
-  'user:update_roles': 'Atribuir perfis',
+  'user:change-password': 'Alterar senha de usuários',
+  'user:update-roles': 'Atribuir perfis',
   'role:list': 'Listar perfis',
   'role:create': 'Criar perfis',
-  'role:update_permissions': 'Editar permissões',
+  'role:update-permissions': 'Editar permissões',
+  'permission:list': 'Listar permissões',
   'metrics:read': 'Ver métricas',
 };
 
@@ -106,6 +107,7 @@ const PERMISSION_RESOURCE_LABEL: Record<string, string> = {
   manifest: 'Manifesto',
   user: 'Usuários',
   role: 'Perfis',
+  permission: 'Permissões',
   metrics: 'Métricas',
 };
 

@@ -50,8 +50,9 @@ export function createMinhaRotaVM(input: MinhaRotaPageInput): MinhaRotaVM {
 }
 ```
 
-Permissão é **slug** (`'produto:criar'`), servido em runtime por
-`GET /metadata/permissions` — não há enum a importar. Ver
+Permissão é **slug** `recurso:ação` em inglês, com hífen quando a ação tem mais
+de uma palavra (`'product:create'`, `'role:update-permissions'`), servido em
+runtime por `GET /metadata/permissions` — não há enum a importar. Ver
 [`src/model/README.md`](../../src/model/README.md).
 
 Rota com parâmetro? Use `routeParam(request, 'id')` — ele falha alto se o

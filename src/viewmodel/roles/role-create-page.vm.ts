@@ -22,8 +22,13 @@ import { listPermissions } from './queries/list-permissions.query';
 import { createRoleSchema } from './schemas/role.schema';
 import type { RoleFormVM } from './vm-contracts';
 
-/** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const ROLE_CREATE_PERMISSIONS = ['role:create'] as const;
+/**
+ * Permissões que a rota exige. Antes vivia em `+permissions.js`.
+ *
+ * `permission:list` entra pelo mesmo motivo da rota de permissões: a matriz sai
+ * do catálogo do backend, e esse endpoint tem guarda própria.
+ */
+export const ROLE_CREATE_PERMISSIONS = ['role:create', 'permission:list'] as const;
 
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface RoleCreatePageInput {
@@ -47,7 +52,7 @@ export interface RoleCreatePageInput {
  *
  * @param request Requisição de página, neutra de framework.
  * @throws {UnauthorizedError} Sem sessão válida.
- * @throws {ForbiddenError} Sem a permissão `role:create`.
+ * @throws {ForbiddenError} Sem `role:create` + `permission:list`.
  */
 export async function createRoleCreatePageInput(
   request: PageRequest,

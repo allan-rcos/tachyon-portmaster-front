@@ -27,8 +27,13 @@ import { listRoles } from './queries/list-roles.query';
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
 export const ROLE_LIST_PERMISSIONS = ['role:list'] as const;
 
-/** Permissões exigidas para criar um perfil (habilitam o botão "novo"). */
-const ROLE_CREATE_PERMISSIONS = ['role:create'] as const;
+/**
+ * Permissões exigidas para criar um perfil (habilitam o botão "novo").
+ *
+ * Repete o que a rota de criação declara, `permission:list` inclusive: o botão
+ * só deve aparecer para quem a rota de destino vai deixar entrar.
+ */
+const ROLE_CREATE_PERMISSIONS = ['role:create', 'permission:list'] as const;
 
 /** Uma linha da listagem, já em formato de apresentação. */
 export interface RoleRowData {

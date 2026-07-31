@@ -26,6 +26,7 @@ export const SAMPLE_PERMISSIONS: readonly Permission[] = [
   'user:update',
   'role:list',
   'role:create',
-  'role:update_permissions',
+  'role:update-permissions',
+  'permission:list',
   'metrics:read',
 ];
