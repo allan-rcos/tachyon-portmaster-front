@@ -38,7 +38,6 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@tanstack/solid-form": "^1.33.2",
     "alien-signals": "^3.2.1",
     "date-fns": "^4.4.0",
     "flatbuffers": "^25.9.23",

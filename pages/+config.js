@@ -5,6 +5,11 @@ import vikeSolid from 'vike-solid/config';
 export default {
   extends: [vikeSolid],
   description: 'Sistema de Alocação de Contêineres e Carga',
+
+  // O produto é pt-BR. Sem isto o padrão do `vike-solid` é `en`, que é o que
+  // vínhamos emitindo em `<html lang>` sem querer.
+  lang: 'pt-BR',
+
   // Sem `stream`: o `vike-solid` só resolve um `<Suspense>` em HTML de verdade
   // quando o User-Agent é bot (onRenderHtml.js — caminho `renderToStringAsync`).
   // Para navegadores reais o stream emite o fallback + um `<template>` inerte
