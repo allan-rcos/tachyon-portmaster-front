@@ -60,8 +60,30 @@ jobs:
       VERSION: ${{ needs.check-version.outputs.version }}
 
     steps:
-      - name: Usar HTTPS para submodules
-        run: git config --global url."https://github.com/".insteadOf "git@github.com:"
+      # Mesma configuração do `ci.yml`, e pelo mesmo motivo: HTTPS + token para
+      # o submodule público, SSH com deploy key para o `tachyon-design`, que é
+      # privado. O comentário longo está lá.
+      - name: Configurar acesso aos submodules
+        env:
+          TACHYON_DESIGN_KEY: ${{ secrets.TACHYON_DESIGN_DEPLOY_KEY }}
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$TACHYON_DESIGN_KEY" > ~/.ssh/tachyon-design
+          chmod 600 ~/.ssh/tachyon-design
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+
+          cat >> ~/.ssh/config <<'SSH_CONFIG'
+          Host github-tachyon-design
+            HostName github.com
+            IdentityFile ~/.ssh/tachyon-design
+            IdentitiesOnly yes
+          SSH_CONFIG
+
+          git config --global \
+            url."git@github-tachyon-design:allan-rcos/tachyon-design".insteadOf \
+            "git@github.com:allan-rcos/tachyon-design"
 
       - uses: actions/checkout@v4
         with:

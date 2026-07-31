@@ -22,13 +22,40 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      # O `.gitmodules` do projeto usa URLs SSH (git@github.com:), que não
-      # funcionam com o token do Actions. Reescrever para HTTPS antes do
-      # checkout é o que permite `submodules: recursive` num runner sem chave.
-      # Isso vale para submodule público; se algum virar privado, será preciso
-      # um PAT com acesso de leitura no lugar do GITHUB_TOKEN.
-      - name: Usar HTTPS para submodules
-        run: git config --global url."https://github.com/".insteadOf "git@github.com:"
+      # O `.gitmodules` usa URLs SSH (git@github.com:), que o runner não tem
+      # chave para resolver. A regra geral é reescrever para HTTPS e deixar o
+      # token do Actions autenticar — o que basta para submodule PÚBLICO.
+      #
+      # O `tachyon-design` é privado, e aí a regra geral não serve: o token do
+      # Actions só enxerga ESTE repositório, então o clone volta 404 ("not
+      # found", e não "forbidden", porque o GitHub não confirma a existência de
+      # repositório privado). Ele fica em SSH, com uma deploy key de leitura
+      # própria, atrás de um alias de host — assim a chave vale só para ele e
+      # nenhum outro clone SSH a usa por engano.
+      #
+      # As duas regras convivem porque o git desempata `insteadOf` pelo match
+      # MAIS LONGO: a específica do tachyon-design vence a genérica.
+      - name: Configurar acesso aos submodules
+        env:
+          TACHYON_DESIGN_KEY: ${{ secrets.TACHYON_DESIGN_DEPLOY_KEY }}
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$TACHYON_DESIGN_KEY" > ~/.ssh/tachyon-design
+          chmod 600 ~/.ssh/tachyon-design
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+
+          cat >> ~/.ssh/config <<'SSH_CONFIG'
+          Host github-tachyon-design
+            HostName github.com
+            IdentityFile ~/.ssh/tachyon-design
+            IdentitiesOnly yes
+          SSH_CONFIG
+
+          git config --global \
+            url."git@github-tachyon-design:allan-rcos/tachyon-design".insteadOf \
+            "git@github.com:allan-rcos/tachyon-design"
 
       - uses: actions/checkout@v4
         with:
