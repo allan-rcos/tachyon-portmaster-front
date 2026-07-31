@@ -1,124 +1,86 @@
-import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
-import { bindMutation } from '@view/core/observable/bind-mutation';
+import { toAccessor } from '@view/core/observable/to-accessor';
 import { PermissionMatrix } from '@view/roles/components/PermissionMatrix';
-import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
-import type { OptionGroup } from '@viewmodel/core/page/options';
 import type { RoleFormText } from '@viewmodel/roles/i18n/text-contracts';
-import { createRole } from '@viewmodel/roles/mutations/create-role.mutation';
-import { updateRolePermissions } from '@viewmodel/roles/mutations/update-role-permissions.mutation';
-import { createRoleSchema } from '@viewmodel/roles/schemas/role.schema';
+import type { RoleFormVM } from '@viewmodel/roles/vm-contracts';
 import { Show, type JSX } from 'solid-js';
 
 import styles from './RoleForm.island.module.scss';
 
 export interface RoleFormProps {
-  mode: 'create' | 'permissions';
-  t: RoleFormText;
-  /** Matriz de permissões, com rótulos já resolvidos pelo ViewModel. */
-  permissionGroups: readonly OptionGroup[];
-  roleId?: string;
-  defaultName?: string;
-  defaultPermissions?: readonly string[];
+  /** ViewModel da rota — dono do estado do formulário. */
+  vm: RoleFormVM;
 }
 
-/** Valores do formulário. `permissions` é `string[]` porque a View não conhece
- *  o enum: quem cobra que sejam permissões válidas é o schema, na submissão. */
-interface FormValues {
-  name: string;
-  permissions: string[];
-}
+/**
+ * Formulário de perfil: cria (nome + permissões) ou sincroniza as permissões de
+ * um perfil existente.
+ *
+ * O nome só é editável na criação — o `PUT` de permissões não o aceita. O `mode`
+ * decide se ele é campo ou `<output>`, e o schema aplica a mesma regra na
+ * validação.
+ *
+ * Sem estado próprio — ver `@view/products/islands/ProductForm.island`.
+ *
+ * @param props.vm ViewModel da rota.
+ */
+export function RoleForm(props: RoleFormProps): JSX.Element {
+  const name = toAccessor(() => props.vm.name());
+  const nameError = toAccessor(() => props.vm.nameError());
+  const permissionsError = toAccessor(() => props.vm.permissionsError());
+  const submitting = toAccessor(() => props.vm.submitting());
+  const failed = toAccessor(() => props.vm.failed());
 
-function Inner(props: RoleFormProps): JSX.Element {
-  const mutation = bindMutation(
-    createMutationSignal(
-      (value: FormValues) => {
-        // O parse é quem estreita `string[]` para `Permission[]` — daqui para
-        // baixo o valor já é do enum.
-        const body = createRoleSchema(props.mode, props.t).parse(value);
-        return props.mode === 'create'
-          ? createRole(body)
-          : updateRolePermissions(props.roleId!, body.permissions);
-      },
-      {
-        onSuccess: () => {
-          window.location.href = '/painel/perfis';
-        },
-      },
-    ),
-  );
-
-  const form = createForm(() => ({
-    defaultValues: {
-      name: props.defaultName ?? '',
-      permissions: [...(props.defaultPermissions ?? [])],
-    } as FormValues,
-    validators: { onChange: createRoleSchema(props.mode, props.t) },
-    onSubmit: ({ value }) => mutation.mutate(value),
-  }));
+  const submit = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    // Lido ANTES do await: depois da submissão o callback estaria fora do
+    // escopo rastreado, e ler `props` de lá é justamente o que a regra
+    // `solid/reactivity` existe para pegar.
+    const destination = props.vm.listHref;
+    void props.vm.submit().then((ok) => {
+      if (ok) window.location.href = destination;
+    });
+  };
 
   return (
-    <form
-      class={styles.form}
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
-    >
+    <form class={styles.form} onSubmit={submit}>
       <Show
-        when={props.mode === 'create'}
+        when={props.vm.mode === 'create'}
         fallback={
-          <FormField label={props.t.name}>
-            <output class={styles.readonly}>{props.defaultName}</output>
+          <FormField label={props.vm.t.name}>
+            <output class={styles.readonly}>{name()}</output>
           </FormField>
         }
       >
-        <form.Field name="name">
-          {(field) => (
-            <FormField
-              label={props.t.name}
-              for="role-name"
-              error={field().state.meta.errors[0]?.message}
-            >
-              <input
-                id="role-name"
-                class={styles.input}
-                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
-                value={field().state.value}
-                onInput={(e) => field().handleChange(e.currentTarget.value)}
-                onBlur={field().handleBlur}
-                placeholder="Operador de pátio"
-              />
-            </FormField>
-          )}
-        </form.Field>
+        <FormField label={props.vm.t.name} for="role-name" error={nameError()}>
+          <input
+            id="role-name"
+            class={styles.input}
+            classList={{ [styles.invalid]: Boolean(nameError()) }}
+            value={name()}
+            onInput={(e) => props.vm.setName(e.currentTarget.value)}
+            onBlur={() => props.vm.blurName()}
+            placeholder="Operador de pátio"
+          />
+        </FormField>
       </Show>
 
-      <form.Field name="permissions">
-        {(field) => (
-          <fieldset class={styles.matrixWrap} disabled={mutation.isPending()}>
-            <legend class={styles.matrixLabel}>{props.t.permissions}</legend>
-            <PermissionMatrix
-              groups={props.permissionGroups}
-              selected={new Set(field().state.value)}
-              onToggle={(perm, checked) => {
-                const set = new Set(field().state.value);
-                if (checked) set.add(perm);
-                else set.delete(perm);
-                field().handleChange([...set]);
-              }}
-              disabled={mutation.isPending()}
-            />
-            <p class={styles.error} role="alert" hidden={field().state.meta.errors.length === 0}>
-              {field().state.meta.errors[0]?.message}
-            </p>
-          </fieldset>
-        )}
-      </form.Field>
+      <fieldset class={styles.matrixWrap} disabled={submitting()}>
+        <legend class={styles.matrixLabel}>{props.vm.t.permissions}</legend>
+        <PermissionMatrix
+          groups={props.vm.permissionGroups}
+          isSelected={props.vm.hasPermission}
+          onToggle={props.vm.togglePermission}
+          disabled={submitting()}
+        />
+        <p class={styles.error} role="alert" hidden={!permissionsError()}>
+          {permissionsError()}
+        </p>
+      </fieldset>
 
-      <p class={styles.error} role="alert" hidden={!mutation.isError()}>
-        {props.t.submitError}
+      <p class={styles.error} role="alert" hidden={!failed()}>
+        {props.vm.t.submitError}
       </p>
 
       <menu class={styles.actions}>
@@ -126,15 +88,15 @@ function Inner(props: RoleFormProps): JSX.Element {
           <button
             type="submit"
             class={styles.submit}
-            classList={{ [styles.loading]: mutation.isPending() }}
-            disabled={mutation.isPending()}
+            classList={{ [styles.loading]: submitting() }}
+            disabled={submitting()}
           >
-            {props.mode === 'create' ? props.t.create : props.t.save}
+            {props.vm.mode === 'create' ? props.vm.t.create : props.vm.t.save}
           </button>
         </li>
         <li>
-          <a class={styles.cancel} href="/painel/perfis">
-            {props.t.cancel}
+          <a class={styles.cancel} href={props.vm.listHref}>
+            {props.vm.t.cancel}
           </a>
         </li>
       </menu>
@@ -142,10 +104,4 @@ function Inner(props: RoleFormProps): JSX.Element {
   );
 }
 
-/** Formulário de perfil (island): cria (nome + permissões) ou
- *  sincroniza as permissões de um perfil existente. */
-export function RoleForm(props: RoleFormProps): JSX.Element {
-  return <Inner {...props} />;
-}
-
-export type { RoleFormText };
+export type { RoleFormText, RoleFormVM };

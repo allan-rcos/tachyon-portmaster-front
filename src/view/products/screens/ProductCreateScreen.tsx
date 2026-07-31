@@ -26,7 +26,7 @@ export function ProductCreateScreen(props: ProductCreateScreenProps): JSX.Elemen
         items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
       />
       <PageHeader title={props.vm.t.new} />
-      <ProductForm mode="create" t={props.vm.t} riskOptions={props.vm.riskOptions} />
+      <ProductForm vm={props.vm} />
     </section>
   );
 }

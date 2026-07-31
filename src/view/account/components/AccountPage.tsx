@@ -30,14 +30,10 @@ export function AccountPage(props: AccountPageProps): JSX.Element {
       <div class={styles.grid}>
         <AccountProfile vm={props.vm} />
         <Card title={props.vm.t.profile}>
-          <AccountForm
-            name={props.vm.identity.name}
-            email={props.vm.identity.email}
-            t={props.vm.t}
-          />
+          <AccountForm vm={props.vm} />
         </Card>
         <Card title={props.vm.t.security}>
-          <PasswordChange t={props.vm.t} />
+          <PasswordChange vm={props.vm} />
         </Card>
       </div>
     </section>

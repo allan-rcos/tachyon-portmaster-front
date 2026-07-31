@@ -4,7 +4,14 @@ import vikeSolid from 'vike-solid/config';
 
 export default {
   extends: [vikeSolid],
-  description: 'Sistema de Alocação de Contêineres e Carga',
+
+  // O `<head>` deixou de ser montado à mão num `+Head` que lê o pageContext: o
+  // `vike-solid` já sabe emitir `<title>`, `og:title`, `description` e
+  // `og:description` a partir das configs `title`/`description`, que vivem em
+  // `+title.ts` e `+description.ts` (o Vike exige que valor de config seja
+  // serializável, então código vai em arquivo próprio). Ambos leem a MESMA
+  // origem: o `data.meta` que o `createXPageInput` da rota resolveu no locale
+  // da requisição. Ao `+Head.tsx` sobrou só o que não tem config própria.
 
   // O produto é pt-BR. Sem isto o padrão do `vike-solid` é `en`, que é o que
   // vínhamos emitindo em `<html lang>` sem querer.
@@ -37,6 +44,4 @@ export default {
   redirects: {
     '/': '/painel',
   },
-  // O <title> é definido dinamicamente em pages/+Head.tsx a partir de
-  // `data.title` — não definimos `title` aqui para evitar dois <title>.
 };

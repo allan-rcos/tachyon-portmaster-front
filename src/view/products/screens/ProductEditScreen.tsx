@@ -29,13 +29,7 @@ export function ProductEditScreen(props: ProductEditScreenProps): JSX.Element {
         ]}
       />
       <PageHeader title={`${props.vm.t.edit} — ${props.vm.productName}`} />
-      <ProductForm
-        mode="edit"
-        productId={props.vm.id}
-        defaultValues={props.vm.values}
-        t={props.vm.t}
-        riskOptions={props.vm.riskOptions}
-      />
+      <ProductForm vm={props.vm} />
     </section>
   );
 }

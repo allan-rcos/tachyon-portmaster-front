@@ -23,7 +23,7 @@ export function UserCreateScreen(props: UserCreateScreenProps): JSX.Element {
         items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
       />
       <PageHeader title={props.vm.t.new} />
-      <UserForm mode="create" roles={[...props.vm.roles]} t={props.vm.t} />
+      <UserForm vm={props.vm} />
     </section>
   );
 }

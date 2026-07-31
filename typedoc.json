@@ -39,7 +39,18 @@
   },
   "sort": ["kind", "alphabetical"],
 
-  "highlightLanguages": ["typescript", "javascript", "json", "jsonc", "scss", "bash", "markdown"],
+  // `tsx` entra porque a View é JSX: sem ele, todo exemplo de componente sai
+  // sem realce na documentação gerada.
+  "highlightLanguages": [
+    "typescript",
+    "tsx",
+    "javascript",
+    "json",
+    "jsonc",
+    "scss",
+    "bash",
+    "markdown"
+  ],
 
   "navigationLinks": {
     "Repositório": "https://github.com/allan-rcos/portmaster"

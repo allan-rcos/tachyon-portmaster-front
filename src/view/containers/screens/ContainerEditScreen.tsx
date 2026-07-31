@@ -23,12 +23,7 @@ export function ContainerEditScreen(props: ContainerEditScreenProps): JSX.Elemen
         items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.code }]}
       />
       <PageHeader title={`${props.vm.t.edit} — ${props.vm.code}`} />
-      <ContainerForm
-        mode="edit"
-        containerId={props.vm.id}
-        defaultValues={props.vm.values}
-        t={props.vm.t}
-      />
+      <ContainerForm vm={props.vm} />
     </section>
   );
 }

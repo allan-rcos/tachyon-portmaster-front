@@ -22,7 +22,7 @@ export function RoleCreateScreen(props: RoleCreateScreenProps): JSX.Element {
         items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
       />
       <PageHeader title={props.vm.t.new} subtitle={props.vm.t.subtitle} />
-      <RoleForm mode="create" t={props.vm.t} permissionGroups={props.vm.permissionGroups} />
+      <RoleForm vm={props.vm} />
     </section>
   );
 }

@@ -1,39 +1,28 @@
-import type { PageMeta } from '@viewmodel/core/page/page-request';
+/**
+ * O que sobra do `<head>` depois que `+title` e `+description` assumiram as
+ * tags que o `vike-solid` sabe emitir sozinho.
+ *
+ * @packageDocumentation
+ */
 import type { JSX } from 'solid-js';
-import { usePageContext } from 'vike-solid/usePageContext';
-
-const DEFAULT_DESCRIPTION = 'Sistema de Alocação de Contêineres e Carga';
 
 /**
  * `<head>` global e ÚNICO `+Head` — o Vike acumula `+Head` pela árvore de
- * diretórios, e manter um só é o que evita `<title>` duplicado.
+ * diretórios, e manter um só é o que evita tag duplicada.
  *
- * O texto vem de UMA origem: `data.meta`, que o `createXPageInput` da rota
- * resolveu no locale do request. Antes havia duas — um `config.routeMeta` para
- * as rotas de /painel (que renderizavam no navegador e não tinham `+data`) e o
- * `data` para as públicas. Com todas as rotas em `+data`, a bifurcação e os 15
- * `+routeMeta.ts` deixaram de existir.
+ * Aqui mora apenas o que NÃO tem config própria no `vike-solid`. `<title>`,
+ * `description`, `og:*` e `viewport` são resolvidos pelo adaptador a partir das
+ * configs declaradas em `+config.js`, `+title.ts` e `+description.ts` —
+ * repeti-los aqui geraria duplicata. Antes deste corte, o `usePageContext` era
+ * lido aqui só para remontar à mão o que o adaptador já sabia montar.
  *
  * App autenticada → `noindex`.
  */
 export default function Head(): JSX.Element {
-  const pageContext = usePageContext();
-
-  const meta = (): PageMeta | undefined =>
-    (pageContext.data as { meta?: PageMeta } | undefined)?.meta;
-
-  const title = () => {
-    const value = meta()?.title;
-    return value ? `${value} — PortMaster` : 'Tachyon PortMaster';
-  };
-
   return (
     <>
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="color-scheme" content="dark" />
       <meta name="robots" content="noindex" />
-      <title>{title()}</title>
-      <meta name="description" content={meta()?.description ?? DEFAULT_DESCRIPTION} />
     </>
   );
 }

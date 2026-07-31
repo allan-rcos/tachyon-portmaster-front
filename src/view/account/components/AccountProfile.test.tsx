@@ -1,12 +1,12 @@
 import { render } from '@solidjs/testing-library';
-import type { AccountPageVM } from '@viewmodel/account/account-page.vm';
 import { accountMessages } from '@viewmodel/account/i18n/account-page.messages';
+import type { AccountProfileVM } from '@viewmodel/account/vm-contracts';
 import { describe, it, expect } from 'vitest';
 
 import { AccountProfile } from './AccountProfile';
 
 /** VM de mentira: só os campos que o componente lê. */
-function vm(): AccountPageVM {
+function vm(): AccountProfileVM {
   // `permissionsCount` é função e não atravessa o `PageInput` — o VM recebe o
   // texto sem ela, com a contagem já resolvida em `roles[].permissionsLabel`.
   const { permissionsCount, ...t } = accountMessages('pt-BR');

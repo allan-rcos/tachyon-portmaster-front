@@ -23,14 +23,7 @@ export function RolePermissionsScreen(props: RolePermissionsScreenProps): JSX.El
         items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.roleName }]}
       />
       <PageHeader title={props.vm.roleName} subtitle={props.vm.t.syncPermissions} />
-      <RoleForm
-        mode="permissions"
-        roleId={props.vm.id}
-        defaultName={props.vm.roleName}
-        defaultPermissions={props.vm.granted}
-        t={props.vm.t}
-        permissionGroups={props.vm.permissionGroups}
-      />
+      <RoleForm vm={props.vm} />
     </section>
   );
 }

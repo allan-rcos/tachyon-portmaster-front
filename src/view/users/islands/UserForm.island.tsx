@@ -1,178 +1,123 @@
-import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
-import { bindMutation } from '@view/core/observable/bind-mutation';
-import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
+import { toAccessor } from '@view/core/observable/to-accessor';
 import type { UserFormText } from '@viewmodel/users/i18n/text-contracts';
-import { createUser } from '@viewmodel/users/mutations/create-user.mutation';
-import { updateUser } from '@viewmodel/users/mutations/update-user.mutation';
-import { createUserSchema } from '@viewmodel/users/schemas/user.schema';
+import type { UserField, UserFormVM } from '@viewmodel/users/vm-contracts';
 import { For, Show, type JSX } from 'solid-js';
 
 import styles from './UserForm.island.module.scss';
 
-export interface RoleOption {
-  id: string;
-  name: string;
-}
-
 export interface UserFormProps {
-  mode: 'create' | 'edit';
-  t: UserFormText;
-  roles: RoleOption[];
-  userId?: string;
-  defaultValues?: { name: string; email: string; role_ids: string[] };
+  /** ViewModel da rota — dono do estado do formulário. */
+  vm: UserFormVM;
 }
 
-interface FormValues {
-  name: string;
-  email: string;
-  initial_password: string;
-  role_ids: string[];
-}
+/**
+ * Formulário de usuário: cria (com senha inicial) ou edita dados + perfis.
+ *
+ * A senha inicial só existe na criação — o `PATCH` não a aceita. O `mode` decide
+ * se o campo aparece, e o schema aplica a mesma regra na validação.
+ *
+ * Sem estado próprio — ver `@view/products/islands/ProductForm.island`.
+ *
+ * @param props.vm ViewModel da rota.
+ */
+export function UserForm(props: UserFormProps): JSX.Element {
+  const field = (name: UserField) => ({
+    value: toAccessor(() => props.vm.value(name)),
+    error: toAccessor(() => props.vm.error(name)),
+  });
 
-function Inner(props: UserFormProps): JSX.Element {
-  const schema = () => createUserSchema(props.mode, props.t);
+  const name = field('name');
+  const email = field('email');
+  const initialPassword = field('initial_password');
 
-  const mutation = bindMutation(
-    createMutationSignal(
-      async (value: FormValues) => {
-        if (props.mode === 'create') {
-          return createUser({
-            name: value.name,
-            email: value.email,
-            initial_password: value.initial_password,
-            role_ids: value.role_ids,
-          });
-        }
-        return updateUser(props.userId!, {
-          name: value.name,
-          email: value.email,
-          role_ids: value.role_ids,
-        });
-      },
-      {
-        onSuccess: () => {
-          window.location.href = '/painel/usuarios';
-        },
-      },
-    ),
-  );
+  const rolesError = toAccessor(() => props.vm.rolesError());
+  const submitting = toAccessor(() => props.vm.submitting());
+  const failed = toAccessor(() => props.vm.failed());
 
-  const form = createForm(() => ({
-    defaultValues: {
-      name: props.defaultValues?.name ?? '',
-      email: props.defaultValues?.email ?? '',
-      initial_password: '',
-      role_ids: props.defaultValues?.role_ids ?? [],
-    } as FormValues,
-    validators: { onChange: schema() },
-    onSubmit: ({ value }) => mutation.mutate(value),
-  }));
+  const submit = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    // Lido ANTES do await: depois da submissão o callback estaria fora do
+    // escopo rastreado, e ler `props` de lá é justamente o que a regra
+    // `solid/reactivity` existe para pegar.
+    const destination = props.vm.listHref;
+    void props.vm.submit().then((ok) => {
+      if (ok) window.location.href = destination;
+    });
+  };
 
   return (
-    <form
-      class={styles.form}
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
-    >
-      <fieldset class={styles.fields} disabled={mutation.isPending()}>
-        <legend class="srOnly">{props.t.data}</legend>
+    <form class={styles.form} onSubmit={submit}>
+      <fieldset class={styles.fields} disabled={submitting()}>
+        <legend class="srOnly">{props.vm.t.data}</legend>
 
-        <form.Field name="name">
-          {(field) => (
-            <FormField
-              label={props.t.name}
-              for="user-name"
-              error={field().state.meta.errors[0]?.message}
-            >
-              <input
-                id="user-name"
-                class={styles.input}
-                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
-                value={field().state.value}
-                onInput={(e) => field().handleChange(e.currentTarget.value)}
-                onBlur={field().handleBlur}
-              />
-            </FormField>
-          )}
-        </form.Field>
+        <FormField label={props.vm.t.name} for="user-name" error={name.error()}>
+          <input
+            id="user-name"
+            class={styles.input}
+            classList={{ [styles.invalid]: Boolean(name.error()) }}
+            value={name.value()}
+            onInput={(e) => props.vm.set('name', e.currentTarget.value)}
+            onBlur={() => props.vm.blur('name')}
+          />
+        </FormField>
 
-        <form.Field name="email">
-          {(field) => (
-            <FormField
-              label={props.t.email}
-              for="user-email"
-              error={field().state.meta.errors[0]?.message}
-            >
-              <input
-                id="user-email"
-                type="email"
-                class={styles.input}
-                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
-                value={field().state.value}
-                onInput={(e) => field().handleChange(e.currentTarget.value)}
-                onBlur={field().handleBlur}
-              />
-            </FormField>
-          )}
-        </form.Field>
+        <FormField label={props.vm.t.email} for="user-email" error={email.error()}>
+          <input
+            id="user-email"
+            type="email"
+            class={styles.input}
+            classList={{ [styles.invalid]: Boolean(email.error()) }}
+            value={email.value()}
+            onInput={(e) => props.vm.set('email', e.currentTarget.value)}
+            onBlur={() => props.vm.blur('email')}
+          />
+        </FormField>
 
-        <Show when={props.mode === 'create'}>
-          <form.Field name="initial_password">
-            {(field) => (
-              <FormField
-                label={props.t.initialPassword}
-                for="user-pass"
-                error={field().state.meta.errors[0]?.message}
-              >
-                <input
-                  id="user-pass"
-                  type="password"
-                  class={styles.input}
-                  classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
-                  value={field().state.value}
-                  onInput={(e) => field().handleChange(e.currentTarget.value)}
-                  onBlur={field().handleBlur}
-                />
-              </FormField>
-            )}
-          </form.Field>
+        <Show when={props.vm.mode === 'create'}>
+          <FormField
+            label={props.vm.t.initialPassword}
+            for="user-pass"
+            error={initialPassword.error()}
+          >
+            <input
+              id="user-pass"
+              type="password"
+              class={styles.input}
+              classList={{ [styles.invalid]: Boolean(initialPassword.error()) }}
+              value={initialPassword.value()}
+              onInput={(e) => props.vm.set('initial_password', e.currentTarget.value)}
+              onBlur={() => props.vm.blur('initial_password')}
+            />
+          </FormField>
         </Show>
 
-        <form.Field name="role_ids">
-          {(field) => (
-            <fieldset class={styles.roles}>
-              <legend class={styles.rolesLabel}>{props.t.roles}</legend>
-              <For each={props.roles}>
-                {(role) => (
-                  <label class={styles.roleItem}>
-                    <input
-                      type="checkbox"
-                      checked={field().state.value.includes(role.id)}
-                      onChange={(e) => {
-                        const set = new Set(field().state.value);
-                        if (e.currentTarget.checked) set.add(role.id);
-                        else set.delete(role.id);
-                        field().handleChange([...set]);
-                      }}
-                    />
-                    <span>{role.name}</span>
-                  </label>
-                )}
-              </For>
-              <p class={styles.error} role="alert" hidden={field().state.meta.errors.length === 0}>
-                {field().state.meta.errors[0]?.message}
-              </p>
-            </fieldset>
-          )}
-        </form.Field>
+        <fieldset class={styles.roles}>
+          <legend class={styles.rolesLabel}>{props.vm.t.roles}</legend>
+          <For each={props.vm.roles}>
+            {(role) => {
+              const checked = toAccessor(() => props.vm.hasRole(role.id));
+              return (
+                <label class={styles.roleItem}>
+                  <input
+                    type="checkbox"
+                    checked={checked()}
+                    onChange={(e) => props.vm.toggleRole(role.id, e.currentTarget.checked)}
+                  />
+                  <span>{role.name}</span>
+                </label>
+              );
+            }}
+          </For>
+          <p class={styles.error} role="alert" hidden={!rolesError()}>
+            {rolesError()}
+          </p>
+        </fieldset>
       </fieldset>
 
-      <p class={styles.error} role="alert" hidden={!mutation.isError()}>
-        {props.t.submitError}
+      <p class={styles.error} role="alert" hidden={!failed()}>
+        {props.vm.t.submitError}
       </p>
 
       <menu class={styles.actions}>
@@ -180,15 +125,15 @@ function Inner(props: UserFormProps): JSX.Element {
           <button
             type="submit"
             class={styles.submit}
-            classList={{ [styles.loading]: mutation.isPending() }}
-            disabled={mutation.isPending()}
+            classList={{ [styles.loading]: submitting() }}
+            disabled={submitting()}
           >
-            {props.mode === 'create' ? props.t.create : props.t.save}
+            {props.vm.mode === 'create' ? props.vm.t.create : props.vm.t.save}
           </button>
         </li>
         <li>
-          <a class={styles.cancel} href="/painel/usuarios">
-            {props.t.cancel}
+          <a class={styles.cancel} href={props.vm.listHref}>
+            {props.vm.t.cancel}
           </a>
         </li>
       </menu>
@@ -196,10 +141,4 @@ function Inner(props: UserFormProps): JSX.Element {
   );
 }
 
-/** Formulário de usuário (island): cria (com senha inicial) ou edita
- *  dados + perfis (updateUser + updateUserRoles). */
-export function UserForm(props: UserFormProps): JSX.Element {
-  return <Inner {...props} />;
-}
-
-export type { UserFormText };
+export type { UserFormText, UserFormVM };

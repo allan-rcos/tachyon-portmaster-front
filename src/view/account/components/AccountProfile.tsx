@@ -1,14 +1,14 @@
 import { Badge } from '@view/core/components/Badge';
 import { Card } from '@view/core/components/Card';
-import type { AccountPageVM } from '@viewmodel/account/account-page.vm';
+import type { AccountProfileVM } from '@viewmodel/account/vm-contracts';
 import { For, type JSX } from 'solid-js';
 
 import styles from './AccountProfile.module.scss';
 
 /** Props do resumo do perfil autenticado. */
 export interface AccountProfileProps {
-  /** ViewModel da rota. */
-  vm: AccountPageVM;
+  /** ViewModel da rota — só a fatia de leitura. */
+  vm: AccountProfileVM;
 }
 
 /**

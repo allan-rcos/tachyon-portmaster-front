@@ -23,18 +23,8 @@ export function UserEditScreen(props: UserEditScreenProps): JSX.Element {
         items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.userName }]}
       />
       <PageHeader title={`${props.vm.t.edit} — ${props.vm.userName}`} />
-      <UserForm
-        mode="edit"
-        userId={props.vm.id}
-        roles={[...props.vm.roles]}
-        defaultValues={{
-          name: props.vm.values.name,
-          email: props.vm.values.email,
-          role_ids: [...props.vm.values.roleIds],
-        }}
-        t={props.vm.t}
-      />
-      <UserAdminActions userId={props.vm.id} t={props.vm.t} />
+      <UserForm vm={props.vm} />
+      <UserAdminActions vm={props.vm} />
     </section>
   );
 }

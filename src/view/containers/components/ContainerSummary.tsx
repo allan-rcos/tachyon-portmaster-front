@@ -64,21 +64,12 @@ export function ContainerSummary(props: ContainerSummaryProps): JSX.Element {
         </div>
       </dl>
 
-      <ContainerActions
-        containerId={props.vm.facts.id}
-        canSeal={props.vm.facts.canSeal}
-        canDispatch={props.vm.facts.canDispatch}
-        t={props.vm.t}
-      />
+      <ContainerActions vm={props.vm} />
 
       <div class={styles.grid}>
         <Card title={props.vm.t.manifest}>
           <ManifestTable items={props.vm.manifest} t={props.vm.t} />
-          <ManifestEditor
-            containerId={props.vm.facts.id}
-            products={[...props.vm.products]}
-            t={props.vm.t}
-          />
+          <ManifestEditor vm={props.vm} />
         </Card>
 
         <Card title={props.vm.t.logs}>

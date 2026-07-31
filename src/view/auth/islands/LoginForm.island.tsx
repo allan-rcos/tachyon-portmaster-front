@@ -1,117 +1,97 @@
-import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
 import { Icon } from '@view/core/components/Icon';
-import { bindMutation } from '@view/core/observable/bind-mutation';
+import { toAccessor } from '@view/core/observable/to-accessor';
 import type { LoginFormText } from '@viewmodel/auth/i18n/text-contracts';
-import { signIn } from '@viewmodel/auth/mutations/sign-in.mutation';
-import { createLoginSchema, type LoginFormData } from '@viewmodel/auth/schemas/login.schema';
-import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
+import type { LoginVM } from '@viewmodel/auth/login-page.vm';
 import { type JSX } from 'solid-js';
 
 import styles from './LoginForm.island.module.scss';
 
-function redirectTarget(): string {
-  const to = new URLSearchParams(window.location.search).get('redirect');
-  return to && to.startsWith('/') ? to : '/painel';
+export interface LoginFormProps {
+  /** ViewModel da rota — dono do estado do formulário. */
+  vm: LoginVM;
 }
 
-function LoginFormInner(props: LoginFormProps): JSX.Element {
-  const mutation = bindMutation(
-    createMutationSignal((v: LoginFormData) => signIn(v), {
-      onSuccess: () => {
-        window.location.href = redirectTarget();
-      },
-    }),
-  );
+/**
+ * Formulário de login.
+ *
+ * Não sobrou estado aqui: valores, erros, "já tocou" e "está enviando" moram no
+ * `LoginVM`; este arquivo só desenha e encaminha eventos. Quem toca o navegador
+ * continua sendo a View — o ViewModel calcula o destino (`vm.redirectTo`) e
+ * sinaliza sucesso, mas não navega.
+ *
+ * @param props.vm ViewModel da rota.
+ */
+export function LoginForm(props: LoginFormProps): JSX.Element {
+  const submit = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    // Lido ANTES do await: depois da submissão o callback estaria fora do
+    // escopo rastreado, e ler `props` de lá é justamente o que a regra
+    // `solid/reactivity` existe para pegar.
+    const destination = props.vm.redirectTo;
+    void props.vm.submit().then((ok) => {
+      if (ok) window.location.href = destination;
+    });
+  };
 
-  const form = createForm(() => ({
-    defaultValues: { email: '', password: '' } as LoginFormData,
-    validators: { onChange: createLoginSchema(props.t) },
-    onSubmit: ({ value }) => {
-      // `mutate` (não `mutateAsync`) trata o erro internamente
-      // (mutation.isError()) e nunca rejeita — evita unhandled rejection.
-      mutation.mutate(value);
-    },
-  }));
+  const email = {
+    value: toAccessor(() => props.vm.value('email')),
+    error: toAccessor(() => props.vm.error('email')),
+  };
+  const password = {
+    value: toAccessor(() => props.vm.value('password')),
+    error: toAccessor(() => props.vm.error('password')),
+  };
+
+  const submitting = toAccessor(() => props.vm.submitting());
+  const failed = toAccessor(() => props.vm.failed());
 
   return (
-    <form
-      class={styles.form}
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
-    >
-      <form.Field name="email">
-        {(field) => (
-          <FormField
-            label={props.t.email}
-            for="email"
-            error={field().state.meta.errors[0]?.message}
-          >
-            <input
-              id="email"
-              type="email"
-              autocomplete="email"
-              class={styles.input}
-              classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
-              value={field().state.value}
-              onInput={(e) => field().handleChange(e.currentTarget.value)}
-              onBlur={field().handleBlur}
-              placeholder="ana@portmaster.test"
-            />
-          </FormField>
-        )}
-      </form.Field>
+    <form class={styles.form} onSubmit={submit}>
+      <FormField label={props.vm.t.email} for="email" error={email.error()}>
+        <input
+          id="email"
+          type="email"
+          autocomplete="email"
+          class={styles.input}
+          classList={{ [styles.invalid]: Boolean(email.error()) }}
+          value={email.value()}
+          onInput={(e) => props.vm.set('email', e.currentTarget.value)}
+          onBlur={() => props.vm.blur('email')}
+          placeholder="ana@portmaster.test"
+        />
+      </FormField>
 
-      <form.Field name="password">
-        {(field) => (
-          <FormField
-            label={props.t.password}
-            for="password"
-            error={field().state.meta.errors[0]?.message}
-          >
-            <input
-              id="password"
-              type="password"
-              autocomplete="current-password"
-              class={styles.input}
-              classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
-              value={field().state.value}
-              onInput={(e) => field().handleChange(e.currentTarget.value)}
-              onBlur={field().handleBlur}
-              placeholder="••••••••"
-            />
-          </FormField>
-        )}
-      </form.Field>
+      <FormField label={props.vm.t.password} for="password" error={password.error()}>
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          class={styles.input}
+          classList={{ [styles.invalid]: Boolean(password.error()) }}
+          value={password.value()}
+          onInput={(e) => props.vm.set('password', e.currentTarget.value)}
+          onBlur={() => props.vm.blur('password')}
+          placeholder="••••••••"
+        />
+      </FormField>
 
-      <p class={styles.error} role="alert" hidden={!mutation.isError()}>
-        {props.t.invalid}
+      <p class={styles.error} role="alert" hidden={!failed()}>
+        {props.vm.t.invalid}
       </p>
 
       <button
         type="submit"
         class={styles.submit}
-        classList={{ [styles.loading]: mutation.isPending() }}
-        disabled={mutation.isPending()}
+        classList={{ [styles.loading]: submitting() }}
+        disabled={submitting()}
       >
         <Icon name="login" size={18} />
-        {props.t.submit}
+        {props.vm.t.submit}
       </button>
     </form>
   );
-}
-
-export interface LoginFormProps {
-  t: LoginFormText;
-}
-
-/** Formulário de login (island). Autentica na API (same-origin token) e grava
- *  o cookie `auth_token`, depois recarrega para a rota destino (novo SSR). */
-export function LoginForm(props: LoginFormProps): JSX.Element {
-  return <LoginFormInner t={props.t} />;
 }
 
 export type { LoginFormText };

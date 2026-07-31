@@ -1,113 +1,75 @@
-import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
 import { Icon } from '@view/core/components/Icon';
-import { bindMutation } from '@view/core/observable/bind-mutation';
-import type { ProductOption } from '@viewmodel/containers/container-detail-page.vm';
-import type { ContainerDetailText } from '@viewmodel/containers/i18n/text-contracts';
-import { loadManifestItem } from '@viewmodel/containers/mutations/load-manifest-item.mutation';
-import { unloadManifestItem } from '@viewmodel/containers/mutations/unload-manifest-item.mutation';
-import {
-  createLoadItemSchema,
-  type LoadItemData,
-} from '@viewmodel/containers/schemas/manifest.schema';
-import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
-import { createSignal, For, type JSX } from 'solid-js';
+import { toAccessor } from '@view/core/observable/to-accessor';
+import type { ManifestEditorVM } from '@viewmodel/containers/vm-contracts';
+import { For, type JSX } from 'solid-js';
 
 import styles from './ManifestEditor.island.module.scss';
 
-interface ManifestFormValues {
-  product_id: string;
-  quantity: string;
-}
-
 export interface ManifestEditorProps {
-  containerId: string;
-  /** Catálogo oferecido pelo seletor de produto, vindo do ViewModel. */
-  products: readonly ProductOption[];
-  t: ContainerDetailText;
+  /** ViewModel da rota — dono do estado do editor. */
+  vm: ManifestEditorVM;
 }
 
-function Inner(props: ManifestEditorProps): JSX.Element {
-  const [target, setTarget] = createSignal<'load' | 'unload'>('load');
+/**
+ * Editor de manifesto: carrega/descarrega itens.
+ *
+ * Sem estado próprio — nem os valores, nem o `target` que decidia qual mutation
+ * o submit aplicaria. Aquele `createSignal<'load' | 'unload'>` existia só porque
+ * o `@tanstack/solid-form` tinha um único `onSubmit`; com dois handlers
+ * explícitos (`vm.load()` / `vm.unload()`) o desvio desaparece.
+ *
+ * Carregar/descarregar altera o peso e o status do contêiner, exibidos por
+ * outros componentes da mesma tela — recarregar é a forma mais barata de manter
+ * todos consistentes.
+ *
+ * @param props.vm ViewModel da rota.
+ */
+export function ManifestEditor(props: ManifestEditorProps): JSX.Element {
+  const productId = {
+    value: toAccessor(() => props.vm.manifestValue('product_id')),
+    error: toAccessor(() => props.vm.manifestError('product_id')),
+  };
+  const quantity = {
+    value: toAccessor(() => props.vm.manifestValue('quantity')),
+    error: toAccessor(() => props.vm.manifestError('quantity')),
+  };
 
-  // Carregar/descarregar altera o peso e o status do contêiner, exibidos por
-  // outros componentes da mesma tela — recarregar é a forma mais barata de
-  // manter todos consistentes.
-  const reloadOnSuccess = { onSuccess: () => window.location.reload() };
+  const pending = toAccessor(() => props.vm.manifestPending());
 
-  const loadMut = bindMutation(
-    createMutationSignal(
-      (v: LoadItemData) => loadManifestItem(props.containerId, v),
-      reloadOnSuccess,
-    ),
-  );
-  const unloadMut = bindMutation(
-    createMutationSignal(
-      (v: LoadItemData) => unloadManifestItem(props.containerId, v),
-      reloadOnSuccess,
-    ),
-  );
-  const pending = () => loadMut.isPending() || unloadMut.isPending();
-
-  const form = createForm(() => ({
-    defaultValues: { product_id: props.products[0]?.id ?? '', quantity: '' } as ManifestFormValues,
-    validators: { onChange: createLoadItemSchema(props.t) },
-    onSubmit: ({ value }) => {
-      const data = createLoadItemSchema(props.t).parse(value);
-      (target() === 'load' ? loadMut : unloadMut).mutate(data);
-    },
-  }));
-
-  const submitWith = (which: 'load' | 'unload') => {
-    setTarget(which);
-    void form.handleSubmit();
+  const reloadIfOk = (ok: boolean) => {
+    if (ok) window.location.reload();
   };
 
   return (
     <form class={styles.form} onSubmit={(e) => e.preventDefault()}>
       <fieldset class={styles.fields} disabled={pending()}>
-        <legend class="srOnly">{props.t.manifest}</legend>
+        <legend class="srOnly">{props.vm.t.manifest}</legend>
 
-        <form.Field name="product_id">
-          {(field) => (
-            <FormField
-              label={props.t.product}
-              for="mani-product"
-              error={field().state.meta.errors[0]?.message}
-            >
-              <select
-                id="mani-product"
-                class={styles.select}
-                value={field().state.value}
-                onChange={(e) => field().handleChange(e.currentTarget.value)}
-              >
-                <For each={props.products}>{(p) => <option value={p.id}>{p.name}</option>}</For>
-              </select>
-            </FormField>
-          )}
-        </form.Field>
+        <FormField label={props.vm.t.product} for="mani-product" error={productId.error()}>
+          <select
+            id="mani-product"
+            class={styles.select}
+            value={productId.value()}
+            onChange={(e) => props.vm.setManifest('product_id', e.currentTarget.value)}
+          >
+            <For each={props.vm.products}>{(p) => <option value={p.id}>{p.name}</option>}</For>
+          </select>
+        </FormField>
 
-        <form.Field name="quantity">
-          {(field) => (
-            <FormField
-              label={props.t.quantity}
-              for="mani-qty"
-              error={field().state.meta.errors[0]?.message}
-            >
-              <input
-                id="mani-qty"
-                type="number"
-                min="1"
-                class={styles.input}
-                classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
-                value={field().state.value}
-                onInput={(e) => field().handleChange(e.currentTarget.value)}
-                onBlur={field().handleBlur}
-                placeholder="0"
-              />
-            </FormField>
-          )}
-        </form.Field>
+        <FormField label={props.vm.t.quantity} for="mani-qty" error={quantity.error()}>
+          <input
+            id="mani-qty"
+            type="number"
+            min="1"
+            class={styles.input}
+            classList={{ [styles.invalid]: Boolean(quantity.error()) }}
+            value={quantity.value()}
+            onInput={(e) => props.vm.setManifest('quantity', e.currentTarget.value)}
+            onBlur={() => props.vm.blurManifest('quantity')}
+            placeholder="0"
+          />
+        </FormField>
       </fieldset>
 
       <menu class={styles.actions}>
@@ -115,30 +77,25 @@ function Inner(props: ManifestEditorProps): JSX.Element {
           <button
             type="button"
             class={styles.load}
-            onClick={() => submitWith('load')}
+            onClick={() => void props.vm.load().then(reloadIfOk)}
             disabled={pending()}
           >
             <Icon name="plus" size={16} />
-            {props.t.load}
+            {props.vm.t.load}
           </button>
         </li>
         <li>
           <button
             type="button"
             class={styles.unload}
-            onClick={() => submitWith('unload')}
+            onClick={() => void props.vm.unload().then(reloadIfOk)}
             disabled={pending()}
           >
             <Icon name="rotate" size={16} />
-            {props.t.unload}
+            {props.vm.t.unload}
           </button>
         </li>
       </menu>
     </form>
   );
-}
-
-/** Editor de manifesto: carrega/descarrega itens (island). */
-export function ManifestEditor(props: ManifestEditorProps): JSX.Element {
-  return <Inner {...props} />;
 }

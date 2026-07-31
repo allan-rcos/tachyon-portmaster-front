@@ -1,83 +1,77 @@
-import { createForm } from '@tanstack/solid-form';
 import { FormField } from '@view/core/components/FormField';
 import { ConfirmDialog } from '@view/core/islands/ConfirmDialog.island';
-import { bindMutation } from '@view/core/observable/bind-mutation';
-import { createMutationSignal } from '@viewmodel/core/observable/mutation-signal';
+import { toAccessor } from '@view/core/observable/to-accessor';
 import type { UserAdminActionsText } from '@viewmodel/users/i18n/text-contracts';
-import { deleteUser } from '@viewmodel/users/mutations/delete-user.mutation';
-import { resetUserPassword } from '@viewmodel/users/mutations/reset-user-password.mutation';
-import { createPasswordResetSchema } from '@viewmodel/users/schemas/user.schema';
+import type { UserAdminActionsVM } from '@viewmodel/users/vm-contracts';
 import { type JSX } from 'solid-js';
 
 import styles from './UserAdminActions.island.module.scss';
 
-function Inner(props: UserAdminActionsProps): JSX.Element {
-  const reset = bindMutation(
-    createMutationSignal((value: string) => resetUserPassword(props.userId, value), {
-      onSuccess: () => form.reset(),
-    }),
-  );
+export interface UserAdminActionsProps {
+  /** ViewModel da rota. */
+  vm: UserAdminActionsVM;
+}
 
-  const form = createForm(() => ({
-    defaultValues: { new_password: '' },
-    validators: { onChange: createPasswordResetSchema(props.t) },
-    onSubmit: ({ value }) => reset.mutate(value.new_password),
-  }));
+/**
+ * Ações administrativas de usuário: redefinir senha e excluir.
+ *
+ * Sem estado próprio. O `form.reset()` que a versão anterior chamava no sucesso
+ * virou responsabilidade do ViewModel, que limpa o campo e acende
+ * `resetDone()` — o mesmo `isSuccess()` de antes, só que sem embrulhar a
+ * mutation num sinal genérico.
+ *
+ * @param props.vm ViewModel da rota.
+ */
+export function UserAdminActions(props: UserAdminActionsProps): JSX.Element {
+  const newPassword = toAccessor(() => props.vm.newPassword());
+  const newPasswordError = toAccessor(() => props.vm.newPasswordError());
+  const resetting = toAccessor(() => props.vm.resetting());
+  const resetDone = toAccessor(() => props.vm.resetDone());
+
+  const reset = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    void props.vm.resetPassword();
+  };
 
   return (
     <div class={styles.wrap}>
       <section class={styles.card}>
-        <h2 class={styles.title}>{props.t.resetPassword}</h2>
-        <form
-          class={styles.resetForm}
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            void form.handleSubmit();
-          }}
-        >
-          <form.Field name="new_password">
-            {(field) => (
-              <FormField
-                label={props.t.newPassword}
-                for="reset-pass"
-                error={field().state.meta.errors[0]?.message}
-              >
-                <input
-                  id="reset-pass"
-                  type="password"
-                  class={styles.input}
-                  classList={{ [styles.invalid]: field().state.meta.errors.length > 0 }}
-                  value={field().state.value}
-                  onInput={(e) => field().handleChange(e.currentTarget.value)}
-                  onBlur={field().handleBlur}
-                />
-              </FormField>
-            )}
-          </form.Field>
-          <button type="submit" class={styles.resetBtn} disabled={reset.isPending()}>
-            {props.t.resetPassword}
+        <h2 class={styles.title}>{props.vm.t.resetPassword}</h2>
+        <form class={styles.resetForm} onSubmit={reset}>
+          <FormField label={props.vm.t.newPassword} for="reset-pass" error={newPasswordError()}>
+            <input
+              id="reset-pass"
+              type="password"
+              class={styles.input}
+              classList={{ [styles.invalid]: Boolean(newPasswordError()) }}
+              value={newPassword()}
+              onInput={(e) => props.vm.setNewPassword(e.currentTarget.value)}
+            />
+          </FormField>
+          <button type="submit" class={styles.resetBtn} disabled={resetting()}>
+            {props.vm.t.resetPassword}
           </button>
         </form>
-        <p class={styles.ok} role="status" hidden={!reset.isSuccess()}>
-          {props.t.passwordChanged}
+        <p class={styles.ok} role="status" hidden={!resetDone()}>
+          {props.vm.t.passwordChanged}
         </p>
       </section>
 
       <section class={styles.card}>
-        <h2 class={styles.title}>{props.t.delete}</h2>
+        <h2 class={styles.title}>{props.vm.t.delete}</h2>
         <ConfirmDialog
-          triggerLabel={props.t.delete}
+          triggerLabel={props.vm.t.delete}
           triggerIcon="trash"
           triggerVariant="danger"
           confirmVariant="danger"
-          title={props.t.delete}
-          message={props.t.deleteConfirm}
-          confirmLabel={props.t.delete}
-          cancelLabel={props.t.cancel}
-          onConfirm={() => deleteUser(props.userId)}
+          title={props.vm.t.delete}
+          message={props.vm.t.deleteConfirm}
+          confirmLabel={props.vm.t.delete}
+          cancelLabel={props.vm.t.cancel}
+          onConfirm={props.vm.remove}
           onDone={() => {
-            window.location.href = '/painel/usuarios';
+            window.location.href = props.vm.listHref;
           }}
         />
       </section>
@@ -85,14 +79,4 @@ function Inner(props: UserAdminActionsProps): JSX.Element {
   );
 }
 
-export interface UserAdminActionsProps {
-  userId: string;
-  t: UserAdminActionsText;
-}
-
-/** Ações administrativas de usuário: redefinir senha e excluir. */
-export function UserAdminActions(props: UserAdminActionsProps): JSX.Element {
-  return <Inner {...props} />;
-}
-
-export type { UserAdminActionsText };
+export type { UserAdminActionsText, UserAdminActionsVM };

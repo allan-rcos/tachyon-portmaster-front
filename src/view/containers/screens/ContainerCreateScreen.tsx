@@ -22,7 +22,7 @@ export function ContainerCreateScreen(props: ContainerCreateScreenProps): JSX.El
         items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.t.new }]}
       />
       <PageHeader title={props.vm.t.new} />
-      <ContainerForm mode="create" t={props.vm.t} />
+      <ContainerForm vm={props.vm} />
     </section>
   );
 }
