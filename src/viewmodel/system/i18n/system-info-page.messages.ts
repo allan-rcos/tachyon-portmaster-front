@@ -20,7 +20,8 @@ export interface SystemInfoText {
   runtime: string;
   memory: string;
   backend: string;
-  backendPending: string;
+  /** Mostrado no lugar dos fatos quando o `GET /info` do backend falha. */
+  backendUnreachable: string;
 }
 
 export const systemInfoMessages = (locale: Locale): SystemInfoText => ({
@@ -33,5 +34,5 @@ export const systemInfoMessages = (locale: Locale): SystemInfoText => ({
   runtime: m.info_runtime({}, { locale }),
   memory: m.info_memory({}, { locale }),
   backend: m.info_backend({}, { locale }),
-  backendPending: m.info_backend_pending({}, { locale }),
+  backendUnreachable: m.info_backend_unreachable({}, { locale }),
 });

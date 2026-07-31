@@ -9,11 +9,16 @@ import type {
   UserUpdateRolesRequest,
   UserList,
 } from './dto';
-import { encUserCreate, encUserUpdate, encUserResetPassword, decUserAdmin } from './fbs';
+import {
+  encUserCreate,
+  encUserUpdate,
+  encUserResetPassword,
+  decUserAdmin,
+  decUserList,
+} from './fbs';
 
-// Lista de usuários não tem tabela FlatBuffers no schema → wire JSON.
 export const listUsers = (c: ApiClient, query?: Record<string, string>): Promise<UserList> =>
-  wire(c, { method: 'GET', path: '/v1/users', query });
+  wire(c, { method: 'GET', path: '/v1/users', query, decode: decUserList });
 
 export const getUser = (c: ApiClient, id: string): Promise<UserAdmin> =>
   wire(c, { method: 'GET', path: `/v1/users/${id}`, decode: decUserAdmin });

@@ -16,5 +16,7 @@ import { toPageInput } from '@/pages/pageInput';
 export { data };
 
 async function data(pageContext: PageContext) {
-  return toPageInput(pageContext, (request) => Promise.resolve(createSystemInfoPageInput(request)));
+  // O `Promise.resolve` daqui saiu junto com a integração do `GET /info`: a rota
+  // agora busca o painel do backend, então já devolve uma promessa de verdade.
+  return toPageInput(pageContext, createSystemInfoPageInput);
 }

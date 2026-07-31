@@ -8,7 +8,6 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import {
@@ -28,10 +27,7 @@ import { createContainerSchema } from './schemas/container.schema';
 import type { ContainerField, ContainerFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const CONTAINER_EDIT_PERMISSIONS = [
-  Permission.ContainerRead,
-  Permission.ContainerUpdate,
-] as const;
+export const CONTAINER_EDIT_PERMISSIONS = ['container:read', 'container:update'] as const;
 
 /** Valores iniciais do formulário — dado plano, atravessa a serialização. */
 export interface ContainerFormValues {

@@ -7,13 +7,12 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import type { Role } from '@model/roles/dto';
 import {
   asyncBoundaryMessages,
   type AsyncBoundaryText,
 } from '@viewmodel/core/i18n/async-boundary.messages';
-import { PERMISSION_LABEL } from '@viewmodel/core/i18n/labels';
+import { permissionLabel } from '@viewmodel/core/i18n/labels';
 import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
@@ -26,10 +25,10 @@ import type { RoleListText } from './i18n/text-contracts';
 import { listRoles } from './queries/list-roles.query';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const ROLE_LIST_PERMISSIONS = [Permission.RoleList] as const;
+export const ROLE_LIST_PERMISSIONS = ['role:list'] as const;
 
 /** Permissões exigidas para criar um perfil (habilitam o botão "novo"). */
-const ROLE_CREATE_PERMISSIONS = [Permission.RoleCreate] as const;
+const ROLE_CREATE_PERMISSIONS = ['role:create'] as const;
 
 /** Uma linha da listagem, já em formato de apresentação. */
 export interface RoleRowData {
@@ -84,7 +83,7 @@ function toRow(r: Role, locale: Locale): RoleRowData {
     name: r.name,
     userCount: formatNumber(r.user_count, locale),
     permissionCount: formatNumber(r.permissions.length, locale),
-    permissions: r.permissions.map((p) => PERMISSION_LABEL[p]),
+    permissions: r.permissions.map(permissionLabel),
     permissionsHref: `/painel/perfis/${r.id}/permissoes`,
   };
 }

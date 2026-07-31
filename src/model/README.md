@@ -7,14 +7,18 @@ i18n nem DOM — o lint reprova qualquer um desses imports.
 model/
   contract/swagger/   submodule: OpenAPI + schemas FlatBuffers
   core/               cliente HTTP, negociação de wire, erros
-  common/             vocabulário transversal (status, risco, permissões)
-  generated/fbs/      saída do flatc — commitada, não editar à mão
+  common/             vocabulário transversal (status, risco, classe de risco)
+  metadata/           catálogo de permissões — o que common/ deixou de fechar
+  system/             GET /info do backend
   <recurso>/
     api.ts    funções que fazem a chamada; recebem o cliente por parâmetro
     dto.ts    tipos e constantes — NUNCA funções
     fbs.ts    codecs FlatBuffers (opcional; sem ele, a rota usa JSON)
     index.ts  barril
 ```
+
+Os bindings do `flatc` NÃO moram aqui: saem em `dist/fbs`, importados por
+`@/fbs/*`. Ver [Codegen](#codegen).
 
 ## A separação `api` × `dto` é estrutural
 
@@ -47,11 +51,19 @@ opcionais, e sem eles a chamada simplesmente usa JSON.
 ## Codegen
 
 ```bash
-bun run gen:fbs   # flatc: contract/swagger → generated/fbs
+bun run gen:fbs   # flatc: contract/swagger → dist/fbs
 ```
 
-`generated/fbs` é **commitado** (o build não depende do `flatc` estar instalado)
-e está fora do lint e do TypeDoc.
+A saída vai para `dist/fbs`, que é **gitignorado** e regerado por `gen`, `dev`,
+`build`, `test` e `typecheck` — ou seja, o `flatc` PRECISA estar instalado.
+Fica fora do lint e do TypeDoc.
+
+O código importa esses bindings por `@/fbs/*`, e nunca por caminho relativo: o
+alias é o que permite trocar o destino do build sem tocar em nenhum `fbs.ts`.
+
+Depois de atualizar o submodule do contrato, rode `bun run gen:fbs` **antes** do
+typecheck — o erro que aparece sem isso é "Cannot find module `@/fbs/...`", que
+descreve o binding faltando e não a mudança de schema que o causou.
 
 ## Adicionar uma fonte
 

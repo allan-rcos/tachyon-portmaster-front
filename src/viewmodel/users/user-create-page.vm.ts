@@ -10,7 +10,6 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
@@ -25,7 +24,7 @@ import { createUserSchema } from './schemas/user.schema';
 import type { RoleOption, UserField, UserFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const USER_CREATE_PERMISSIONS = [Permission.UserCreate] as const;
+export const USER_CREATE_PERMISSIONS = ['user:create'] as const;
 
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface UserCreatePageInput {

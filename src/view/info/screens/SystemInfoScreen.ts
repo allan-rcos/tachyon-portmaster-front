@@ -1,6 +1,6 @@
 import { Badge } from '@view/core/components/Badge';
 import { Toolbar } from '@view/core/components/Toolbar';
-import type { SystemInfoVM } from '@viewmodel/system/system-info-page.vm';
+import type { InfoFact, SystemInfoVM } from '@viewmodel/system/system-info-page.vm';
 import { html, type TemplateResult } from 'lit';
 
 import styles from './SystemInfoScreen.module.scss';
@@ -21,6 +21,19 @@ export interface SystemInfoScreenProps {
  *
  * @param props.vm ViewModel da rota.
  */
+/** Os pares rótulo/valor de um painel. */
+function facts(items: readonly InfoFact[]): TemplateResult {
+  return html`<dl class=${styles.facts}>
+    ${items.map(
+      (fact) =>
+        html`<div class=${styles.fact}>
+          <dt class=${styles.label}>${fact.label}</dt>
+          <dd class=${styles.value}>${fact.value}</dd>
+        </div>`,
+    )}
+  </dl>`;
+}
+
 export function SystemInfoScreen(props: SystemInfoScreenProps): TemplateResult {
   const { vm } = props;
 
@@ -33,22 +46,19 @@ export function SystemInfoScreen(props: SystemInfoScreenProps): TemplateResult {
           <h2 class=${styles.name}>${vm.processName}</h2>
           ${Badge({ tone: 'teal', children: vm.runtime })}
         </header>
-        <dl class=${styles.facts}>
-          ${vm.facts.map(
-            (fact) =>
-              html`<div class=${styles.fact}>
-                <dt class=${styles.label}>${fact.label}</dt>
-                <dd class=${styles.value}>${fact.value}</dd>
-              </div>`,
-          )}
-        </dl>
+        ${facts(vm.facts)}
       </article>
 
       <article class=${styles.panel}>
         <header class=${styles.head}>
-          <h2 class=${styles.name}>${vm.t.backend}</h2>
+          <h2 class=${styles.name}>${vm.backend?.processName ?? vm.t.backend}</h2>
+          ${vm.backend?.runtime ? Badge({ tone: 'sage', children: vm.backend.runtime }) : null}
         </header>
-        <p class=${styles.pending}>${vm.t.backendPending}</p>
+        ${
+          vm.backend
+            ? facts(vm.backend.facts)
+            : html`<p class=${styles.pending}>${vm.t.backendUnreachable}</p>`
+        }
       </article>
     </div>
   </section>`;

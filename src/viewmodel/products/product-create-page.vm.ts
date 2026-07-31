@@ -18,7 +18,6 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import { RISK_CLASS_OPTIONS } from '@viewmodel/core/i18n/labels';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
@@ -34,7 +33,7 @@ import { createProductSchema } from './schemas/product.schema';
 import type { ProductField, ProductFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const PRODUCT_CREATE_PERMISSIONS = [Permission.ProductCreate] as const;
+export const PRODUCT_CREATE_PERMISSIONS = ['product:create'] as const;
 
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface ProductCreatePageInput {

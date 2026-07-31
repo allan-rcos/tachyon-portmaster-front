@@ -5,12 +5,15 @@
  * por detecção de capacidade (`globalThis.tjs`, `globalThis.Bun`), sem importar
  * nada específico de runtime, para continuar válida sob txiki, Bun ou Node.
  *
- * Segue o mesmo par das demais rotas (`createXPageInput` + `createXVM`), com
- * duas diferenças: é pública (não chama `authorize`, logo não tem `shell`) e
- * não faz E/S — o dado nasce do próprio processo.
+ * Segue o mesmo par das demais rotas (`createXPageInput` + `createXVM`), com uma
+ * diferença: é pública — não chama `authorize`, logo não tem `shell`. O `GET
+ * /info` do backend também é público, então os dois painéis da tela existem sem
+ * sessão.
  *
  * @packageDocumentation
  */
+import { getProjectInfo } from '@model/system';
+import { resolveClient } from '@viewmodel/core/client/api-client';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 
@@ -33,6 +36,21 @@ export interface InfoFact {
   value: string;
 }
 
+/**
+ * Um painel da tela: um processo e os fatos que ele reporta.
+ *
+ * Os dois painéis têm a mesma forma porque medem as mesmas coisas — o do
+ * frontend só nasce de uma leitura local em vez de uma requisição.
+ */
+export interface InfoPanel {
+  /** Nome do processo, no cabeçalho do painel. */
+  processName: string;
+  /** Selo do runtime; ausente quando o processo não reporta um. */
+  runtime?: string;
+  /** Pares rótulo/valor do painel. */
+  facts: readonly InfoFact[];
+}
+
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface SystemInfoPageInput {
   /** `<title>`/`<description>` da rota. */
@@ -45,6 +63,14 @@ export interface SystemInfoPageInput {
   runtime: string;
   /** Pares rótulo/valor do painel do frontend. */
   facts: readonly InfoFact[];
+  /**
+   * O painel do backend; ausente quando o `GET /info` falhou.
+   *
+   * Opcional de propósito: uma tela de diagnóstico que quebra quando a API está
+   * fora perde justamente o diagnóstico que importa naquele momento. API fora é
+   * um RESULTADO desta rota, não um erro dela.
+   */
+  backend?: InfoPanel;
 }
 
 /** Fallback de memória para runtimes isolados que não expõem RSS (~10 MB). */
@@ -78,11 +104,50 @@ export function readSystemInfo(): SystemInfo {
 }
 
 /**
- * O trabalho de servidor da rota: i18n e a leitura do próprio processo.
+ * Os mesmos quatro fatos, medidos em qualquer um dos dois processos.
+ *
+ * @param info Diagnóstico cru — do próprio processo ou do backend.
+ * @param t    Texto já resolvido, para rotular cada fato.
+ */
+function toFacts(info: SystemInfo, t: SystemInfoText): readonly InfoFact[] {
+  return [
+    { key: 'version', label: t.version, value: info.version },
+    { key: 'environment', label: t.environment, value: info.environment },
+    { key: 'runtime', label: t.runtime, value: info.runtime },
+    { key: 'memory', label: t.memory, value: `${info.memory_usage_mb} MB` },
+  ];
+}
+
+/**
+ * Lê o `GET /info` do backend, devolvendo `undefined` se ele não responder.
+ *
+ * Engolir o erro é o comportamento certo AQUI e só aqui: a tela existe para
+ * relatar o estado do sistema, e "a API não respondeu" é um desses estados.
+ *
+ * @param request Requisição de página, para repassar os cabeçalhos no SSR.
+ * @param t       Texto já resolvido, para rotular os fatos.
+ */
+async function readBackendPanel(
+  request: PageRequest,
+  t: SystemInfoText,
+): Promise<InfoPanel | undefined> {
+  try {
+    const info = await getProjectInfo(resolveClient(request.headers));
+    return { processName: info.name, runtime: info.runtime, facts: toFacts(info, t) };
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * O trabalho de servidor da rota: i18n, a leitura do próprio processo e a do
+ * backend.
  *
  * @param request Requisição de página, neutra de framework.
  */
-export function createSystemInfoPageInput(request: PageRequest): SystemInfoPageInput {
+export async function createSystemInfoPageInput(
+  request: PageRequest,
+): Promise<SystemInfoPageInput> {
   const t = systemInfoMessages(resolveLocale(request.headers));
   const info = readSystemInfo();
 
@@ -91,12 +156,8 @@ export function createSystemInfoPageInput(request: PageRequest): SystemInfoPageI
     t,
     processName: info.name,
     runtime: info.runtime,
-    facts: [
-      { key: 'version', label: t.version, value: info.version },
-      { key: 'environment', label: t.environment, value: info.environment },
-      { key: 'runtime', label: t.runtime, value: info.runtime },
-      { key: 'memory', label: t.memory, value: `${info.memory_usage_mb} MB` },
-    ],
+    facts: toFacts(info, t),
+    backend: await readBackendPanel(request, t),
   };
 }
 
@@ -110,6 +171,8 @@ export interface SystemInfoVM {
   runtime: string;
   /** Pares rótulo/valor. */
   facts: readonly InfoFact[];
+  /** Painel do backend; ausente quando a API não respondeu. */
+  backend?: InfoPanel;
 }
 
 /**
@@ -123,5 +186,6 @@ export function createSystemInfoVM(input: SystemInfoPageInput): SystemInfoVM {
     processName: input.processName,
     runtime: input.runtime,
     facts: input.facts,
+    backend: input.backend,
   };
 }

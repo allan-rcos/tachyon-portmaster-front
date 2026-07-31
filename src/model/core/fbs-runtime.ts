@@ -9,11 +9,10 @@
  *
  * @packageDocumentation
  */
-import type { RiskClass, Permission } from '@model/common/dto';
+import type { RiskClass, TelemetryEvent } from '@model/common/dto';
 import * as flatbuffers from 'flatbuffers';
 
 import { ContainerStatus as FbContainerStatus } from '@/fbs/api/fbs/common/container-status';
-import { Permission as FbPermission } from '@/fbs/api/fbs/common/permission';
 import { RiskClass as FbRiskClass } from '@/fbs/api/fbs/common/risk-class';
 import { TelemetryEvent as FbTelemetryEvent } from '@/fbs/api/fbs/common/telemetry-event';
 
@@ -46,13 +45,23 @@ export function buf(bytes: Uint8Array): flatbuffers.ByteBuffer {
 // o índice→nome que o decode precisa. Antes isto era `indexOf` sobre os arrays
 // de `common/dto`, o que obrigava aquela ordem a espelhar o schema de fio: uma
 // reordenação inocente lá corromperia o wire em silêncio.
+//
+// `event` é a exceção: o mapeamento reverso do flatc daria `'Load'`, mas o
+// contrato publica o evento em minúsculas (`load`) — é o valor que a coluna
+// guarda e o que o wire JSON entrega SEM passar por aqui. Como os dois wires
+// precisam produzir o mesmo DTO, o índice vai para o slug, não para o nome do
+// case. Ainda assim a chave numérica vem do enum do flatc, então reordenar o
+// `.fbs` não corrompe o wire em silêncio, e um case novo quebra a compilação
+// deste `Record` em vez de virar `undefined` na tela.
+const TELEMETRY_EVENT_SLUG: Record<FbTelemetryEvent, TelemetryEvent> = {
+  [FbTelemetryEvent.Load]: 'load',
+  [FbTelemetryEvent.Unload]: 'unload',
+};
+
 const ENUM_BY_FIELD: Record<string, Record<number, string>> = {
   status: FbContainerStatus,
   riskClass: FbRiskClass,
-  event: FbTelemetryEvent,
-};
-const ENUM_LIST_BY_FIELD: Record<string, Record<number, string>> = {
-  permissions: FbPermission,
+  event: TELEMETRY_EVENT_SLUG,
 };
 
 function camelToSnake(k: string): string {
@@ -81,8 +90,6 @@ export function fromT(value: any): any {
       // Índice fora do enum conhecido = versão da API à frente do cliente;
       // preservar o número cru é mais honesto que gravar `undefined`.
       out[snake] = ENUM_BY_FIELD[key]?.[val] ?? val;
-    } else if (key in ENUM_LIST_BY_FIELD && Array.isArray(val)) {
-      out[snake] = val.map((n: number) => ENUM_LIST_BY_FIELD[key]?.[n] ?? n);
     } else if (Array.isArray(val)) {
       out[snake] = val.map(fromT);
     } else if (val !== null && typeof val === 'object') {
@@ -99,8 +106,3 @@ export function fromT(value: any): any {
  * @param s Classe de risco.
  */
 export const riskIndex = (s: RiskClass): number => FbRiskClass[s];
-/**
- * Índices numéricos de permissões (string[] → enum FBS[]).
- * @param ps Permissões a converter.
- */
-export const permIndexes = (ps: Permission[]): number[] => ps.map((p) => FbPermission[p]);

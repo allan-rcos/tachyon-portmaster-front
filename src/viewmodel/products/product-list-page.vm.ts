@@ -16,7 +16,6 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import type { Product } from '@model/products/dto';
 import {
   asyncBoundaryMessages,
@@ -35,10 +34,10 @@ import type { ProductListText } from './i18n/text-contracts';
 import { listProducts } from './queries/list-products.query';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const PRODUCT_LIST_PERMISSIONS = [Permission.ProductRead] as const;
+export const PRODUCT_LIST_PERMISSIONS = ['product:read'] as const;
 
 /** Permissões exigidas para criar um produto (habilitam o botão "novo"). */
-const PRODUCT_CREATE_PERMISSIONS = [Permission.ProductCreate] as const;
+const PRODUCT_CREATE_PERMISSIONS = ['product:create'] as const;
 
 /**
  * Uma linha da listagem, já em formato de apresentação.

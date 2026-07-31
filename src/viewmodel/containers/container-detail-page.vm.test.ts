@@ -7,7 +7,7 @@
 //
 //  Ver `@viewmodel/products/product-list-page.vm.test` para o modelo.
 // ============================================================
-import { ContainerStatus, Permission } from '@model/common';
+import { ContainerStatus } from '@model/common';
 import { accountProfileFactory, roleRefFactory } from '@viewmodel/account/testing/account.factory';
 import { containerDetailMessages } from '@viewmodel/containers/i18n/container-detail-page.messages';
 import {
@@ -75,7 +75,7 @@ beforeEach(() => {
     accountProfileFactory.build({
       roles: [
         roleRefFactory.build({
-          permissions: [Permission.ContainerRead, Permission.ContainerSummary],
+          permissions: ['container:read', 'container:summary'],
         }),
       ],
     }),

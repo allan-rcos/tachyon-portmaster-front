@@ -7,8 +7,7 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
-import { PERMISSION_OPTION_GROUPS } from '@viewmodel/core/i18n/labels';
+import { permissionOptionGroups } from '@viewmodel/core/i18n/labels';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { OptionGroup } from '@viewmodel/core/page/options';
@@ -19,11 +18,12 @@ import { z } from 'zod';
 
 import { roleNewMessages, type RoleNewText } from './i18n/role-create-page.messages';
 import { createRole } from './mutations/create-role.mutation';
+import { listPermissions } from './queries/list-permissions.query';
 import { createRoleSchema } from './schemas/role.schema';
 import type { RoleFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const ROLE_CREATE_PERMISSIONS = [Permission.RoleCreate] as const;
+export const ROLE_CREATE_PERMISSIONS = ['role:create'] as const;
 
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface RoleCreatePageInput {
@@ -42,22 +42,26 @@ export interface RoleCreatePageInput {
 /**
  * O trabalho de servidor da rota: autorização e i18n.
  *
+ * A matriz deixou de ser constante do módulo: o catálogo de permissões vive no
+ * backend, então a rota BUSCA a matriz como busca qualquer outro dado.
+ *
  * @param request Requisição de página, neutra de framework.
  * @throws {UnauthorizedError} Sem sessão válida.
- * @throws {ForbiddenError} Sem a permissão `RoleCreate`.
+ * @throws {ForbiddenError} Sem a permissão `role:create`.
  */
 export async function createRoleCreatePageInput(
   request: PageRequest,
 ): Promise<RoleCreatePageInput> {
   const account = await authorize(request, ROLE_CREATE_PERMISSIONS);
   const t = roleNewMessages(resolveLocale(request.headers));
+  const catalog = await listPermissions(request.headers);
 
   return {
     meta: { title: t.new, description: t.subtitle },
     shell: shellIdentity(account),
     t,
     listHref: '/painel/perfis',
-    permissionGroups: PERMISSION_OPTION_GROUPS,
+    permissionGroups: permissionOptionGroups(catalog),
   };
 }
 
@@ -74,8 +78,9 @@ export interface RoleCreateVM extends RoleFormVM {
   mode: 'create';
 }
 
-/** Valores enquanto se edita. `permissions` é `string[]` porque a View não
- *  conhece o enum — quem estreita para `Permission[]` é o schema. */
+/** Valores enquanto se edita. `permissions` é `string[]` porque é exatamente
+ *  isso que um slug é — não há mais enum para estreitar. O schema cobra que a
+ *  seleção não seja vazia; quem cobra que os slugs existam é o backend. */
 interface Draft {
   name: string;
   permissions: string[];

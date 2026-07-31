@@ -10,7 +10,7 @@
  *
  * @packageDocumentation
  */
-import { ContainerStatus, Permission } from '@model/common';
+import { ContainerStatus } from '@model/common';
 import type { CargoManifestItem, TelemetryLogItem } from '@model/containers/dto';
 import {
   CONTAINER_STATUS_LABEL,
@@ -55,10 +55,7 @@ import type {
 } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const CONTAINER_DETAIL_PERMISSIONS = [
-  Permission.ContainerRead,
-  Permission.ContainerSummary,
-] as const;
+export const CONTAINER_DETAIL_PERMISSIONS = ['container:read', 'container:summary'] as const;
 
 /** Cabeçalho do contêiner, já em formato de apresentação. */
 export interface ContainerFacts {

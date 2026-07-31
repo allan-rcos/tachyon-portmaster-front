@@ -18,9 +18,15 @@ beforeEach(() => {
 });
 
 describe('listUsers', () => {
-  it('aplica o limite padrão', async () => {
+  it('pede a primeira página com o limite padrão', async () => {
     await listUsers(HEADERS);
-    expect(mockedList).toHaveBeenCalledWith(expect.anything(), { limit: '50' });
+    expect(mockedList).toHaveBeenCalledWith(expect.anything(), { page: '1', limit: '50' });
+  });
+
+  // `/users` é a única listagem por página numerada — as outras usam cursor.
+  it('pede a página pedida, sem cursor', async () => {
+    await listUsers(HEADERS, 3);
+    expect(mockedList).toHaveBeenCalledWith(expect.anything(), { page: '3', limit: '50' });
   });
 
   it('devolve os usuários com seus perfis', async () => {

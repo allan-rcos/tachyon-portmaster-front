@@ -4,10 +4,10 @@
 //
 //  Ver `@viewmodel/products/product-create-page.vm.test` para o modelo.
 // ============================================================
-import { Permission } from '@model/common';
-import { PERMISSION_OPTION_GROUPS } from '@viewmodel/core/i18n/labels';
+import { permissionOptionGroups } from '@viewmodel/core/i18n/labels';
 import { roleNewMessages } from '@viewmodel/roles/i18n/role-create-page.messages';
 import { createRole } from '@viewmodel/roles/mutations/create-role.mutation';
+import { SAMPLE_PERMISSIONS } from '@viewmodel/roles/testing/permissions.sample';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createRoleCreateVM, type RoleCreatePageInput } from './role-create-page.vm';
@@ -22,7 +22,7 @@ const input: RoleCreatePageInput = {
   shell: { name: 'Ana', role: 'Administrador', initials: 'AF', href: '/painel/conta' },
   t,
   listHref: '/painel/perfis',
-  permissionGroups: PERMISSION_OPTION_GROUPS,
+  permissionGroups: permissionOptionGroups(SAMPLE_PERMISSIONS),
 };
 
 beforeEach(() => {
@@ -33,12 +33,12 @@ describe('createRoleCreateVM', () => {
   it('cria o perfil com nome e permissões marcadas', async () => {
     const vm = createRoleCreateVM(input);
     vm.setName('Operador de pátio');
-    vm.togglePermission(Permission.ProductRead, true);
+    vm.togglePermission('product:read', true);
 
     await expect(vm.submit()).resolves.toBe(true);
     expect(mockedCreate).toHaveBeenCalledWith({
       name: 'Operador de pátio',
-      permissions: [Permission.ProductRead],
+      permissions: ['product:read'],
     });
   });
 
@@ -53,13 +53,13 @@ describe('createRoleCreateVM', () => {
 
   it('reflete a seleção e o toggle desmarca', () => {
     const vm = createRoleCreateVM(input);
-    expect(vm.hasPermission(Permission.ProductRead)).toBe(false);
+    expect(vm.hasPermission('product:read')).toBe(false);
 
-    vm.togglePermission(Permission.ProductRead, true);
-    expect(vm.hasPermission(Permission.ProductRead)).toBe(true);
+    vm.togglePermission('product:read', true);
+    expect(vm.hasPermission('product:read')).toBe(true);
 
-    vm.togglePermission(Permission.ProductRead, false);
-    expect(vm.hasPermission(Permission.ProductRead)).toBe(false);
+    vm.togglePermission('product:read', false);
+    expect(vm.hasPermission('product:read')).toBe(false);
   });
 
   it('o erro da matriz só aparece depois da primeira tentativa', async () => {
@@ -83,7 +83,7 @@ describe('createRoleCreateVM', () => {
     mockedCreate.mockRejectedValueOnce(new Error('409'));
     const vm = createRoleCreateVM(input);
     vm.setName('Operador de pátio');
-    vm.togglePermission(Permission.ProductRead, true);
+    vm.togglePermission('product:read', true);
 
     await expect(vm.submit()).resolves.toBe(false);
     expect(vm.failed()).toBe(true);

@@ -9,7 +9,6 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import { type Tone } from '@viewmodel/core/i18n/labels';
 import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
@@ -21,7 +20,7 @@ import { painelMessages, type PainelPageText } from './i18n/dashboard-page.messa
 import { getMetrics } from './queries/get-metrics.query';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const DASHBOARD_PERMISSIONS = [Permission.MetricsRead] as const;
+export const DASHBOARD_PERMISSIONS = ['metrics:read'] as const;
 
 /** Um cartão de KPI, pronto para desenhar. */
 /**

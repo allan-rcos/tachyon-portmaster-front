@@ -7,7 +7,6 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
@@ -21,7 +20,7 @@ import { createContainerSchema } from './schemas/container.schema';
 import type { ContainerField, ContainerFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const CONTAINER_CREATE_PERMISSIONS = [Permission.ContainerCreate] as const;
+export const CONTAINER_CREATE_PERMISSIONS = ['container:create'] as const;
 
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface ContainerCreatePageInput {

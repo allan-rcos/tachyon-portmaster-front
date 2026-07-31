@@ -5,10 +5,10 @@
 //  O que este arquivo protege e a versão em island não protegia: o `PUT` leva o
 //  CONJUNTO INTEIRO de permissões, não um delta, e o nome do perfil não viaja.
 // ============================================================
-import { Permission } from '@model/common';
-import { PERMISSION_OPTION_GROUPS } from '@viewmodel/core/i18n/labels';
+import { permissionOptionGroups } from '@viewmodel/core/i18n/labels';
 import { rolePermissionsMessages } from '@viewmodel/roles/i18n/role-permissions-page.messages';
 import { updateRolePermissions } from '@viewmodel/roles/mutations/update-role-permissions.mutation';
+import { SAMPLE_PERMISSIONS } from '@viewmodel/roles/testing/permissions.sample';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createRolePermissionsVM, type RolePermissionsPageInput } from './role-permissions-page.vm';
@@ -24,8 +24,8 @@ const input: RolePermissionsPageInput = {
   t,
   id: 'rol_1',
   roleName: 'Administrador',
-  granted: [Permission.ProductRead],
-  permissionGroups: PERMISSION_OPTION_GROUPS,
+  granted: ['product:read'],
+  permissionGroups: permissionOptionGroups(SAMPLE_PERMISSIONS),
   listHref: '/painel/perfis',
 };
 
@@ -37,25 +37,22 @@ describe('createRolePermissionsVM', () => {
   it('nasce com as permissões já concedidas marcadas', () => {
     const vm = createRolePermissionsVM(input);
 
-    expect(vm.hasPermission(Permission.ProductRead)).toBe(true);
-    expect(vm.hasPermission(Permission.ProductCreate)).toBe(false);
+    expect(vm.hasPermission('product:read')).toBe(true);
+    expect(vm.hasPermission('product:create')).toBe(false);
     expect(vm.name()).toBe('Administrador');
   });
 
   it('sincroniza o conjunto INTEIRO, sem recriar o perfil', async () => {
     const vm = createRolePermissionsVM(input);
-    vm.togglePermission(Permission.ProductCreate, true);
+    vm.togglePermission('product:create', true);
 
     await expect(vm.submit()).resolves.toBe(true);
-    expect(mockedUpdate).toHaveBeenCalledWith('rol_1', [
-      Permission.ProductRead,
-      Permission.ProductCreate,
-    ]);
+    expect(mockedUpdate).toHaveBeenCalledWith('rol_1', ['product:read', 'product:create']);
   });
 
   it('desmarcar tudo é recusado — um perfil sem permissão não serve', async () => {
     const vm = createRolePermissionsVM(input);
-    vm.togglePermission(Permission.ProductRead, false);
+    vm.togglePermission('product:read', false);
 
     await expect(vm.submit()).resolves.toBe(false);
     expect(mockedUpdate).not.toHaveBeenCalled();

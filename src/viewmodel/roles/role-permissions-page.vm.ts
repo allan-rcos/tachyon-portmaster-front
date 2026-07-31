@@ -10,8 +10,7 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
-import { PERMISSION_OPTION_GROUPS } from '@viewmodel/core/i18n/labels';
+import { permissionOptionGroups } from '@viewmodel/core/i18n/labels';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { OptionGroup } from '@viewmodel/core/page/options';
@@ -30,15 +29,13 @@ import {
   type RolePermissionsText,
 } from './i18n/role-permissions-page.messages';
 import { updateRolePermissions } from './mutations/update-role-permissions.mutation';
+import { listPermissions } from './queries/list-permissions.query';
 import { listRoles } from './queries/list-roles.query';
 import { createRoleSchema } from './schemas/role.schema';
 import type { RoleFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const ROLE_PERMISSIONS_PERMISSIONS = [
-  Permission.RoleList,
-  Permission.RoleUpdatePermissions,
-] as const;
+export const ROLE_PERMISSIONS_PERMISSIONS = ['role:list', 'role:update_permissions'] as const;
 
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface RolePermissionsPageInput {
@@ -65,7 +62,7 @@ export interface RolePermissionsPageInput {
  *
  * @param request Requisição de página, neutra de framework.
  * @throws {UnauthorizedError} Sem sessão válida.
- * @throws {ForbiddenError} Sem `RoleList` + `RoleUpdatePermissions`.
+ * @throws {ForbiddenError} Sem `role:list` + `role:update_permissions`.
  * @throws {PageNotFoundError} Quando o id não corresponde a um perfil.
  */
 export async function createRolePermissionsPageInput(
@@ -75,7 +72,12 @@ export async function createRolePermissionsPageInput(
   const t = rolePermissionsMessages(resolveLocale(request.headers));
   const id = routeParam(request, 'id');
 
-  const res = await listRoles(request.headers);
+  // A listagem e o catálogo são independentes: buscar em paralelo tira uma ida
+  // ao backend do caminho crítico do SSR.
+  const [res, catalog] = await Promise.all([
+    listRoles(request.headers),
+    listPermissions(request.headers),
+  ]);
   const role = res.data.find((candidate) => candidate.id === id);
   if (!role) throw new PageNotFoundError(`Perfil inexistente: ${id}`);
 
@@ -86,7 +88,7 @@ export async function createRolePermissionsPageInput(
     id,
     roleName: role.name,
     granted: role.permissions,
-    permissionGroups: PERMISSION_OPTION_GROUPS,
+    permissionGroups: permissionOptionGroups(catalog),
     listHref: '/painel/perfis',
   };
 }

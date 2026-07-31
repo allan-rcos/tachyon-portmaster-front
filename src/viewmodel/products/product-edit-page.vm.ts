@@ -14,7 +14,6 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import { RISK_CLASS_OPTIONS } from '@viewmodel/core/i18n/labels';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
@@ -34,7 +33,7 @@ import { createProductSchema } from './schemas/product.schema';
 import type { ProductField, ProductFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const PRODUCT_EDIT_PERMISSIONS = [Permission.ProductRead, Permission.ProductUpdate] as const;
+export const PRODUCT_EDIT_PERMISSIONS = ['product:read', 'product:update'] as const;
 
 /** Valores iniciais do formulário — dado plano, atravessa a serialização. */
 export interface ProductFormValues {

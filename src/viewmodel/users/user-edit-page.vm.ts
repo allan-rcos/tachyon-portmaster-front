@@ -10,7 +10,6 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import {
@@ -33,7 +32,7 @@ import { createPasswordResetSchema, createUserSchema } from './schemas/user.sche
 import type { RoleOption, UserAdminActionsVM, UserField, UserFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const USER_EDIT_PERMISSIONS = [Permission.UserGet, Permission.UserUpdate] as const;
+export const USER_EDIT_PERMISSIONS = ['user:get', 'user:update'] as const;
 
 /** Valores iniciais do formulário — dado plano, atravessa a serialização. */
 export interface UserFormValues {

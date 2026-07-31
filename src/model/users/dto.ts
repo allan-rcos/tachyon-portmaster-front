@@ -1,5 +1,4 @@
 import type { RoleRef } from '@model/account/dto';
-import type { Paged } from '@model/common/dto';
 
 /** Usuário na visão administrativa, com os perfis vinculados. */
 export interface UserAdmin {
@@ -33,5 +32,14 @@ export interface UserUpdateRolesRequest {
   role_ids: string[];
 }
 
-/** Página de usuários. */
-export type UserList = Paged<UserAdmin>;
+/**
+ * Lista de usuários.
+ *
+ * NÃO é `Paged`, diferente de produtos, contêineres e perfis: o envelope do
+ * `UserListResponse` só tem `data`. A rota pagina por `page`/`limit`, e nem o
+ * cursor nem o total chegam no corpo — inventar os campos aqui só faria o
+ * ViewModel oferecer um "carregar mais" que nunca teria para onde ir.
+ */
+export interface UserList {
+  data: UserAdmin[];
+}

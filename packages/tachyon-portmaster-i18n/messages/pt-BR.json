@@ -66,7 +66,7 @@
   "containers_unload": "Descarregar",
   "containers_weight": "Peso atual",
   "info_backend": "API (Rust)",
-  "info_backend_pending": "Aguardando integração.",
+  "info_backend_unreachable": "Não foi possível falar com a API.",
   "info_environment": "Ambiente",
   "info_eyebrow": "Diagnóstico",
   "info_frontend": "Frontend",

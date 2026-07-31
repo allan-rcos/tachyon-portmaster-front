@@ -7,7 +7,6 @@
  *
  * @packageDocumentation
  */
-import { Permission } from '@model/common';
 import type { UserAdmin } from '@model/users/dto';
 import {
   asyncBoundaryMessages,
@@ -15,19 +14,19 @@ import {
 } from '@viewmodel/core/i18n/async-boundary.messages';
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize, can } from '@viewmodel/core/page/authorize';
-import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
+import { type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
 import { signal } from 'alien-signals';
 
 import type { UserListText } from './i18n/text-contracts';
 import { usersListMessages } from './i18n/user-list-page.messages';
-import { listUsers } from './queries/list-users.query';
+import { listUsers, USERS_PAGE_SIZE } from './queries/list-users.query';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const USER_LIST_PERMISSIONS = [Permission.UserList] as const;
+export const USER_LIST_PERMISSIONS = ['user:list'] as const;
 
 /** Permissões exigidas para criar um usuário (habilitam o botão "novo"). */
-const USER_CREATE_PERMISSIONS = [Permission.UserCreate] as const;
+const USER_CREATE_PERMISSIONS = ['user:create'] as const;
 
 /** Uma linha da listagem, já em formato de apresentação. */
 export interface UserRowData {
@@ -55,8 +54,15 @@ export interface UserListPageInput {
   boundary: AsyncBoundaryText;
   /** Primeira página, já formatada. */
   items: readonly UserRowData[];
-  /** Cursor da próxima página; ausente quando acabou. */
-  nextCursor?: string;
+  /**
+   * Próxima página a pedir; ausente quando a atual veio incompleta.
+   *
+   * Número, e não cursor: `/users` pagina por `page`/`limit`. Sem `total` no
+   * envelope, "veio uma página cheia" é o único sinal de que pode haver mais —
+   * o preço é uma última requisição vazia quando o total é múltiplo exato do
+   * tamanho de página.
+   */
+  nextPage?: number;
   /** Permissão de criação, já avaliada. */
   canCreate: boolean;
   /** Destino do botão "novo usuário". */
@@ -83,13 +89,13 @@ function toRow(u: UserAdmin): UserRowData {
  *
  * @param request Requisição de página, neutra de framework.
  * @throws {UnauthorizedError} Sem sessão válida.
- * @throws {ForbiddenError} Sem a permissão `UserList`.
+ * @throws {ForbiddenError} Sem a permissão `user:list`.
  */
 export async function createUserListPageInput(request: PageRequest): Promise<UserListPageInput> {
   const account = await authorize(request, USER_LIST_PERMISSIONS);
   const locale = resolveLocale(request.headers);
   const t = usersListMessages(locale);
-  const page = await listUsers(request.headers, searchParams(request));
+  const page = await listUsers(request.headers);
 
   return {
     meta: { title: t.title, description: t.subtitle },
@@ -97,7 +103,7 @@ export async function createUserListPageInput(request: PageRequest): Promise<Use
     t,
     boundary: asyncBoundaryMessages(locale),
     items: page.data.map(toRow),
-    nextCursor: page.next_cursor,
+    nextPage: page.data.length < USERS_PAGE_SIZE ? undefined : 2,
     canCreate: can(account, USER_CREATE_PERMISSIONS),
     newHref: '/painel/usuarios/nova',
   };
@@ -134,21 +140,21 @@ export interface UserListVM {
  */
 export function createUserListVM(input: UserListPageInput): UserListVM {
   const items = signal<readonly UserRowData[]>(input.items);
-  const cursor = signal<string | undefined>(input.nextCursor);
+  const nextPage = signal<number | undefined>(input.nextPage);
   const loadingMore = signal(false);
   const failed = signal(false);
 
   async function fetchNext(): Promise<void> {
-    const next = cursor();
+    const next = nextPage();
     if (next === undefined || loadingMore()) return;
     loadingMore(true);
     failed(false);
     try {
       // Sem headers: a paginação só acontece no navegador, onde o cookie viaja
       // sozinho. O servidor entrega apenas a primeira página.
-      const page = await listUsers(undefined, new URLSearchParams({ cursor: next }));
+      const page = await listUsers(undefined, next);
       items([...items(), ...page.data.map(toRow)]);
-      cursor(page.next_cursor);
+      nextPage(page.data.length < USERS_PAGE_SIZE ? undefined : next + 1);
     } catch {
       failed(true);
     } finally {
@@ -162,7 +168,7 @@ export function createUserListVM(input: UserListPageInput): UserListVM {
     items,
     canCreate: input.canCreate,
     newHref: input.newHref,
-    hasMore: () => cursor() !== undefined,
+    hasMore: () => nextPage() !== undefined,
     isLoadingMore: loadingMore,
     errorMessage: () => (failed() ? input.boundary.loadError : undefined),
     loadMore: fetchNext,

@@ -11,7 +11,7 @@
  *
  * @packageDocumentation
  */
-import { ContainerStatus, Permission } from '@model/common';
+import { ContainerStatus } from '@model/common';
 import type { Container } from '@model/containers/dto';
 import {
   asyncBoundaryMessages,
@@ -34,10 +34,10 @@ import type { ContainerListText } from './i18n/text-contracts';
 import { listContainers } from './queries/list-containers.query';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const CONTAINER_LIST_PERMISSIONS = [Permission.ContainerRead] as const;
+export const CONTAINER_LIST_PERMISSIONS = ['container:read'] as const;
 
 /** Permissões exigidas para criar um contêiner (habilitam o botão "novo"). */
-const CONTAINER_CREATE_PERMISSIONS = [Permission.ContainerCreate] as const;
+const CONTAINER_CREATE_PERMISSIONS = ['container:create'] as const;
 
 /** Uma linha da listagem, já em formato de apresentação. */
 export interface ContainerRowData {
