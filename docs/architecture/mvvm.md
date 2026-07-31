@@ -23,13 +23,15 @@ src/model/
   contract/swagger/   submodule com o OpenAPI e os schemas FlatBuffers
   core/               cliente HTTP, negociação de wire, erros
   common/             vocabulário transversal (status, risco, permissões)
-  generated/fbs/      saída do flatc (commitada; regenerável com bun run gen:fbs)
   <recurso>/
     api.ts            funções que fazem a chamada
     dto.ts            tipos e enums do recurso
     fbs.ts            codecs FlatBuffers
     index.ts          barril do recurso
 ```
+
+Os bindings do `flatc` não moram em `src/`: saem em `dist/fbs`, gitignorado e
+regerado por `bun run gen`, e são importados por `@/fbs/*`.
 
 A separação **`api.ts` × `dto.ts`** não é cosmética: `dto` contém só tipos e
 constantes, `api` só funções que exigem um cliente. É o que permite o ViewModel
