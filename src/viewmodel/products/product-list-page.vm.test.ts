@@ -11,7 +11,7 @@
 //
 //  Nenhum dos dois precisa de framework de interface para ser exercitado.
 // ============================================================
-import { Permission } from '@model/common';
+import type { Permission } from '@model/common';
 import { accountProfileFactory, roleRefFactory } from '@viewmodel/account/testing/account.factory';
 import { ForbiddenError, UnauthorizedError } from '@viewmodel/core/page/page-errors';
 import type { PageRequest } from '@viewmodel/core/page/page-request';
@@ -47,7 +47,7 @@ const request: PageRequest = {
 
 beforeEach(() => {
   mockedList.mockResolvedValue(paged(productFactory.buildList(3)));
-  mockedAccount.mockResolvedValue(accountWith(Permission.ProductRead, Permission.ProductCreate));
+  mockedAccount.mockResolvedValue(accountWith('product:read', 'product:create'));
 });
 
 describe('createProductListPageInput', () => {
@@ -74,17 +74,15 @@ describe('createProductListPageInput', () => {
   });
 
   it('avalia a permissão de criar e entrega a decisão pronta', async () => {
-    mockedAccount.mockResolvedValueOnce(accountWith(Permission.ProductRead));
+    mockedAccount.mockResolvedValueOnce(accountWith('product:read'));
     expect((await createProductListPageInput(request)).canCreate).toBe(false);
 
-    mockedAccount.mockResolvedValueOnce(
-      accountWith(Permission.ProductRead, Permission.ProductCreate),
-    );
+    mockedAccount.mockResolvedValueOnce(accountWith('product:read', 'product:create'));
     expect((await createProductListPageInput(request)).canCreate).toBe(true);
   });
 
-  it('recusa quem não tem ProductRead', async () => {
-    mockedAccount.mockResolvedValueOnce(accountWith(Permission.MetricsRead));
+  it('recusa quem não tem product:read', async () => {
+    mockedAccount.mockResolvedValueOnce(accountWith('metrics:read'));
     await expect(createProductListPageInput(request)).rejects.toThrow(ForbiddenError);
   });
 

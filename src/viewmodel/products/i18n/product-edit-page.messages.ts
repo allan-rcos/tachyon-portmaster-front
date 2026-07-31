@@ -1,5 +1,9 @@
-// Catálogo da rota /painel/produtos/@id/editar: texto do form (dono: ProductForm)
-// + chrome da página. `edit` vem de commonText (via productFormMessages).
+/**
+ * Catálogo da rota /painel/produtos/@id/editar: texto do form (dono: ProductForm)
+ * + chrome da página. `edit` vem de commonText (via productFormMessages).
+ *
+ * @packageDocumentation
+ */
 import type { Locale } from '@viewmodel/core/i18n/locale';
 import { productFormMessages } from '@viewmodel/products/i18n/product-form.messages';
 

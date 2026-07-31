@@ -1,8 +1,10 @@
-// ============================================================
-//  A API separa "dados do usuário" de "perfis do usuário" em dois endpoints,
-//  mas para a interface é uma única edição. Compor as duas chamadas é trabalho
-//  do ViewModel — a View não deveria saber que existem dois recursos.
-// ============================================================
+/**
+ * A API separa "dados do usuário" de "perfis do usuário" em dois endpoints,
+ * mas para a interface é uma única edição. Compor as duas chamadas é trabalho
+ * do ViewModel — a View não deveria saber que existem dois recursos.
+ *
+ * @packageDocumentation
+ */
 import { updateUser as apiUpdateUser, updateUserRoles } from '@model/users';
 import type { UserAdmin } from '@model/users/dto';
 import { browserClient } from '@viewmodel/core/client/api-client';

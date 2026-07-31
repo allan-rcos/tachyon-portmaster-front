@@ -1,37 +1,43 @@
-// ============================================================
-//  Rota /painel/conteineres.
-//
-//  Mesmo desenho de `@viewmodel/products/product-list-page.vm`, que documenta
-//  os dois papéis. Duas diferenças próprias desta tela:
-//
-//   • a ocupação (peso ÷ capacidade) é calculada AQUI e entregue já em número
-//     para a barra e em string para o rótulo — a View não faz aritmética;
-//   • os filtros da query string viram opções prontas para o `<select>`, com o
-//     rótulo traduzido e a marcação de selecionado já resolvida.
-// ============================================================
-import { ContainerStatus, Permission } from '@model/common';
+/**
+ * Rota /painel/conteineres.
+ *
+ * Mesmo desenho de `@viewmodel/products/product-list-page.vm`, que documenta
+ * os dois papéis. Duas diferenças próprias desta tela:
+ *
+ * • a ocupação (peso ÷ capacidade) é calculada AQUI e entregue já em número
+ *   para a barra e em string para o rótulo — a View não faz aritmética;
+ * • os filtros da query string viram opções prontas para o `<select>`, com o
+ *   rótulo traduzido e a marcação de selecionado já resolvida.
+ *
+ * @packageDocumentation
+ */
+import { ContainerStatus } from '@model/common';
 import type { Container } from '@model/containers/dto';
 import {
   asyncBoundaryMessages,
   type AsyncBoundaryText,
 } from '@viewmodel/core/i18n/async-boundary.messages';
-import { CONTAINER_STATUS_LABEL, CONTAINER_STATUS_TONE, type Tone } from '@viewmodel/core/i18n/labels';
+import {
+  CONTAINER_STATUS_LABEL,
+  CONTAINER_STATUS_TONE,
+  type Tone,
+} from '@viewmodel/core/i18n/labels';
 import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
-import { createSignal, type Signal } from '@viewmodel/core/observable/signal';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
 import { formatPercent, formatWeight } from '@viewmodel/core/utils/formatters';
+import { signal } from 'alien-signals';
 
 import { containersListMessages } from './i18n/container-list-page.messages';
 import type { ContainerListText } from './i18n/text-contracts';
 import { listContainers } from './queries/list-containers.query';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const CONTAINER_LIST_PERMISSIONS = [Permission.ContainerRead] as const;
+export const CONTAINER_LIST_PERMISSIONS = ['container:read'] as const;
 
 /** Permissões exigidas para criar um contêiner (habilitam o botão "novo"). */
-const CONTAINER_CREATE_PERMISSIONS = [Permission.ContainerCreate] as const;
+const CONTAINER_CREATE_PERMISSIONS = ['container:create'] as const;
 
 /** Uma linha da listagem, já em formato de apresentação. */
 export interface ContainerRowData {
@@ -181,7 +187,10 @@ export async function createContainerListPageInput(
     filters,
     statusOptions: [
       { value: '', label: t.allStatuses },
-      ...Object.values(ContainerStatus).map((s) => ({ value: s, label: CONTAINER_STATUS_LABEL[s] })),
+      ...Object.values(ContainerStatus).map((s) => ({
+        value: s,
+        label: CONTAINER_STATUS_LABEL[s],
+      })),
     ].map(({ value, label }) => ({
       value,
       label,
@@ -201,7 +210,7 @@ export interface ContainerListVM {
   /** Texto da fronteira de carregamento. */
   boundary: AsyncBoundaryText;
   /** Linhas acumuladas — cresce a cada `loadMore`. */
-  items: Signal<readonly ContainerRowData[]>;
+  items: () => readonly ContainerRowData[];
   /** Filtros correntes, para repovoar o formulário. */
   filters: ContainerListFilters;
   /** Opções do filtro de status. */
@@ -228,16 +237,16 @@ export interface ContainerListVM {
  * @param input Dado da rota, vindo do `+data`.
  */
 export function createContainerListVM(input: ContainerListPageInput): ContainerListVM {
-  const items = createSignal<readonly ContainerRowData[]>(input.items);
-  const cursor = createSignal<string | undefined>(input.nextCursor);
-  const loadingMore = createSignal(false);
-  const failed = createSignal(false);
+  const items = signal<readonly ContainerRowData[]>(input.items);
+  const cursor = signal<string | undefined>(input.nextCursor);
+  const loadingMore = signal(false);
+  const failed = signal(false);
 
   async function fetchNext(): Promise<void> {
     const next = cursor();
     if (next === undefined || loadingMore()) return;
-    loadingMore.set(true);
-    failed.set(false);
+    loadingMore(true);
+    failed(false);
     try {
       // Os filtros correntes viajam junto: paginar não pode trocar o recorte.
       const params = new URLSearchParams({ cursor: next });
@@ -245,12 +254,12 @@ export function createContainerListVM(input: ContainerListPageInput): ContainerL
       if (input.filters.status) params.set('status', input.filters.status);
 
       const page = await listContainers(undefined, params);
-      items.set([...items(), ...page.data.map((c) => toRow(c, input.locale))]);
-      cursor.set(page.next_cursor);
+      items([...items(), ...page.data.map((c) => toRow(c, input.locale))]);
+      cursor(page.next_cursor);
     } catch {
-      failed.set(true);
+      failed(true);
     } finally {
-      loadingMore.set(false);
+      loadingMore(false);
     }
   }
 

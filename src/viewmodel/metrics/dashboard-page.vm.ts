@@ -1,13 +1,14 @@
-// ============================================================
-//  Rota /painel — o painel operacional.
-//
-//  Os KPIs e a divisão de ocupação chegam JÁ FORMATADOS: número com separador,
-//  percentual com sufixo, rótulo e tom de cada status. A View só desenha —
-//  antes ela fazia `formatNumber`/`formatPercent` e montava os segmentos.
-//
-//  Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
-import { Permission } from '@model/common';
+/**
+ * Rota /painel — o painel operacional.
+ *
+ * Os KPIs e a divisão de ocupação chegam JÁ FORMATADOS: número com separador,
+ * percentual com sufixo, rótulo e tom de cada status. A View só desenha —
+ * antes ela fazia `formatNumber`/`formatPercent` e montava os segmentos.
+ *
+ * Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { type Tone } from '@viewmodel/core/i18n/labels';
 import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
@@ -19,7 +20,7 @@ import { painelMessages, type PainelPageText } from './i18n/dashboard-page.messa
 import { getMetrics } from './queries/get-metrics.query';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const DASHBOARD_PERMISSIONS = [Permission.MetricsRead] as const;
+export const DASHBOARD_PERMISSIONS = ['metrics:read'] as const;
 
 /** Um cartão de KPI, pronto para desenhar. */
 /**

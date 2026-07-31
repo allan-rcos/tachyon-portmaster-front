@@ -1,19 +1,26 @@
-// ============================================================
-//  Rota /painel/conteineres/nova.
-//
-//  A rota não busca nada: só autoriza e resolve texto. Ver
-//  `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
-import { Permission } from '@model/common';
+/**
+ * Rota /painel/conteineres/nova.
+ *
+ * A rota não busca nada de leitura: só autoriza e resolve texto. O estado do
+ * formulário mora aqui — ver `@viewmodel/products/product-create-page.vm` para
+ * o desenho, e `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
 import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
+import { computed, signal } from 'alien-signals';
+import { z } from 'zod';
 
 import { containerNewMessages, type ContainerNewText } from './i18n/container-create-page.messages';
+import { createContainer } from './mutations/create-container.mutation';
+import { createContainerSchema } from './schemas/container.schema';
+import type { ContainerField, ContainerFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const CONTAINER_CREATE_PERMISSIONS = [Permission.ContainerCreate] as const;
+export const CONTAINER_CREATE_PERMISSIONS = ['container:create'] as const;
 
 /** Tudo que a tela precisa para existir. Resolvido ANTES do ViewModel. */
 export interface ContainerCreatePageInput {
@@ -48,13 +55,26 @@ export async function createContainerCreatePageInput(
   };
 }
 
-/** Superfície do formulário de criação. */
-export interface ContainerCreateVM {
-  /** Texto da tela. */
+/**
+ * Superfície do registro de contêiner.
+ *
+ * O grosso é o {@link ContainerFormVM} — o mesmo contrato que a edição
+ * satisfaz. Aqui só o que o registro estreita.
+ */
+export interface ContainerCreateVM extends ContainerFormVM {
+  /** Texto da tela — o do formulário, mais o cabeçalho da rota. */
   t: ContainerNewText;
-  /** Volta para a listagem. */
-  listHref: string;
+  /** `create` decide o rótulo do botão e que o código é editável. */
+  mode: 'create';
 }
+
+/** Valores enquanto se digita — tudo texto. Ver `@viewmodel/products/product-create-page.vm`. */
+interface Draft {
+  code: string;
+  max_capacity: string;
+}
+
+const ALL_FIELDS: readonly ContainerField[] = ['code', 'max_capacity'];
 
 /**
  * Cria o ViewModel da criação a partir do dado já resolvido.
@@ -62,5 +82,47 @@ export interface ContainerCreateVM {
  * @param input Dado da rota, vindo do `+data`.
  */
 export function createContainerCreateVM(input: ContainerCreatePageInput): ContainerCreateVM {
-  return { t: input.t, listHref: input.listHref };
+  const schema = createContainerSchema('create', input.t);
+  const values = signal<Draft>({ code: '', max_capacity: '' });
+  const touched = signal<ReadonlySet<ContainerField>>(new Set());
+  const submitting = signal(false);
+  const failed = signal(false);
+
+  const problems = computed(() => {
+    const result = schema.safeParse(values());
+    return result.success ? {} : z.flattenError(result.error).fieldErrors;
+  });
+
+  return {
+    t: input.t,
+    listHref: input.listHref,
+    mode: 'create',
+    value: (field) => values()[field],
+    error: (field) => (touched().has(field) ? problems()[field]?.[0] : undefined),
+    submitting,
+    failed,
+    set: (field, value) => {
+      values({ ...values(), [field]: value });
+      failed(false);
+    },
+    blur: (field) => touched(new Set(touched()).add(field)),
+    submit: async () => {
+      const result = schema.safeParse(values());
+      if (!result.success) {
+        touched(new Set(ALL_FIELDS));
+        return false;
+      }
+      submitting(true);
+      failed(false);
+      try {
+        await createContainer(result.data);
+        return true;
+      } catch {
+        failed(true);
+        return false;
+      } finally {
+        submitting(false);
+      }
+    },
+  };
 }

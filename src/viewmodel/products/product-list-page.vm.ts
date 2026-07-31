@@ -1,20 +1,21 @@
-// ============================================================
-//  Rota /painel/produtos — as duas metades do MVVM desta tela.
-//
-//   • `createProductListPageInput` é o DATA: o papel de uma resposta de API
-//     JSON. Faz o trabalho de servidor (sessão, permissão, cookie, i18n, 1ª
-//     página) e devolve dado PURO e SERIALIZÁVEL — o Vike o atravessa com o
-//     `@brillout/json-serializer` para hidratar o cliente, então nada de
-//     função, signal ou instância de classe aqui dentro.
-//
-//   • `createProductListVM` é a REATIVIDADE: signals e handlers nomeados,
-//     construído no `+Page` a partir daquele dado puro. Roda igual nos dois
-//     lados — no 1º load a partir do input desserializado, na navegação
-//     client-side a partir do input que o `+data` produziu no navegador.
-//
-//  A tela (`ProductListScreen`) é stateless: só lê deste VM.
-// ============================================================
-import { Permission } from '@model/common';
+/**
+ * Rota /painel/produtos — as duas metades do MVVM desta tela.
+ *
+ * • `createProductListPageInput` é o DATA: o papel de uma resposta de API
+ *   JSON. Faz o trabalho de servidor (sessão, permissão, cookie, i18n, 1ª
+ *   página) e devolve dado PURO e SERIALIZÁVEL — o Vike o atravessa com o
+ *   `@brillout/json-serializer` para hidratar o cliente, então nada de
+ *   função, signal ou instância de classe aqui dentro.
+ *
+ * • `createProductListVM` é a REATIVIDADE: signals e handlers nomeados,
+ *   construído no `+Page` a partir daquele dado puro. Roda igual nos dois
+ *   lados — no 1º load a partir do input desserializado, na navegação
+ *   client-side a partir do input que o `+data` produziu no navegador.
+ *
+ * A tela (`ProductListScreen`) é stateless: só lê deste VM.
+ *
+ * @packageDocumentation
+ */
 import type { Product } from '@model/products/dto';
 import {
   asyncBoundaryMessages,
@@ -22,21 +23,21 @@ import {
 } from '@viewmodel/core/i18n/async-boundary.messages';
 import { RISK_CLASS_LABEL, RISK_CLASS_TONE, type Tone } from '@viewmodel/core/i18n/labels';
 import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
-import { createSignal, type Signal } from '@viewmodel/core/observable/signal';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
 import { formatDensity } from '@viewmodel/core/utils/formatters';
+import { signal } from 'alien-signals';
 
 import { productsListMessages } from './i18n/product-list-page.messages';
 import type { ProductListText } from './i18n/text-contracts';
 import { listProducts } from './queries/list-products.query';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const PRODUCT_LIST_PERMISSIONS = [Permission.ProductRead] as const;
+export const PRODUCT_LIST_PERMISSIONS = ['product:read'] as const;
 
 /** Permissões exigidas para criar um produto (habilitam o botão "novo"). */
-const PRODUCT_CREATE_PERMISSIONS = [Permission.ProductCreate] as const;
+const PRODUCT_CREATE_PERMISSIONS = ['product:create'] as const;
 
 /**
  * Uma linha da listagem, já em formato de apresentação.
@@ -135,7 +136,7 @@ export interface ProductListVM {
   /** Texto da fronteira de carregamento. */
   boundary: AsyncBoundaryText;
   /** Linhas acumuladas — cresce a cada `loadMore`. */
-  items: Signal<readonly ProductRowData[]>;
+  items: () => readonly ProductRowData[];
   /** Permissão de criação, já avaliada no servidor. */
   canCreate: boolean;
   /** Destino do botão "novo produto". */
@@ -158,27 +159,27 @@ export interface ProductListVM {
  * @param input Dado da rota, vindo do `+data`.
  */
 export function createProductListVM(input: ProductListPageInput): ProductListVM {
-  const items = createSignal<readonly ProductRowData[]>(input.items);
-  const cursor = createSignal<string | undefined>(input.nextCursor);
-  const loadingMore = createSignal(false);
-  const failed = createSignal(false);
+  const items = signal<readonly ProductRowData[]>(input.items);
+  const cursor = signal<string | undefined>(input.nextCursor);
+  const loadingMore = signal(false);
+  const failed = signal(false);
 
   async function fetchNext(): Promise<void> {
     const next = cursor();
     if (next === undefined || loadingMore()) return;
-    loadingMore.set(true);
-    failed.set(false);
+    loadingMore(true);
+    failed(false);
     try {
       // Sem headers: a paginação só acontece no navegador, onde o cookie viaja
       // sozinho. O servidor entrega apenas a primeira página.
       const page = await listProducts(undefined, new URLSearchParams({ cursor: next }));
-      items.set([...items(), ...page.data.map((p) => toRow(p, input.locale))]);
-      cursor.set(page.next_cursor);
+      items([...items(), ...page.data.map((p) => toRow(p, input.locale))]);
+      cursor(page.next_cursor);
     } catch {
       // O erro vira estado: a tela mostra a mensagem e oferece `retry`.
-      failed.set(true);
+      failed(true);
     } finally {
-      loadingMore.set(false);
+      loadingMore(false);
     }
   }
 

@@ -1,8 +1,10 @@
-// ============================================================
-//  Erros de transporte. O ofetch lança `FetchError` em respostas
-//  não-2xx, com `.status`, `.statusCode`, `.data` (corpo parseado)
-//  e `.response`. Reexportamos para o app tratar sem acoplar ao ofetch.
-// ============================================================
+/**
+ * Erros de transporte. O ofetch lança `FetchError` em respostas
+ * não-2xx, com `.status`, `.statusCode`, `.data` (corpo parseado)
+ * e `.response`. Reexportamos para o app tratar sem acoplar ao ofetch.
+ *
+ * @packageDocumentation
+ */
 export { FetchError } from 'ofetch';
 
 /**

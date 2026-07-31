@@ -1,11 +1,13 @@
-// ============================================================
-//  Transporte por operação. `wire()` executa uma chamada REST via
-//  ofetch negociando o formato: JSON quando `client.wire === 'json'`;
-//  FlatBuffers quando `client.wire === 'fbs'` E a operação fornece os
-//  adaptadores `encode`/`decode` (senão cai para JSON, mesmo em prod).
-//
-//  ofetch cobre parse de JSON, querystring e erro (FetchError em não-2xx).
-// ============================================================
+/**
+ * Transporte por operação. `wire()` executa uma chamada REST via
+ * ofetch negociando o formato: JSON quando `client.wire === 'json'`;
+ * FlatBuffers quando `client.wire === 'fbs'` E a operação fornece os
+ * adaptadores `encode`/`decode` (senão cai para JSON, mesmo em prod).
+ *
+ * ofetch cobre parse de JSON, querystring e erro (FetchError em não-2xx).
+ *
+ * @packageDocumentation
+ */
 import type { ApiClient } from './http';
 
 /** Verbos HTTP usados pela API. */

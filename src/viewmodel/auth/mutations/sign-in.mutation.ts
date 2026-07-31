@@ -1,8 +1,10 @@
-// ============================================================
-//  Autenticação. A mutation não devolve o token cru para a View: ela já o
-//  persiste no cookie de sessão, porque "onde a credencial é guardada" é
-//  decisão do ViewModel, não da interface. A View só reage ao sucesso.
-// ============================================================
+/**
+ * Autenticação. A mutation não devolve o token cru para a View: ela já o
+ * persiste no cookie de sessão, porque "onde a credencial é guardada" é
+ * decisão do ViewModel, não da interface. A View só reage ao sucesso.
+ *
+ * @packageDocumentation
+ */
 import { login } from '@model/auth';
 import type { LoginFormData } from '@viewmodel/auth/schemas/login.schema';
 import { browserClient } from '@viewmodel/core/client/api-client';

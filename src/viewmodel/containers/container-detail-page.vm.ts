@@ -1,14 +1,16 @@
-// ============================================================
-//  Rota /painel/conteineres/@id.
-//
-//  A tela mais composta do produto: resumo do contêiner + manifesto de carga +
-//  telemetria + ações. Tudo é resolvido no `+data`, em duas buscas PARALELAS —
-//  o resumo e o catálogo de produtos que o editor de manifesto oferece são
-//  recursos independentes, e serializar as chamadas só somaria latência.
-//
-//  Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
-// ============================================================
-import { ContainerStatus, Permission } from '@model/common';
+/**
+ * Rota /painel/conteineres/@id.
+ *
+ * A tela mais composta do produto: resumo do contêiner + manifesto de carga +
+ * telemetria + ações. Tudo é resolvido no `+data`, em duas buscas PARALELAS —
+ * o resumo e o catálogo de produtos que o editor de manifesto oferece são
+ * recursos independentes, e serializar as chamadas só somaria latência.
+ *
+ * Ver `@viewmodel/products/product-list-page.vm` para os dois papéis.
+ *
+ * @packageDocumentation
+ */
+import { ContainerStatus } from '@model/common';
 import type { CargoManifestItem, TelemetryLogItem } from '@model/containers/dto';
 import {
   CONTAINER_STATUS_LABEL,
@@ -33,24 +35,27 @@ import {
   formatWeight,
 } from '@viewmodel/core/utils/formatters';
 import { listProducts } from '@viewmodel/products/queries/list-products.query';
+import { computed, signal } from 'alien-signals';
+import { z } from 'zod';
 
 import { containerDetailMessages } from './i18n/container-detail-page.messages';
 import type { ContainerDetailPageText } from './i18n/container-detail-page.messages';
+import { deleteContainer } from './mutations/delete-container.mutation';
+import { dispatchContainer } from './mutations/dispatch-container.mutation';
+import { loadManifestItem } from './mutations/load-manifest-item.mutation';
+import { sealContainer } from './mutations/seal-container.mutation';
+import { unloadManifestItem } from './mutations/unload-manifest-item.mutation';
 import { getContainerSummary } from './queries/get-container-summary.query';
+import { createLoadItemSchema, type LoadItemData } from './schemas/manifest.schema';
+import type {
+  ContainerActionsVM,
+  ManifestEditorVM,
+  ManifestField,
+  ProductOption,
+} from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
-export const CONTAINER_DETAIL_PERMISSIONS = [
-  Permission.ContainerRead,
-  Permission.ContainerSummary,
-] as const;
-
-/** Opção de produto oferecida no editor de manifesto. */
-export interface ProductOption {
-  /** Id opaco base62 do produto. */
-  id: string;
-  /** Nome exibido na opção. */
-  name: string;
-}
+export const CONTAINER_DETAIL_PERMISSIONS = ['container:read', 'container:summary'] as const;
 
 /** Cabeçalho do contêiner, já em formato de apresentação. */
 export interface ContainerFacts {
@@ -175,7 +180,9 @@ export async function createContainerDetailPageInput(
   ]);
 
   const c = summary.container;
-  const occupancy = c.max_capacity ? Math.round((c.current_weight / c.max_capacity) * 1000) / 10 : 0;
+  const occupancy = c.max_capacity
+    ? Math.round((c.current_weight / c.max_capacity) * 1000) / 10
+    : 0;
 
   return {
     meta: { title: `${t.title} — ${c.code}`, description: t.summary },
@@ -202,8 +209,23 @@ export async function createContainerDetailPageInput(
   };
 }
 
-/** Superfície do detalhe de contêiner. */
-export interface ContainerDetailVM {
+/** Valores enquanto se digita no editor de manifesto — tudo texto. */
+interface ManifestDraft {
+  product_id: string;
+  quantity: string;
+}
+
+const ALL_MANIFEST_FIELDS: readonly ManifestField[] = ['product_id', 'quantity'];
+
+/**
+ * Superfície do detalhe de contêiner.
+ *
+ * A tela é um cluster de três peças, e o tipo diz isso: as ações de ciclo de
+ * vida ({@link ContainerActionsVM}), o editor de manifesto
+ * ({@link ManifestEditorVM}) e o cabeçalho/tabelas que só esta rota tem. Antes
+ * a composição só se descobria lendo os três componentes.
+ */
+export interface ContainerDetailVM extends ContainerActionsVM, ManifestEditorVM {
   /** Texto do cluster inteiro. */
   t: ContainerDetailPageText;
   /** Cabeçalho do contêiner. */
@@ -212,10 +234,6 @@ export interface ContainerDetailVM {
   manifest: readonly ManifestRowData[];
   /** Eventos recentes, já formatados. */
   logs: readonly TelemetryRowData[];
-  /** Catálogo oferecido pelo editor de manifesto. */
-  products: readonly ProductOption[];
-  /** Volta para a listagem. */
-  listHref: string;
 }
 
 /**
@@ -224,6 +242,43 @@ export interface ContainerDetailVM {
  * @param input Dado da rota, vindo do `+data`.
  */
 export function createContainerDetailVM(input: ContainerDetailPageInput): ContainerDetailVM {
+  const id = input.facts.id;
+  const schema = createLoadItemSchema(input.t);
+  const values = signal<ManifestDraft>({
+    product_id: input.products[0]?.id ?? '',
+    quantity: '',
+  });
+  const touched = signal<ReadonlySet<ManifestField>>(new Set());
+  const pending = signal(false);
+
+  const problems = computed(() => {
+    const result = schema.safeParse(values());
+    return result.success ? {} : z.flattenError(result.error).fieldErrors;
+  });
+
+  /**
+   * O caminho comum de carregar e descarregar: valida uma vez e aplica a
+   * mutation que o botão escolheu.
+   *
+   * @param apply Mutation a aplicar sobre a entrada validada.
+   */
+  async function run(apply: (data: LoadItemData) => Promise<unknown>): Promise<boolean> {
+    const result = schema.safeParse(values());
+    if (!result.success) {
+      touched(new Set(ALL_MANIFEST_FIELDS));
+      return false;
+    }
+    pending(true);
+    try {
+      await apply(result.data);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      pending(false);
+    }
+  }
+
   return {
     t: input.t,
     facts: input.facts,
@@ -231,5 +286,17 @@ export function createContainerDetailVM(input: ContainerDetailPageInput): Contai
     logs: input.logs,
     products: input.products,
     listHref: input.listHref,
+
+    seal: () => sealContainer(id),
+    dispatch: () => dispatchContainer(id),
+    remove: () => deleteContainer(id),
+
+    manifestValue: (field) => values()[field],
+    manifestError: (field) => (touched().has(field) ? problems()[field]?.[0] : undefined),
+    manifestPending: pending,
+    setManifest: (field, value) => values({ ...values(), [field]: value }),
+    blurManifest: (field) => touched(new Set(touched()).add(field)),
+    load: () => run((data) => loadManifestItem(id, data)),
+    unload: () => run((data) => unloadManifestItem(id, data)),
   };
 }

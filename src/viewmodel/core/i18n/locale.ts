@@ -1,12 +1,14 @@
-// ============================================================
-//  Resolução de locale a partir do cookie `flow-locale`, com fallback pt-BR.
-//
-//  Funciona nos dois lados: no SSR o cookie chega nos headers do request; no
-//  navegador, em `document.cookie`. É o que permite a uma tela renderizar no
-//  servidor ou no cliente sem mudar a resolução de texto — a base de todo o
-//  i18n do projeto, já que o locale é sempre passado explicitamente
-//  (`m.foo({}, { locale })`), sem estado global.
-// ============================================================
+/**
+ * Resolução de locale a partir do cookie `flow-locale`, com fallback pt-BR.
+ *
+ * Funciona nos dois lados: no SSR o cookie chega nos headers do request; no
+ * navegador, em `document.cookie`. É o que permite a uma tela renderizar no
+ * servidor ou no cliente sem mudar a resolução de texto — a base de todo o
+ * i18n do projeto, já que o locale é sempre passado explicitamente
+ * (`m.foo({}, { locale })`), sem estado global.
+ *
+ * @packageDocumentation
+ */
 import { readHeader, type IncomingHeaders } from '@viewmodel/core/client/api-client';
 import { parseCookies } from '@viewmodel/core/utils/cookies';
 

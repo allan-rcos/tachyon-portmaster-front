@@ -1,5 +1,9 @@
-// Catálogo da rota /entrar. Inclui o texto do LoginForm (form usado só por
-// esta rota) + o chrome do painel promocional. `valText` provê os erros.
+/**
+ * Catálogo da rota /entrar. Inclui o texto do LoginForm (form usado só por
+ * esta rota) + o chrome do painel promocional. `valText` provê os erros.
+ *
+ * @packageDocumentation
+ */
 import { valText, type ValText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 

@@ -1,4 +1,8 @@
-// Catálogo da rota /painel/conteineres/nova: texto do form + chrome da página.
+/**
+ * Catálogo da rota /painel/conteineres/nova: texto do form + chrome da página.
+ *
+ * @packageDocumentation
+ */
 import { containerFormMessages } from '@viewmodel/containers/i18n/container-form.messages';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 

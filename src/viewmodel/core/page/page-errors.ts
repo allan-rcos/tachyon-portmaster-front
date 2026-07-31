@@ -1,16 +1,17 @@
-// ============================================================
-//  Erros de autorização de página, sinalizados pelo ViewModel.
-//
-//  O ViewModel NÃO chama `redirect()` nem `render()` do Vike: ele descreve o
-//  que aconteceu e quem traduz para uma resposta HTTP é o composition root
-//  (`pages/`). É o que mantém a decisão de autorização testável sem levantar
-//  framework nenhum — e o que permitiria trocar o roteador sem reescrever
-//  regra de acesso.
-//
-//  Ver `@viewmodel/core/page/page-request` para `PageNotFoundError`, que segue
-//  o mesmo princípio para "o recurso não existe".
-// ============================================================
-
+/**
+ * Erros de autorização de página, sinalizados pelo ViewModel.
+ *
+ * O ViewModel NÃO chama `redirect()` nem `render()` do Vike: ele descreve o
+ * que aconteceu e quem traduz para uma resposta HTTP é o composition root
+ * (`pages/`). É o que mantém a decisão de autorização testável sem levantar
+ * framework nenhum — e o que permitiria trocar o roteador sem reescrever
+ * regra de acesso.
+ *
+ * Ver `@viewmodel/core/page/page-request` para `PageNotFoundError`, que segue
+ * o mesmo princípio para "o recurso não existe".
+ *
+ * @packageDocumentation
+ */
 /**
  * Não há sessão válida: o cookie está ausente, expirado ou foi rejeitado.
  *

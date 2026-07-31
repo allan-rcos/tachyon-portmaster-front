@@ -1,14 +1,18 @@
-// ============================================================
-//  DTOs proxy (JSON) transversais — enums e tipos comuns. Espelham
-//  o swagger/swagger.json. IDs são STRINGS base62 opacas no front
-//  (o backend converte para i64 só na infra).
-// ============================================================
-
+/**
+ * DTOs proxy (JSON) transversais — enums e tipos comuns. Espelham
+ * o swagger/swagger.json. IDs são STRINGS base62 opacas no front
+ * (o backend converte para i64 só na infra).
+ *
+ * @packageDocumentation
+ */
 // Enums como objeto `as const`, não `enum` do TS: o `enum` de string é
-// NOMINAL, então `Permission` deixaria de aceitar a string crua vinda do JSON
+// NOMINAL, então `RiskClass` deixaria de aceitar a string crua vinda do JSON
 // da API e exigiria cast em toda fronteira — além de não ser tree-shakeable.
-// Este padrão dá o acesso namespaced (`Permission.ProductRead`) com o tipo
+// Este padrão dá o acesso namespaced (`RiskClass.Class2Gases`) com o tipo
 // ainda sendo a união de strings literais, que casa com o wire sem cast.
+//
+// Vale para os enums que o `.fbs` ainda fecha. `Permission` saiu dessa lista:
+// virou catálogo de runtime, e o porquê está na própria declaração, lá embaixo.
 //
 // A ORDEM aqui é documental, não carrega significado: os valores numéricos do
 // FlatBuffers vêm dos enums gerados pelo `flatc`, e é neles que
@@ -36,42 +40,33 @@ export const RiskClass = {
 } as const;
 export type RiskClass = (typeof RiskClass)[keyof typeof RiskClass];
 
+// Único enum cujo VALOR não é o nome do case: o contrato publica o evento em
+// minúsculas (`load`), que é o texto guardado na coluna e o que o wire JSON
+// entrega cru. A chave segue o case do `.fbs` para o acesso namespaced.
+//
+// Só `Load` e `Unload` existem: `Create`, `Seal` e `Dispatch` eram invenção do
+// front — nunca estiveram no schema, e o backend descarta valor que não casa
+// com nenhum case em vez de forçá-lo para um.
 export const TelemetryEvent = {
-  Create: 'Create',
-  Load: 'Load',
-  Unload: 'Unload',
-  Seal: 'Seal',
-  Dispatch: 'Dispatch',
+  Load: 'load',
+  Unload: 'unload',
 } as const;
 export type TelemetryEvent = (typeof TelemetryEvent)[keyof typeof TelemetryEvent];
 
-export const Permission = {
-  ProductRead: 'ProductRead',
-  ProductCreate: 'ProductCreate',
-  ProductUpdate: 'ProductUpdate',
-  ProductDelete: 'ProductDelete',
-  ContainerRead: 'ContainerRead',
-  ContainerCreate: 'ContainerCreate',
-  ContainerUpdate: 'ContainerUpdate',
-  ContainerDelete: 'ContainerDelete',
-  ContainerSeal: 'ContainerSeal',
-  ContainerDispatch: 'ContainerDispatch',
-  ContainerSummary: 'ContainerSummary',
-  ManifestLoad: 'ManifestLoad',
-  ManifestUnload: 'ManifestUnload',
-  UserGet: 'UserGet',
-  UserList: 'UserList',
-  UserCreate: 'UserCreate',
-  UserUpdate: 'UserUpdate',
-  UserDelete: 'UserDelete',
-  UserChangePassword: 'UserChangePassword',
-  UserUpdateRoles: 'UserUpdateRoles',
-  RoleList: 'RoleList',
-  RoleCreate: 'RoleCreate',
-  RoleUpdatePermissions: 'RoleUpdatePermissions',
-  MetricsRead: 'MetricsRead',
-} as const;
-export type Permission = (typeof Permission)[keyof typeof Permission];
+/**
+ * Slug de uma permissão, no formato `recurso:ação` (ex.: `product:create`).
+ *
+ * É `string` ABERTA, e isso é a mudança de contrato, não preguiça de tipagem: as
+ * permissões deixaram de ser um enum do schema e viraram linhas de registro que
+ * cada use case declara no WorkerStart do backend. O catálogo só existe em
+ * runtime, e quem o publica é `GET /metadata/permissions` — qualquer união
+ * fechada aqui seria uma cópia condenada a envelhecer em silêncio, concordando
+ * com o compilador e discordando do servidor.
+ *
+ * O apelido existe para que a intenção continue legível nas assinaturas: um
+ * `Permission[]` diz o que um `string[]` não diria.
+ */
+export type Permission = string;
 
 /** Resposta paginada por cursor (padrão do backend). */
 export interface Paged<T> {

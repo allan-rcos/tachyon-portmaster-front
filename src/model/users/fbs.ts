@@ -5,11 +5,13 @@ import type {
   UserCreateRequest,
   UserUpdateRequest,
   UserAdminPasswordResetRequest,
+  UserList,
 } from './dto';
 
 import { UserAdminPasswordResetRequestT } from '@/fbs/api/fbs/admin/user-admin-password-reset-request';
 import { UserAdminResponse as FbUserAdminResponse } from '@/fbs/api/fbs/admin/user-admin-response';
 import { UserCreateRequestT } from '@/fbs/api/fbs/admin/user-create-request';
+import { UserListResponse as FbUserListResponse } from '@/fbs/api/fbs/admin/user-list-response';
 import { UserUpdateRequestT } from '@/fbs/api/fbs/admin/user-update-request';
 
 export const encUserCreate = (v: UserCreateRequest): Uint8Array =>
@@ -23,3 +25,6 @@ export const encUserResetPassword = (v: UserAdminPasswordResetRequest): Uint8Arr
 
 export const decUserAdmin = (b: Uint8Array): UserAdmin =>
   fromT(FbUserAdminResponse.getRootAsUserAdminResponse(buf(b)).unpack()) as UserAdmin;
+
+export const decUserList = (b: Uint8Array): UserList =>
+  fromT(FbUserListResponse.getRootAsUserListResponse(buf(b)).unpack()) as UserList;

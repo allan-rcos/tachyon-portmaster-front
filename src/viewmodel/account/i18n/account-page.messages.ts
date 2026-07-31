@@ -1,6 +1,10 @@
-// Catálogo i18n da rota /painel/conta. Um único `t` alimenta o resumo
-// (AccountProfile) e os dois forms (AccountForm, PasswordChange); cada um
-// declara seu contrato local e consome o subconjunto que precisa.
+/**
+ * Catálogo i18n da rota /painel/conta. Um único `t` alimenta o resumo
+ * (AccountProfile) e os dois forms (AccountForm, PasswordChange); cada um
+ * declara seu contrato local e consome o subconjunto que precisa.
+ *
+ * @packageDocumentation
+ */
 import { commonText, valText, type CommonText, type ValText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 

@@ -13,7 +13,7 @@
     "info_runtime",
     "info_memory",
     "info_backend",
-    "info_backend_pending"
+    "info_backend_unreachable"
   ],
   "patternProperties": {
     "^info_": { "type": "string", "minLength": 1 }

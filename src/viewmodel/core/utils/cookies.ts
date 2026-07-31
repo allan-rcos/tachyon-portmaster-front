@@ -1,9 +1,10 @@
-// ============================================================
-//  Helpers de cookie. `parseCookies` roda no server (a partir do
-//  header Cookie); `getCookie`/`setCookie`/`deleteCookie` no browser
-//  (islands). Estado de preferência (tema/sidebar) vive aqui.
-// ============================================================
-
+/**
+ * Helpers de cookie. `parseCookies` roda no server (a partir do
+ * header Cookie); `getCookie`/`setCookie`/`deleteCookie` no browser
+ * (islands). Estado de preferência (tema/sidebar) vive aqui.
+ *
+ * @packageDocumentation
+ */
 /**
  * Converte o cabeçalho `Cookie` num mapa nome → valor.
  *

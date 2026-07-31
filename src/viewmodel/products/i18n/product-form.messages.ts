@@ -1,7 +1,10 @@
-// Texto do formulário de produto (dono: o próprio form). As rotas
-// /produtos/nova e /produtos/@id/editar resolvem este catálogo no seu +data
-// e passam por prop. Termos transversais e de validação vêm de commonText/valText.
-
+/**
+ * Texto do formulário de produto (dono: o próprio form). As rotas
+ * /produtos/nova e /produtos/@id/editar resolvem este catálogo no seu +data
+ * e passam por prop. Termos transversais e de validação vêm de commonText/valText.
+ *
+ * @packageDocumentation
+ */
 import { commonText, valText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 

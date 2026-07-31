@@ -1,6 +1,9 @@
-// Texto do formulário de perfil (dono: o próprio form). Reusado por
-// /perfis/nova (mode=create) e /perfis/@id/permissoes (mode=permissions).
-
+/**
+ * Texto do formulário de perfil (dono: o próprio form). Reusado por
+ * /perfis/nova (mode=create) e /perfis/@id/permissoes (mode=permissions).
+ *
+ * @packageDocumentation
+ */
 import { commonText, valText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 

@@ -1,4 +1,3 @@
-import { Permission } from '@model/common';
 import { z } from 'zod';
 
 /** Chaves de erro dos schemas de perfil (contrato local). */
@@ -36,8 +35,13 @@ export function createRoleSchema(mode: RoleFormMode, t?: RoleSchemaText) {
             .min(2, t?.nameShort ?? 'Nome muito curto')
             .max(60, t?.nameLong ?? 'Nome muito longo')
         : z.string(),
+    // Era `z.enum(Permission)`. Não é mais: o catálogo de permissões vive no
+    // backend, então validar o slug aqui só recriaria a lista fechada que o
+    // contrato acabou de abrir — e rejeitaria, no cliente, uma permissão nova
+    // que o servidor aceita. O que ainda é regra de formulário, e continua
+    // valendo, é não submeter um perfil sem nenhuma permissão marcada.
     permissions: z
-      .array(z.enum(Permission))
+      .array(z.string())
       .min(1, t?.permissionsRequired ?? 'Selecione ao menos uma permissão'),
   });
 }

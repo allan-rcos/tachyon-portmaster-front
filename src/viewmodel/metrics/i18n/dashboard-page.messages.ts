@@ -1,5 +1,9 @@
-// Catálogo i18n da rota /painel (dashboard). Dono do texto é a página; o
-// cluster de métricas recebe `t` resolvido por prop (contrato MetricsPanelText).
+/**
+ * Catálogo i18n da rota /painel (dashboard). Dono do texto é a página; o
+ * cluster de métricas recebe `t` resolvido por prop (contrato MetricsPanelText).
+ *
+ * @packageDocumentation
+ */
 import type { Locale } from '@viewmodel/core/i18n/locale';
 
 import type { MetricsPanelText } from './text-contracts';

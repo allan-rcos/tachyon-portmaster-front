@@ -1,6 +1,8 @@
-// ============================================================
-//  Factory do DTO de usuário administrável.
-// ============================================================
+/**
+ * Factory do DTO de usuário administrável.
+ *
+ * @packageDocumentation
+ */
 import { faker } from '@faker-js/faker';
 import type { UserAdmin } from '@model/users/dto';
 import { roleRefFactory } from '@viewmodel/account/testing/account.factory';

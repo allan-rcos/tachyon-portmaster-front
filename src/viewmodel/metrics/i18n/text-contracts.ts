@@ -1,9 +1,10 @@
-// ============================================================
-//  Contratos de texto do painel de métricas.
-//  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
-//  morar no ViewModel.
-// ============================================================
-
+/**
+ * Contratos de texto do painel de métricas.
+ * Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
+ * morar no ViewModel.
+ *
+ * @packageDocumentation
+ */
 /**
  * Texto do painel de métricas. Contrato do cluster inteiro (StatTiles +
  * OccupancyBreakdown + OccupancyChart): um único `t` resolvido alimenta todos,

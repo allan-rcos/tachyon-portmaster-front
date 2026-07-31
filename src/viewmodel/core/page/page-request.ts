@@ -1,17 +1,19 @@
-// ============================================================
-//  Contrato de requisição de página — a fronteira entre o Vike e o ViewModel.
-//
-//  Os carregadores de página (`*.vm.ts`) recebem este tipo, nunca o
-//  `PageContext` do Vike. Duas consequências práticas:
-//
-//   • o ViewModel é testável sem levantar nada do Vike — basta um objeto
-//     literal;
-//   • trocar (ou remover) o framework de roteamento não toca a lógica de
-//     aplicação: só o adaptador `toPageRequest` em `pages/`.
-//
-//  `toPageRequest` aceita a forma do PageContext estruturalmente, sem importar
-//  `vike/types` — é o que mantém esta camada livre do framework.
-// ============================================================
+/**
+ * Contrato de requisição de página — a fronteira entre o Vike e o ViewModel.
+ *
+ * Os carregadores de página (`*.vm.ts`) recebem este tipo, nunca o
+ * `PageContext` do Vike. Duas consequências práticas:
+ *
+ * • o ViewModel é testável sem levantar nada do Vike — basta um objeto
+ *   literal;
+ * • trocar (ou remover) o framework de roteamento não toca a lógica de
+ *   aplicação: só o adaptador `toPageRequest` em `pages/`.
+ *
+ * `toPageRequest` aceita a forma do PageContext estruturalmente, sem importar
+ * `vike/types` — é o que mantém esta camada livre do framework.
+ *
+ * @packageDocumentation
+ */
 import type { IncomingHeaders } from '@viewmodel/core/client/api-client';
 
 /** Dados de uma requisição de página, independentes de framework. */

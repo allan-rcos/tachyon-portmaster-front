@@ -1,12 +1,14 @@
-// ============================================================
-//  Cliente HTTP do SDK. `createClient` monta uma instância ofetch
-//  configurada (baseURL, cookies, credenciais) e carrega o formato
-//  de wire escolhido pelo app (JSON em dev, FlatBuffers em prod).
-//
-//  Este módulo é PURO: não lê variáveis de ambiente, não conhece `/api`
-//  nem Vike/txiki. Quem injeta baseURL, headers e wire é o app
-//  (features/core/api/client.ts).
-// ============================================================
+/**
+ * Cliente HTTP do SDK. `createClient` monta uma instância ofetch
+ * configurada (baseURL, cookies, credenciais) e carrega o formato
+ * de wire escolhido pelo app (JSON em dev, FlatBuffers em prod).
+ *
+ * Este módulo é PURO: não lê variáveis de ambiente, não conhece `/api`
+ * nem Vike/txiki. Quem injeta baseURL, headers e wire é o app
+ * (features/core/api/client.ts).
+ *
+ * @packageDocumentation
+ */
 import { ofetch, type $Fetch } from 'ofetch';
 
 /** Formato de serialização no fio. */

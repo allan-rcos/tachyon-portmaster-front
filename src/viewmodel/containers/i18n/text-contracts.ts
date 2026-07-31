@@ -1,8 +1,10 @@
-// ============================================================
-//  Contratos de texto do domínio de contêineres.
-//  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
-//  morar no ViewModel.
-// ============================================================
+/**
+ * Contratos de texto do domínio de contêineres.
+ * Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
+ * morar no ViewModel.
+ *
+ * @packageDocumentation
+ */
 import type { ContainerSchemaText } from '@viewmodel/containers/schemas/container.schema';
 import type { LoadItemSchemaText } from '@viewmodel/containers/schemas/manifest.schema';
 

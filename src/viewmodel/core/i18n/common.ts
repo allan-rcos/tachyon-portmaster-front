@@ -1,9 +1,11 @@
-// ============================================================
-//  Vocabulário de UI transversal (Paraglide). Não é catálogo: são só os
-//  termos que várias páginas repetem (salvar/cancelar/ações/nav). Cada
-//  página ESPALHA `commonText(locale)`/`navText(locale)` no seu `t` e
-//  sobrescreve o que precisar. Locale sempre explícito → resolvido em SSR.
-// ============================================================
+/**
+ * Vocabulário de UI transversal (Paraglide). Não é catálogo: são só os
+ * termos que várias páginas repetem (salvar/cancelar/ações/nav). Cada
+ * página ESPALHA `commonText(locale)`/`navText(locale)` no seu `t` e
+ * sobrescreve o que precisar. Locale sempre explícito → resolvido em SSR.
+ *
+ * @packageDocumentation
+ */
 import type { Locale } from './locale';
 
 import { m } from '@/paraglide/messages';

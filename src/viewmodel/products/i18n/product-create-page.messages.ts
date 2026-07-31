@@ -1,5 +1,9 @@
-// Catálogo da rota /painel/produtos/nova: texto do form (dono: ProductForm) +
-// o "chrome" da página (título/subtítulo/rótulo do botão novo).
+/**
+ * Catálogo da rota /painel/produtos/nova: texto do form (dono: ProductForm) +
+ * o "chrome" da página (título/subtítulo/rótulo do botão novo).
+ *
+ * @packageDocumentation
+ */
 import type { Locale } from '@viewmodel/core/i18n/locale';
 import { productFormMessages } from '@viewmodel/products/i18n/product-form.messages';
 

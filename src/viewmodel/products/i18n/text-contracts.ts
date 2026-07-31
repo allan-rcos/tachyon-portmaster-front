@@ -1,15 +1,17 @@
-// ============================================================
-//  Contratos de texto do domínio de produtos.
-//
-//  O contrato mora no ViewModel — não na View — porque é o ViewModel que
-//  PRODUZ o texto (resolvendo o catálogo i18n para um locale) e a View que o
-//  CONSOME. Declará-lo aqui é o que mantém a direção da dependência
-//  (view → viewmodel) e permite que os catálogos em `./*.messages.ts` sejam
-//  tipados sem enxergar nenhum componente.
-//
-//  O `tsc` fecha o ciclo: se um catálogo esquecer uma chave, a atribuição ao
-//  contrato falha no build — não na tela.
-// ============================================================
+/**
+ * Contratos de texto do domínio de produtos.
+ *
+ * O contrato mora no ViewModel — não na View — porque é o ViewModel que
+ * PRODUZ o texto (resolvendo o catálogo i18n para um locale) e a View que o
+ * CONSOME. Declará-lo aqui é o que mantém a direção da dependência
+ * (view → viewmodel) e permite que os catálogos em `./*.messages.ts` sejam
+ * tipados sem enxergar nenhum componente.
+ *
+ * O `tsc` fecha o ciclo: se um catálogo esquecer uma chave, a atribuição ao
+ * contrato falha no build — não na tela.
+ *
+ * @packageDocumentation
+ */
 import type { ProductSchemaText } from '@viewmodel/products/schemas/product.schema';
 
 /** Chaves de texto que a listagem de produtos consome. */

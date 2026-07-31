@@ -1,9 +1,14 @@
-// ============================================================
-//  Contratos de texto do domínio de conta (perfil próprio).
-//  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
-//  morar no ViewModel.
-// ============================================================
-import type { AccountSchemaText, PasswordChangeSchemaText } from '@viewmodel/account/schemas/account.schema';
+/**
+ * Contratos de texto do domínio de conta (perfil próprio).
+ * Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
+ * morar no ViewModel.
+ *
+ * @packageDocumentation
+ */
+import type {
+  AccountSchemaText,
+  PasswordChangeSchemaText,
+} from '@viewmodel/account/schemas/account.schema';
 
 /** Chaves de texto do resumo do perfil próprio (SSR). */
 export interface AccountProfileText {

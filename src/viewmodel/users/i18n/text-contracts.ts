@@ -1,8 +1,10 @@
-// ============================================================
-//  Contratos de texto do domínio de usuários.
-//  Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
-//  morar no ViewModel.
-// ============================================================
+/**
+ * Contratos de texto do domínio de usuários.
+ * Ver `@viewmodel/products/i18n/text-contracts` para o porquê de o contrato
+ * morar no ViewModel.
+ *
+ * @packageDocumentation
+ */
 import type { PasswordResetSchemaText, UserSchemaText } from '@viewmodel/users/schemas/user.schema';
 
 /** Chaves de texto que a listagem de usuários consome. */

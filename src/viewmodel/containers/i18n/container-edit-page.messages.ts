@@ -1,5 +1,9 @@
-// Catálogo da rota /painel/conteineres/@id/editar: texto do form + chrome.
-// `edit` vem de commonText (via containerFormMessages), reexposto no tipo.
+/**
+ * Catálogo da rota /painel/conteineres/@id/editar: texto do form + chrome.
+ * `edit` vem de commonText (via containerFormMessages), reexposto no tipo.
+ *
+ * @packageDocumentation
+ */
 import { containerFormMessages } from '@viewmodel/containers/i18n/container-form.messages';
 import { commonText, type CommonText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';

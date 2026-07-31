@@ -1,6 +1,10 @@
-// Catálogo da rota /painel/usuarios/@id/editar: texto do form (UserForm) +
-// das ações administrativas (UserAdminActions) + chrome. Espalha commonText
-// para expor delete/edit/cancel no tipo do `t`.
+/**
+ * Catálogo da rota /painel/usuarios/@id/editar: texto do form (UserForm) +
+ * das ações administrativas (UserAdminActions) + chrome. Espalha commonText
+ * para expor delete/edit/cancel no tipo do `t`.
+ *
+ * @packageDocumentation
+ */
 import { commonText, type CommonText } from '@viewmodel/core/i18n/common';
 import type { Locale } from '@viewmodel/core/i18n/locale';
 import { userFormMessages } from '@viewmodel/users/i18n/user-form.messages';

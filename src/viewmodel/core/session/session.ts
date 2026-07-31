@@ -1,13 +1,15 @@
-// ============================================================
-//  Sessão server-side: carrega o AccountProfile (via cookie → GET /account)
-//  UMA vez por request e memoiza, para que o guard (auth + permissões) e os
-//  carregadores de página que precisem do perfil compartilhem o mesmo fetch.
-//
-//  A memoização é chaveada pelo objeto de `headers`, não pelo PageContext do
-//  Vike: é o mesmo objeto durante todo o request (cada `toPageRequest` o
-//  repassa por referência), então o compartilhamento continua valendo — e esta
-//  camada deixa de conhecer o framework de roteamento.
-// ============================================================
+/**
+ * Sessão server-side: carrega o AccountProfile (via cookie → GET /account)
+ * UMA vez por request e memoiza, para que o guard (auth + permissões) e os
+ * carregadores de página que precisem do perfil compartilhem o mesmo fetch.
+ *
+ * A memoização é chaveada pelo objeto de `headers`, não pelo PageContext do
+ * Vike: é o mesmo objeto durante todo o request (cada `toPageRequest` o
+ * repassa por referência), então o compartilhamento continua valendo — e esta
+ * camada deixa de conhecer o framework de roteamento.
+ *
+ * @packageDocumentation
+ */
 import { getAccount, type AccountProfile } from '@model/account';
 import type { Permission } from '@model/common';
 import { serverClient } from '@viewmodel/core/client/api-client';
