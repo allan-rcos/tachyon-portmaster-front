@@ -202,53 +202,97 @@ Adicione as chaves nos **três** catálogos e declare-as no
 [o guia de i18n](i18n.md). `bun run i18n:check` reprova chave faltante em
 qualquer locale, e também chave declarada e não usada.
 
-### `berth-list-page.vm.ts` — o ViewModel da tela
+### `berth-list-page.vm.ts` — os dois papéis da rota
+
+Um arquivo, duas metades: o **data** (trabalho de servidor, resolvido antes do
+render) e a **reatividade** (o que a tela assina).
 
 ```ts
-import type { BerthList } from './domain';
+import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import type { Tone } from '@viewmodel/core/i18n/labels';
+import { authorize } from '@viewmodel/core/page/authorize';
+import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
+import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
+import { signal } from 'alien-signals';
+
 import { berthListMessages } from './i18n/berth-list-page.messages';
 import type { BerthListText } from './i18n/text-contracts';
 import { listBerths } from './queries/list-berths.query';
-import {
-  asyncBoundaryMessages,
-  type AsyncBoundaryText,
-} from '../core/i18n/async-boundary.messages';
-import { createAsyncSignal, type AsyncSignal } from '../core/observable/async-signal';
-import type { PageMeta } from '../core/page/page-request';
-import { contextLocale, contextParams, type VMContext } from '../core/page/vm-context';
 
-/** Superfície observável da listagem de berços. */
+/** Permissões que a rota exige. */
+export const BERTH_LIST_PERMISSIONS = ['berth:read'] as const;
+
+/** Uma linha da listagem, JÁ FORMATADA. A View não formata nada. */
+export interface BerthRowData {
+  id: string;
+  code: string;
+  status: { label: string; tone: Tone };
+  draft: string;
+  detailHref: string;
+}
+
+/** Tudo que a tela precisa. Serializável — atravessa o `passToClient`. */
+export interface BerthListPageInput {
+  meta: PageMeta;
+  shell: ShellIdentity;
+  t: BerthListText;
+  items: readonly BerthRowData[];
+  nextCursor?: string;
+}
+
+/**
+ * O trabalho de servidor: autoriza, resolve i18n, busca e formata.
+ *
+ * @param request Requisição de página, neutra de framework.
+ * @throws {UnauthorizedError} Sem sessão válida.
+ * @throws {ForbiddenError} Sem a permissão `berth:read`.
+ */
+export async function createBerthListPageInput(
+  request: PageRequest,
+): Promise<BerthListPageInput> {
+  const account = await authorize(request, BERTH_LIST_PERMISSIONS);
+  const locale = resolveLocale(request.headers);
+  const t = berthListMessages(locale);
+  const page = await listBerths(request.headers);
+
+  return {
+    meta: { title: t.title, description: t.subtitle },
+    shell: shellIdentity(account),
+    t,
+    items: page.data.map((b) => toRow(b, locale)),
+    nextCursor: page.next_cursor,
+  };
+}
+
+/** Superfície reativa da listagem. */
 export interface BerthListVM {
   t: BerthListText;
-  boundary: AsyncBoundaryText;
-  berths: AsyncSignal<BerthList, []>;
-  load: () => Promise<void>;
+  items: () => readonly BerthRowData[];
+  hasMore: () => boolean;
+  loadMore: () => Promise<void>;
 }
 
 /**
- * Cria o ViewModel da listagem de berços.
+ * Cria o ViewModel da listagem a partir do dado já resolvido.
  *
- * @param context Contexto de execução — navegador quando omitido.
+ * @param input Dado da rota, vindo do `+data`.
  */
-export function createBerthListVM(context: VMContext = {}): BerthListVM {
-  const t = berthListMessages(contextLocale(context));
-  const boundary = asyncBoundaryMessages(contextLocale(context));
-  const params = contextParams(context);
-  const berths = createAsyncSignal<BerthList, []>(() => listBerths(context.headers, params));
-
-  return { t, boundary, berths, load: () => berths.run() };
-}
-
-/**
- * Título e descrição da rota, para o `<head>`.
- *
- * @param context Contexto de execução — só o locale importa aqui.
- */
-export function berthListMeta(context: VMContext = {}): PageMeta {
-  const t = berthListMessages(contextLocale(context));
-  return { title: t.title, description: t.subtitle };
+export function createBerthListVM(input: BerthListPageInput): BerthListVM {
+  const items = signal<readonly BerthRowData[]>(input.items);
+  const cursor = signal(input.nextCursor);
+  /* … `loadMore` com try/catch/finally, como em product-list-page.vm … */
 }
 ```
+
+Permissão é **slug** (`'berth:read'`), servido em runtime por
+`GET /metadata/permissions` — não há enum a importar.
+
+Formulário nesta feature? O estado dele mora **aqui**, escrito à mão com
+`signal`/`computed` e o schema Zod — não no island. Ver
+[`src/viewmodel/README.md`](../../src/viewmodel/README.md) e
+`product-create-page.vm.ts` como referência. O contrato que a View consome
+(`BerthFormVM`) vai em `src/viewmodel/berths/vm-contracts.ts`, para que criação e
+edição satisfaçam o mesmo island.
 
 ---
 
@@ -256,122 +300,181 @@ export function berthListMeta(context: VMContext = {}): PageMeta {
 
 ### `components/BerthList.tsx` — puro
 
-Recebe dados prontos e o texto. Não busca nada, não guarda estado.
+Recebe o ViewModel e desenha. Não busca nada, não guarda estado, não formata.
 
 ```tsx
-import { DataTable, type Column } from '@view/core/components/DataTable';
-import { PageHeader } from '@view/core/components/PageHeader';
-import type { Berth } from '@viewmodel/berths/domain';
-import type { BerthListText } from '@viewmodel/berths/i18n/text-contracts';
-import type { JSX } from 'solid-js';
+import { EmptyState } from '@view/core/components/EmptyState';
+import { RowList } from '@view/core/components/RowList';
+import { Toolbar } from '@view/core/components/Toolbar';
+import { toAccessor } from '@view/core/observable/to-accessor';
+import { BerthRow } from '@view/berths/components/BerthRow';
+import type { BerthListVM } from '@viewmodel/berths/berth-list-page.vm';
+import { Show, type JSX } from 'solid-js';
 
-export function BerthList(props: { items: Berth[]; total: number; t: BerthListText }): JSX.Element {
-  const columns = (): Column<Berth>[] => [
-    { header: props.t.code, cell: (b) => b.code },
-    { header: props.t.status, cell: (b) => b.status },
-  ];
+/** Props da listagem de berços. */
+export interface BerthListProps {
+  /** ViewModel da rota. */
+  vm: BerthListVM;
+}
+
+/**
+ * Listagem de berços.
+ *
+ * @param props.vm ViewModel da rota.
+ */
+export function BerthList(props: BerthListProps): JSX.Element {
+  const items = toAccessor(() => props.vm.items());
+
   return (
     <section>
-      <PageHeader title={props.t.title} subtitle={props.t.subtitle} />
-      <DataTable items={props.items} columns={columns()} empty={props.t.empty} />
+      <Toolbar title={props.vm.t.title} subtitle={props.vm.t.subtitle} />
+
+      <Show
+        when={items().length > 0}
+        fallback={<EmptyState icon="ship" message={props.vm.t.empty} />}
+      >
+        <RowList
+          columns="1fr 160px 120px"
+          headers={[props.vm.t.code, props.vm.t.status, props.vm.t.draft]}
+          items={items()}
+        >
+          {(item) => <BerthRow item={item} />}
+        </RowList>
+      </Show>
     </section>
   );
 }
 ```
 
+`toAccessor` é a ponte: o ViewModel é `alien-signals`, o Solid tem reatividade
+própria, e ela converte um getter `() => T` num `Accessor<T>` que o Solid
+rastreia. Duas regras que valem para toda a View:
+
+- **Monte os acessores no setup, nunca dentro do JSX.** Cada `toAccessor` cria um
+  signal e um effect; chamá-lo numa expressão rastreada os recriaria a cada
+  reavaliação.
+- **Passe um thunk** (`() => props.vm.items()`), não o getter direto. Assim a
+  ponte continua correta se a prop `vm` trocar — e é o que faz o
+  `solid/reactivity` parar de reclamar com razão.
+
+Getter parametrizado (`vm.value(field)`) vira um acessor **por campo**, montado a
+partir da lista estática de campos — ver o island abaixo.
+
 ### `screens/BerthListScreen.tsx` — a cola
 
-Liga os sinais do ViewModel ao componente puro. `createScreenBinding` faz o
-ritual (assinar + carregar na montagem) e `AsyncBoundary` trata
-carregando/erro/retry.
+Uma linha, porque não há mais ritual de carregamento a fazer: quando a tela
+renderiza, o dado já existe.
 
 ```tsx
-import { AsyncBoundary } from '@view/core/components/AsyncBoundary';
-import { Skeleton } from '@view/core/components/Skeleton';
-import { createScreenBinding } from '@view/core/screens/createScreenBinding';
-import { BerthList } from '@view/berths/components/BerthList';
-import type { BerthListVM } from '@viewmodel/berths/berth-list-page.vm';
-import type { JSX } from 'solid-js';
-
 export function BerthListScreen(props: { vm: BerthListVM }): JSX.Element {
-  const { data, status } = createScreenBinding(props.vm.berths, props.vm.load);
-
-  return (
-    <AsyncBoundary
-      status={status()}
-      data={data()}
-      fallback={<Skeleton height="18rem" />}
-      errorMessage={props.vm.boundary.loadError}
-      retryLabel={props.vm.boundary.retry}
-      onRetry={() => void props.vm.load()}
-    >
-      {(page) => <BerthList items={page.data} total={page.total} t={props.vm.t} />}
-    </AsyncBoundary>
-  );
+  return <BerthList vm={props.vm} />;
 }
 ```
 
 ### `islands/BerthForm.island.tsx` — o interativo
 
-Chama a **mutation do ViewModel**, nunca o Model. `bindMutation` traz o estado
-para a reatividade do Solid; `zodValidator` pluga o schema no formulário.
+Desenho puro sobre o VM da rota. Não tem `createForm`, não tem mutation, não tem
+schema: valores, erros, "já tocou" e "está enviando" moram no ViewModel. Quem
+toca o navegador é a View — o VM sinaliza sucesso, a View navega.
 
 ```tsx
-const mutation = bindMutation(
-  createMutationSignal((value: BerthFormData) => createBerth(value), {
-    onSuccess: () => {
-      window.location.href = '/painel/bercos';
-    },
-  }),
-);
+export function BerthForm(props: { vm: BerthFormVM }): JSX.Element {
+  const field = (name: BerthField) => ({
+    value: toAccessor(() => props.vm.value(name)),
+    error: toAccessor(() => props.vm.error(name)),
+  });
 
-const form = createForm(() => ({
-  defaultValues: { code: '' } as BerthFormData,
-  validators: { onChange: zodValidator<BerthFormData>(createBerthSchema(props.t)) },
-  onSubmit: ({ value }) => mutation.mutate(value),
-}));
+  const code = field('code');
+  const submitting = toAccessor(() => props.vm.submitting());
+
+  const submit = (event: Event) => {
+    event.preventDefault();
+    // Lido ANTES do await: depois da submissão o callback está fora do escopo
+    // rastreado, e ler `props` de lá é o que a regra `solid/reactivity` pega.
+    const destination = props.vm.listHref;
+    void props.vm.submit().then((ok) => {
+      if (ok) window.location.href = destination;
+    });
+  };
+
+  return (
+    <form onSubmit={submit}>
+      <fieldset disabled={submitting()}>
+        <FormField label={props.vm.t.code} for="code" error={code.error()}>
+          <input
+            id="code"
+            value={code.value()}
+            onInput={(e) => props.vm.set('code', e.currentTarget.value)}
+            onBlur={() => props.vm.blur('code')}
+          />
+        </FormField>
+      </fieldset>
+      {/* … botão de envio e cancelar … */}
+    </form>
+  );
+}
 ```
+
+Island guarda estado próprio só quando ele é **de interface** — um diálogo
+aberto, um observador de viewport. Aí é um `createSignal` local no componente,
+como em `ConfirmDialog.island.tsx` e `InfiniteList.island.tsx`; não há classe
+base nem registro. Ver [`src/view/README.md`](../../src/view/README.md).
 
 ---
 
 ## 4. pages — a rota
 
-Só composição. Sem CSS, sem markup.
+Só composição. Sem CSS, sem markup, sem lógica.
 
 ```
 pages/painel/bercos/
-  +Page.tsx          instancia o VM e renderiza a tela
-  +routeMeta.ts      reexporta o meta do VM
-  +permissions.js    permissões exigidas
+  +data.ts    delega ao `createBerthListPageInput`
+  +Page.tsx   constrói o VM e renderiza a tela
+```
+
+Não há `+permissions.js` (a permissão é declarada pelo `*.vm.ts` da rota) nem
+`+routeMeta.ts` (o `<head>` sai de `data.meta`, via `pages/+title.ts` e
+`pages/+description.ts`).
+
+```ts
+// +data.ts
+import { createBerthListPageInput } from '@viewmodel/berths/berth-list-page.vm';
+import type { PageContext } from 'vike/types';
+
+import { toPageInput } from '@/pages/pageInput';
+
+export { data };
+
+/**
+ * Trabalho de servidor da rota, resolvido ANTES do render.
+ *
+ * @param pageContext Contexto da requisição, dado pelo Vike.
+ */
+async function data(pageContext: PageContext) {
+  return toPageInput(pageContext, createBerthListPageInput);
+}
 ```
 
 ```tsx
 // +Page.tsx
 import { BerthListScreen } from '@view/berths/screens/BerthListScreen';
-import { createBerthListVM } from '@viewmodel/berths/berth-list-page.vm';
-import { ClientOnly } from 'vike-solid/ClientOnly';
-import { usePageContext } from 'vike-solid/usePageContext';
+import {
+  createBerthListVM,
+  type BerthListPageInput,
+} from '@viewmodel/berths/berth-list-page.vm';
+import type { JSX } from 'solid-js';
+import { useData } from 'vike-solid/useData';
 
-export default function Page() {
-  const pageContext = usePageContext();
-  const vm = createBerthListVM({ url: pageContext.urlOriginal });
-  return (
-    <ClientOnly fallback={<div />}>
-      <BerthListScreen vm={vm} />
-    </ClientOnly>
-  );
+/** Único ponto de composição da rota. */
+export default function Page(): JSX.Element {
+  const input = useData<BerthListPageInput>();
+  return <BerthListScreen vm={createBerthListVM(input)} />;
 }
 ```
 
-```ts
-// +routeMeta.ts
-export { berthListMeta as default } from '@viewmodel/berths/berth-list-page.vm';
-```
-
-```js
-// +permissions.js
-export default ['BerthRead'];
-```
+O corpo do componente roda **uma vez** por montagem — é isso que faz o estado do
+VM (o formulário digitado, as páginas já trazidas pelo cursor) sobreviver aos
+re-renders. Construir o VM dentro do JSX o recriaria zerado a cada tecla.
 
 Acrescente o item de navegação em `src/view/core/components/Sidebar.tsx` e a
 chave correspondente em `navText`.
@@ -381,17 +484,19 @@ chave correspondente em `navText`.
 ## 5. Testes
 
 Um por camada, cada um mockando a fronteira logo abaixo. Ver
-[a infra de teste](../../src/testing/README.md) para os detalhes.
+[o guia de testes](testing.md) para os detalhes.
 
 ```
 src/model/berths/                     (opcional: codecs)
 src/viewmodel/berths/queries/list-berths.query.test.ts    mocka @model/berths
-src/viewmodel/berths/berth-list-page.vm.test.ts           mocka a query
-src/view/berths/islands/BerthForm.island.test.tsx         mocka a mutation
+src/viewmodel/berths/berth-list-page.vm.test.ts           mocka a query e as
+                                                          mutations — inclusive o
+                                                          formulário, sem DOM
 src/view/berths/components/BerthList.test.tsx             não mocka nada
 ```
 
-Adicione a factory do DTO em `src/testing/factories/model.factory.ts`.
+A factory do DTO vai em `src/viewmodel/berths/testing/berth.factory.ts`, junto da
+feature.
 
 ---
 
@@ -407,9 +512,13 @@ bun run build
 
 ## Checklist do que costuma escapar
 
-- [ ] `dto.ts` sem nenhuma função — senão a View alcança a rede pelo `domain.ts`
-- [ ] `headers` **opcional** nas queries, e `resolveClient` em vez de `serverClient`
+- [ ] `dto.ts` sem nenhuma função — é o que mantém a rede fora do alcance da View
+- [ ] `headers` **opcional** nas queries, para servirem os dois lados
+- [ ] Nada formatado na View: peso, data e percentual saem do ViewModel como string
+- [ ] `submit()` devolvendo `Promise<boolean>` e nunca rejeitando; `remove()` rejeitando
 - [ ] O contrato `*Text` em `i18n/text-contracts`, não no componente
 - [ ] Chaves i18n nos **três** catálogos e declaradas no schema
 - [ ] JSDoc em tudo que Model e ViewModel exportam
 - [ ] `pages/` sem CSS e sem markup
+- [ ] `toAccessor` chamado no setup do componente, nunca dentro do JSX
+- [ ] Props lidas como `props.x` — desestruturar quebra a reatividade do Solid

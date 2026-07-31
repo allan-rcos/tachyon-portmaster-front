@@ -1,6 +1,6 @@
 # ViewModel — a lógica da aplicação
 
-Tudo que é lógica e não é interface. TypeScript puro: **zero Vike, zero Lit,
+Tudo que é lógica e não é interface. TypeScript puro: **zero Vike, zero Solid,
 zero DOM** — verificado pelo lint.
 
 ```
@@ -104,9 +104,13 @@ seleção de perfis) aparece depois da **primeira tentativa de envio** — não 
 ## Reatividade: só alien-signals
 
 `signal(v)` lê por chamada e escreve por chamada; `computed` deriva; `effect`
-observa. Não há wrapper e não há ponte para o framework de interface — o effect
-raiz do `vike-lit` lê os getters ao desenhar, e é isso que registra a
-dependência.
+observa. Não há wrapper: os getters expostos são `() => T`, e é assim que a View
+os consome.
+
+Usar alien-signals, e não os primitivos do Solid, é o que mantém esta camada
+agnóstica de framework de interface — e é o que permitiu ao branch em Lit
+reaproveitá-la inteira, sem alterar uma linha. O custo fica todo do outro lado,
+num arquivo só: `@view/core/observable/to-accessor`.
 
 Os `observable/` genéricos (`async-signal`, `mutation-signal`, `signal`) foram
 apagados. Ponto de atenção registrado: o `createAsyncSignal` tinha guarda de

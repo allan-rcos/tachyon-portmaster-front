@@ -3,122 +3,143 @@
 Para uma rota sobre dados que **já existem** no Model. Se o recurso ainda não
 existe, comece por [criar uma feature](add-feature.md).
 
-## 1. O ViewModel da rota
+Toda rota tem a mesma forma: um `+data` que resolve tudo no servidor, e um
+`+Page` que compõe. Não há rota "client-side" com carregamento na tela — quando a
+tela renderiza, o dado já existe.
 
-`src/viewmodel/<feature>/<rota>.vm.ts`, exportando a factory e o meta:
+## 1. Os dois papéis, no `*.vm.ts` da rota
+
+`src/viewmodel/<feature>/<rota>.vm.ts` exporta duas coisas:
 
 ```ts
-/** Superfície observável da tela. */
-export interface MinhaTelaVM {
-  t: MinhaTelaText;
-  boundary: AsyncBoundaryText; /* … */
+/** Permissões que a rota exige. */
+export const MINHA_ROTA_PERMISSIONS = ['recurso:acao'] as const;
+
+/** Tudo que a tela precisa. Resolvido ANTES do ViewModel, e serializável. */
+export interface MinhaRotaPageInput {
+  meta: PageMeta; // `<title>`/`<description>`
+  shell: ShellIdentity; // rodapé da barra lateral
+  t: MinhaRotaText; // texto no locale da requisição
+  items: readonly MinhaLinha[]; // dado JÁ FORMATADO
 }
 
 /**
- * Cria o ViewModel da tela.
+ * O trabalho de servidor: autoriza, resolve i18n, busca e formata.
  *
- * @param context Contexto de execução — navegador quando omitido.
+ * @param request Requisição de página, neutra de framework.
  */
-export function createMinhaTelaVM(context: VMContext = {}): MinhaTelaVM {
-  /* … */
+export async function createMinhaRotaPageInput(
+  request: PageRequest,
+): Promise<MinhaRotaPageInput> {
+  const account = await authorize(request, MINHA_ROTA_PERMISSIONS);
+  const locale = resolveLocale(request.headers);
+  const t = minhaRotaMessages(locale);
+  const page = await listMinhaCoisa(request.headers);
+
+  return {
+    meta: { title: t.title, description: t.subtitle },
+    shell: shellIdentity(account),
+    t,
+    items: page.data.map((x) => toLinha(x, locale)),
+  };
 }
 
-/**
- * Título e descrição da rota, para o `<head>`.
- *
- * @param context Contexto de execução — só o locale importa aqui.
- */
-export function minhaTelaMeta(context: VMContext = {}): PageMeta {
+/** A reatividade: recebe o que o data resolveu e devolve sinais + ações. */
+export function createMinhaRotaVM(input: MinhaRotaPageInput): MinhaRotaVM {
   /* … */
 }
 ```
 
-Rota com parâmetro? Use `routeParam(context, 'id')` — ele falha alto se o
+Permissão é **slug** (`'produto:criar'`), servido em runtime por
+`GET /metadata/permissions` — não há enum a importar. Ver
+[`src/model/README.md`](../../src/model/README.md).
+
+Rota com parâmetro? Use `routeParam(request, 'id')` — ele falha alto se o
 segmento não estiver declarado, em vez de propagar `undefined`.
+
+**Formatar é aqui.** Pesos, datas e percentuais saem como string. A View não usa
+`Intl`.
 
 ## 2. A tela na View
 
-`src/view/<feature>/screens/MinhaTelaScreen.tsx`, ligando o VM ao componente
-puro com `createScreenBinding` + `AsyncBoundary`.
+`src/view/<feature>/screens/MinhaRotaScreen.tsx` — componente stateless que
+recebe o VM:
+
+```tsx
+export function MinhaRotaScreen(props: { vm: MinhaRotaVM }): JSX.Element {
+  return <MinhaRotaLista vm={props.vm} />;
+}
+```
 
 ## 3. Os arquivos do Vike
 
 ```
 pages/painel/minha-rota/
-  +Page.tsx          instancia o VM, envolve em <ClientOnly>
-  +routeMeta.ts      export { minhaTelaMeta as default } from '@viewmodel/…'
-  +permissions.js    export default ['MinhaPermissao'];
+  +data.ts     delega ao `createMinhaRotaPageInput` via `toPageInput`
+  +Page.tsx    constrói o VM e devolve a tela
 ```
 
-Rota com parâmetro precisa repassar `routeParams`:
+Não há mais `+permissions.js` (a permissão é declarada pela rota) nem
+`+routeMeta.ts` (o `<head>` sai de `data.meta`, via `pages/+title.ts` e
+`pages/+description.ts`).
 
-```tsx
-const vm = createMinhaTelaVM({
-  url: pageContext.urlOriginal,
-  routeParams: pageContext.routeParams,
-});
-```
-
-## Página pública (com SSR e dados)
-
-`/painel/**` renderiza no navegador porque a app é `noindex` — o servidor só
-roda o guard. Uma rota **pública**, onde o SEO importa, mantém `+data.ts`:
+`+data.ts`:
 
 ```ts
-import type { PageContextServer } from 'vike/types';
+import { createMinhaRotaPageInput } from '@viewmodel/<feature>/minha-rota.vm';
+import type { PageContext } from 'vike/types';
 
-import { toPageRequest } from '@viewmodel/core/page/page-request';
-import { loadMinhaPagina, type MinhaPaginaData } from '@viewmodel/…/minha-pagina.vm';
+import { toPageInput } from '@/pages/pageInput';
 
-export type Data = MinhaPaginaData;
+export { data };
 
-/** Casca do Vike: adapta o PageContext e delega ao ViewModel. */
-export const data = (pageContext: PageContextServer): Promise<Data> =>
-  loadMinhaPagina(toPageRequest(pageContext));
-```
-
-Com `+data`, o `<head>` sai de `data.title`/`data.description` e o `+routeMeta`
-é dispensável — o `+Head` aceita as duas origens.
-
-## Levar uma rota de `/painel` de volta ao SSR
-
-Chame o mesmo ViewModel dentro de um `+data.ts`, passando os headers:
-
-```ts
-export const data = async (pageContext: PageContextServer) => {
-  const vm = createMinhaTelaVM({
-    headers: pageContext.headers, // ← só isto muda o lado
-    url: pageContext.urlOriginal,
-    routeParams: pageContext.routeParams,
-  });
-  await vm.load();
-  return { items: vm.recurso.data(), t: vm.t, title: minhaTelaMeta().title };
-};
-```
-
-O ViewModel não muda: `resolveClient` passa a usar o cliente de loopback e
-`contextLocale` passa a ler o header em vez do `document.cookie`.
-
-## Erros de domínio
-
-O ViewModel sinaliza ausência com `PageNotFoundError`. Traduzir para HTTP é
-trabalho da casca:
-
-```ts
-try {
-  return await loadMinhaPagina(toPageRequest(pageContext));
-} catch (error) {
-  if (error instanceof PageNotFoundError) throw render(404);
-  throw error;
+/**
+ * Trabalho de servidor da rota, resolvido ANTES do render.
+ *
+ * @param pageContext Contexto da requisição, dado pelo Vike.
+ */
+async function data(pageContext: PageContext) {
+  return toPageInput(pageContext, createMinhaRotaPageInput);
 }
 ```
 
-> Em rota client-side não há status HTTP a emitir: o `AsyncBoundary` mostra o
-> estado de erro.
+`+Page.tsx`:
+
+```tsx
+export default function Page(): JSX.Element {
+  const vm = createMinhaRotaVM(useData<MinhaRotaPageInput>());
+  return <MinhaRotaScreen vm={vm} />;
+}
+```
+
+O corpo do componente roda **uma vez** por montagem, e é isso que faz o estado do
+VM (formulário digitado, páginas já trazidas pelo cursor) sobreviver aos
+re-renders. Construir o VM dentro do JSX o recriaria zerado a cada tecla.
+
+## Erros de domínio
+
+O `createXPageInput` lança erro de domínio; traduzir para HTTP é trabalho de
+`pages/pageInput.ts`, que já faz isso para todas as rotas:
+
+| erro de domínio     | resposta                         |
+| ------------------- | -------------------------------- |
+| `UnauthorizedError` | `redirect('/entrar?redirect=…')` |
+| `ForbiddenError`    | `render(403)`                    |
+| `PageNotFoundError` | `render(404)`                    |
+
+Por isso um id que não resolve deve virar `PageNotFoundError` no ViewModel:
+
+```ts
+const produto = await getProduct(id, request.headers).catch(() => {
+  throw new PageNotFoundError(`Produto não encontrado: ${id}`);
+});
+```
 
 ## O que NÃO fazer em `pages/`
 
 - Declarar componente ou markup → vai para `src/view/<feature>/components/`
-- Importar `.scss` → vai junto do componente na View
+- Importar `.scss` → vai junto do componente na View (a exceção é o
+  `global.scss` no `+Layout.tsx`)
 - Importar `@model/*` → o lint reprova
 - Colocar regra de negócio no `+data.ts` → ela pertence ao `*.vm.ts`
+- Guardar estado → o VM guarda; o `+Page` só compõe

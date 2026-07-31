@@ -82,7 +82,7 @@ O lint reprova, mas vale saber o porquê:
 | Proibido                             | Razão                                   |
 | ------------------------------------ | --------------------------------------- |
 | importar `@viewmodel/*` ou `@view/*` | é a camada mais baixa                   |
-| importar `solid-js` / `@tanstack/*`  | não conhece a biblioteca de interface   |
+| importar `solid-js` / `vike-solid`   | não conhece a biblioteca de interface   |
 | importar `vike`                      | não conhece o roteador                  |
 | importar `@/paraglide/*`             | mensagem de erro é decisão do ViewModel |
 | ler `import.meta.env`                | o app injeta baseURL e credenciais      |

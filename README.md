@@ -25,17 +25,18 @@ Cada camada só enxerga a de baixo. A regra **não é convenção**: está aplic
 
 | Camada          | Responsabilidade                           | Não pode                              |
 | --------------- | ------------------------------------------ | ------------------------------------- |
-| `src/model`     | falar com as fontes de dados               | conhecer Vike, Solid, i18n ou DOM     |
-| `src/viewmodel` | lógica, estado observável, i18n, validação | conhecer JSX, Vike ou Solid           |
+| `src/model`     | falar com as fontes de dados                | conhecer Vike, Solid, i18n ou DOM     |
+| `src/viewmodel` | lógica, estado, i18n, validação, formatação | conhecer Vike, Solid ou DOM           |
 | `src/view`      | interface                                  | falar com a rede ou importar `@model` |
 | `pages`         | integrar o Vike (rotas, guard, `<head>`)   | ter CSS, markup ou lógica             |
 
 O que isso compra na prática:
 
-- **mover uma tela entre servidor e cliente é uma decisão de uma linha** — o
-  `VMContext` escolhe o lado pela presença de `headers`, e o ViewModel não muda;
+- **trocar o motor de interface não toca a lógica** — o mesmo `src/viewmodel`
+  roda idêntico no branch em Lit; o Solid entra por um arquivo só
+  (`@view/core/observable/to-accessor`);
 - **o ViewModel é testável sem DOM, sem Vike e sem rede** — recebe `PageRequest`,
-  um objeto literal;
+  um objeto literal, e isso vale até para os nove formulários;
 - **a interface não alcança a rede por construção** — ela só enxerga o submódulo
   `dto` do Model, que não contém funções.
 
@@ -47,9 +48,8 @@ Detalhes e o porquê de cada decisão em
 ```
 src/
   model/        camada de dados (recursos da API, contrato swagger, codecs)
-  viewmodel/    queries, mutations, schemas, i18n, observables
+  viewmodel/    queries, mutations, schemas, i18n, ViewModels de rota
   view/         componentes, islands, telas e estilos
-  testing/      factories e infra de teste
 pages/          composition root do Vike — só arquivos `+`
 packages/
   tachyon-design/           submodule: design system (SASS)
@@ -187,7 +187,7 @@ Comece por [`docs/`](docs/README.md).
 
 Cada camada também tem README junto do código:
 [model](src/model/README.md) · [viewmodel](src/viewmodel/README.md) ·
-[view](src/view/README.md) · [testing](src/testing/README.md).
+[view](src/view/README.md).
 
 ---
 
@@ -198,5 +198,6 @@ Cada camada também tem README junto do código:
 - A CLI do adapter força `NODE_ENV=production` e **não** usa `--minify` ao
   empacotar: há um bug do Bun que tenta resolver um `require` morto do
   `@babel/core`, puxado só pelo toolchain.
-- As telas de `/painel` renderizam no navegador; o servidor só executa o guard
-  de autenticação e permissões. As rotas públicas seguem em SSR com dados.
+- Toda rota resolve o `+data` ANTES do render, nos dois lados: no servidor o
+  HTML da primeira requisição sai completo para qualquer User-Agent; no
+  navegador a navegação client-side resolve sem pedir a página de volta.

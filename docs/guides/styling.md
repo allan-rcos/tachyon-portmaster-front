@@ -46,11 +46,13 @@ Trocar a origem do design system é trocar um alias em `vite.config.ts` e
 Como `packages/tachyon-design` é submodule, alterá-lo exige commit no
 repositório de origem.
 
-## Tema claro/escuro
+## Tema
 
-O tema vem do cookie `flow-theme`, aplicado como `data-theme` no `<html>` por um
-script anti-FOUC em `pages/+Head.tsx` — antes da primeira pintura. Nos estilos,
-responda a `[data-theme='light']`; o padrão (sem atributo) é o escuro.
+Não há seletor de tema: **o produto é escuro**. O `pages/+Head.tsx` declara
+`<meta name="color-scheme" content="dark">` e é isso. O seletor claro/escuro, o
+cookie `flow-theme` e o script anti-FOUC que existiam foram removidos junto com o
+`ThemeSwitcher` — sobrariam duas árvores de estilo para manter, uma delas nunca
+vista.
 
 ## Cores por "tom"
 
