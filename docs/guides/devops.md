@@ -80,11 +80,17 @@ verdade, e publicar vira efeito de um commit revisado.
 
 Publica dois artefatos do **mesmo** build:
 
-- `portmaster-dist-vX.Y.Z.zip` — o `dist` pronto para rodar;
+- `portmaster-dist-vX.Y.Z.zip` — o `dist` pronto para rodar, acompanhado do
+  `.zip.sha256` para quem consome conferir o download;
 - `ghcr.io/<owner>/portmaster:X.Y.Z` e `:latest` — imagem montada a partir desse
   mesmo zip, via `Dockerfile.dist`.
 
 Buildar uma vez só é o que garante que zip e imagem contêm o mesmo código.
+
+O `dist` é podado antes de virar zip **e** antes de virar imagem: sobram apenas
+`client/` e `txiki/server.mjs`. O `server/` já foi embutido no bundle pelo
+`Bun.build` do adapter, e `fbs/` e `paraglide/` chegaram aos assets pelos
+aliases do Vite — os três só existiam como entrada de build.
 
 Para publicar:
 

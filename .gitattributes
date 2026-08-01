@@ -1,0 +1,7 @@
+# O repositório é gravado com LF em qualquer plataforma. Sem isto, um clone sob
+# `core.autocrlf=true` reescreve os executáveis com CRLF — e um shebang seguido
+# de \r não roda, o que atinge o `packages/tachyon-portmaster-i18n/bin/i18n-check.mjs`
+# e os scripts do CI.
+* text=auto eol=lf
+*.sh text eol=lf
+*.mjs text eol=lf

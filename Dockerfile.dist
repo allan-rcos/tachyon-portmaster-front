@@ -25,8 +25,9 @@ RUN git clone --recursive --shallow-submodules --depth 1 --branch "${TXIKI_REF}"
       https://github.com/saghul/txiki.js /usr/src/txiki
 WORKDIR /usr/src/txiki
 
-# clang, e não gcc: o fonte usa `#pragma region`, que o gcc não conhece e que,
-# sob o `-Werror` do próprio projeto, aborta a compilação a 92%.
+# clang, e não gcc: com gcc a compilação aborta a 92%, nos `#pragma region` que
+# ele não conhece. Não é o `-Werror` do projeto — a v26.6.0 reporta
+# `QJS_BUILD_WERROR: OFF`, e com clang compila em cima da mesma configuração.
 ENV CC=clang CXX=clang++
 RUN make && strip build/tjs
 

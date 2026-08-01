@@ -7,7 +7,8 @@
 #  fora de ordem.
 #
 #  Publica dois artefatos do MESMO build:
-#   • portmaster-dist-vX.Y.Z.zip — o `dist` pronto para rodar com `tjs`;
+#   • portmaster-dist-vX.Y.Z.zip — o `dist` pronto para rodar com `tjs`, mais o
+#     .sha256 correspondente;
 #   • ghcr.io/<owner>/portmaster:X.Y.Z — imagem montada a partir desse zip,
 #     via Dockerfile.dist. Buildar a aplicação uma vez só é o que garante que
 #     imagem e zip contêm exatamente o mesmo código.
@@ -122,8 +123,23 @@ jobs:
       - name: Build
         run: bun run build
 
+      # O que roda é só `dist/txiki/server.mjs` mais o `dist/client`, que ele
+      # alcança por `../client/` a partir do próprio `import.meta.url`. O resto
+      # é entrada de build: `dist/server` já foi embutido no bundle pelo
+      # `Bun.build` do adapter, e `fbs`/`paraglide` chegaram aos assets pelos
+      # aliases do Vite. Podar aqui, antes do zip E da imagem, mantém os dois
+      # com exatamente o mesmo conteúdo.
+      - name: Enxugar o dist para o que roda
+        run: |
+          rm -rf dist/server dist/fbs dist/paraglide dist/assets.json
+          du -sh dist
+
+      # O .sha256 vai junto porque a infra que consome o zip precisa conferir o
+      # download; sem ele, o hash tem de ser fixado à mão a cada subida.
       - name: Empacotar o dist
-        run: zip -r "portmaster-dist-v${VERSION}.zip" dist
+        run: |
+          zip -r "portmaster-dist-v${VERSION}.zip" dist
+          sha256sum "portmaster-dist-v${VERSION}.zip" > "portmaster-dist-v${VERSION}.zip.sha256"
 
       - name: Criar a release
         env:
@@ -131,6 +147,7 @@ jobs:
         run: |
           gh release create "v${VERSION}" \
             "portmaster-dist-v${VERSION}.zip" \
+            "portmaster-dist-v${VERSION}.zip.sha256" \
             --title "v${VERSION}" \
             --generate-notes
 

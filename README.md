@@ -170,8 +170,11 @@ o CI usa para não compilar a aplicação duas vezes. Ver
 O gatilho é a **mudança da versão no `package.json`** na `main`, não uma tag
 manual. O workflow revalida tudo e publica dois artefatos do mesmo build:
 
-- `portmaster-dist-vX.Y.Z.zip` — o `dist` pronto para rodar;
+- `portmaster-dist-vX.Y.Z.zip` — o `dist` pronto para rodar, mais o `.sha256`;
 - `ghcr.io/allan-rcos/portmaster:X.Y.Z` e `:latest`.
+
+O zip leva só `client/` e `txiki/server.mjs`: `server/`, `fbs/` e `paraglide/`
+são entrada de build, já embutidas no bundle.
 
 ```bash
 # edite "version" no package.json
