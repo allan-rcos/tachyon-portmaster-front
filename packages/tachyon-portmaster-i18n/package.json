@@ -4,7 +4,7 @@
   "description": "Fonte do i18n do PortMaster: catálogos por locale, projeto inlang/Paraglide e o validador de contrato bilateral (JSON Schema ↔ resolvers).",
   "type": "module",
   "private": true,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "portmaster",
     "i18n",
