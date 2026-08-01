@@ -1,6 +1,6 @@
 /**
  * Factory do DTO de produto. Ver `@viewmodel/core/testing/factory-support`
- * para `paged` e `seedFaker`.
+ * para `paged`.
  *
  * @packageDocumentation
  */

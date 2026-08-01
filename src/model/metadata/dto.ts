@@ -1,5 +1,3 @@
-import type { Permission } from '@model/common/dto';
-
 /**
  * Uma linha do catálogo de metadados do backend.
  *
@@ -22,6 +20,3 @@ export interface MetadataItem {
 export interface PermissionList {
   data: MetadataItem[];
 }
-
-/** Um item do catálogo já estreitado para o slug que o resto do front usa. */
-export type PermissionCatalog = readonly Permission[];

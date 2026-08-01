@@ -1,11 +1,9 @@
 /**
  * Catálogos de mensagem e contratos de texto de autenticação.
  *
- * O `text-contracts.ts` declara as interfaces `*Text` que a View recebe; os
- * `*.messages.ts` resolvem cada uma para um locale. Esquecer uma chave é erro de
- * `tsc`.
+ * Sem `text-contracts.ts`, ao contrário das outras features: o contrato do login
+ * é o `LoginPageText`, declarado junto do catálogo que o resolve.
  *
  * @packageDocumentation
  */
 export * from './login-page.messages';
-export * from './text-contracts';

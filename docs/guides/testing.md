@@ -38,6 +38,21 @@ await expect(vm.submit()).resolves.toBe(true);
 expect(mockedCreate).toHaveBeenCalledWith({ name: 'Cimento', density: 1.44 /* … */ });
 ```
 
+## Gerar entrada a partir do schema: não use
+
+`zod-schema-faker` produz um valor a partir de um schema Zod. O repositório já
+teve um teste assim; foi removido. Dois limites medidos em 31/07/2026 (v2.1.1):
+
+- schema com `ZodPipe`/`ZodTransform` quebra o gerador — inclui os três schemas
+  de e-mail, que usam `.pipe(z.email())`;
+- o e-mail gerado é inválido em ~0,06% das vezes (3 falhas em 5.000): strings de
+  milhares de caracteres, com ponto duplo e apóstrofo. Um teste que afirme "o
+  gerado passa no schema" fica vermelho a cada ~1.700 execuções, sem apontar bug
+  nenhum.
+
+Para entrada válida, escreva o literal ou use a factory da feature
+(`src/viewmodel/<feature>/testing/`).
+
 ## Componente: montar é inline, três linhas
 
 ```ts

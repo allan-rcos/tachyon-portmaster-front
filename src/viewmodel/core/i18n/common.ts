@@ -16,7 +16,6 @@ import { m } from '@/paraglide/messages';
  *  casar com os contratos dos componentes/ilhas, que recebem texto puro. */
 export type CommonText = { [K in keyof ReturnType<typeof commonText>]: string };
 export type ValText = { [K in keyof ReturnType<typeof valText>]: string };
-export type NavText = { [K in keyof ReturnType<typeof navText>]: string };
 
 /**
  * Termos de UI compartilhados — as páginas espalham no seu `t`.

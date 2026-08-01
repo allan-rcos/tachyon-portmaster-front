@@ -29,10 +29,10 @@ Cada `<rota>.vm.ts` exporta duas coisas, e a separação é o eixo do desenho:
 ```ts
 // 1. DATA — trabalho de servidor. Autoriza, resolve i18n, busca, FORMATA.
 //    Devolve dado puro e serializável, que atravessa o `passToClient` do Vike.
-export async function createProductListPageInput(request: PageRequest): Promise<…>
+declare function createProductListPageInput(request: PageRequest): Promise<ProductListPageInput>;
 
 // 2. REATIVIDADE — recebe o que o data resolveu e devolve sinais + ações.
-export function createProductListVM(input: ProductListPageInput): ProductListVM
+declare function createProductListVM(input: ProductListPageInput): ProductListVM;
 ```
 
 Quando a tela renderiza, **o dado já existe**. Não há carga inicial, não há

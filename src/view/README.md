@@ -77,8 +77,12 @@ Um island é classe, e é a única coisa da View que guarda estado:
 ```ts
 export class SidebarDrawer extends Island<void> {
   #open = signal(false);
-  template(): Renderable { … }
-  override dispose(): void { … }   // o que era `onCleanup`
+  template(): Renderable {
+    /* … */
+  }
+  override dispose(): void {
+    /* … o que era `onCleanup` */
+  }
 }
 ```
 

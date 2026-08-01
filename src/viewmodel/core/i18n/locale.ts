@@ -38,13 +38,3 @@ export function resolveLocale(headers?: IncomingHeaders): Locale {
   return fromCookieHeader(readHeader(headers, 'cookie'));
 }
 
-/**
- * Resolve o locale no navegador, lendo `document.cookie`.
- *
- * Fora do navegador (SSR, testes em Node) devolve o locale padrão em vez de
- * lançar — chamar isto no servidor é engano de composição, não erro fatal.
- */
-export function resolveBrowserLocale(): Locale {
-  if (typeof document === 'undefined') return DEFAULT_LOCALE;
-  return fromCookieHeader(document.cookie);
-}

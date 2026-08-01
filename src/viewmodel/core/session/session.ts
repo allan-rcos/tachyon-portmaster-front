@@ -56,14 +56,3 @@ export function grantedPermissions(account: AccountProfile): Set<Permission> {
   return new Set(account.roles.flatMap((r) => r.permissions));
 }
 
-/**
- * Verifica se o usuário possui TODAS as permissões exigidas.
- *
- * @param account  Perfil da sessão.
- * @param required Permissões exigidas pela rota (vazio = só exige autenticação).
- */
-export function hasPermissions(account: AccountProfile, required: readonly Permission[]): boolean {
-  if (required.length === 0) return true;
-  const granted = grantedPermissions(account);
-  return required.every((p) => granted.has(p));
-}

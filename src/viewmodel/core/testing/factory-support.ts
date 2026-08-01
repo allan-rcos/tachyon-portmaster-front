@@ -3,7 +3,7 @@
  *
  * As factories em si moram na feature que possui o recurso
  * (`@viewmodel/<feature>/testing/<x>.factory`); aqui fica só o que não
- * pertence a nenhuma delas: o envelope de paginação e o controle de semente.
+ * pertence a nenhuma delas: o envelope de paginação.
  *
  * Substituem o banco em memória que o MSW mantinha. A diferença que importa: o
  * antigo `test/msw/db.ts` era uma RÉPLICA da API — rotas, paginação e regras de
@@ -14,7 +14,6 @@
  *
  * @packageDocumentation
  */
-import { faker } from '@faker-js/faker';
 import type { Paged } from '@model/common/dto';
 
 /**
@@ -25,17 +24,4 @@ import type { Paged } from '@model/common/dto';
  */
 export function paged<T>(data: T[], nextCursor?: string): Paged<T> {
   return { data, total: data.length, next_cursor: nextCursor };
-}
-
-/**
- * Fixa a semente do faker para tornar um teste determinístico.
- *
- * Use só quando o teste depender do VALOR gerado (ex.: comparar snapshot). Se
- * ele depende só do formato, deixe aleatório — é o que faz aparecer acoplamento
- * acidental a um dado específico.
- *
- * @param seed Semente a fixar.
- */
-export function seedFaker(seed = 20260725): void {
-  faker.seed(seed);
 }

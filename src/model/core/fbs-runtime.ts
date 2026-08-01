@@ -76,15 +76,17 @@ function camelToSnake(k: string): string {
  *
  * @param value Objeto (ou array) vindo do FlatBuffers.
  */
-export function fromT(value: any): any {
+export function fromT(value: unknown): unknown {
   if (value === null || value === undefined) return undefined;
   if (Array.isArray(value)) return value.map(fromT);
   if (typeof value !== 'object') return value;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const out: Record<string, any> = {};
-  for (const key of Object.keys(value)) {
-    const val = value[key];
+  // `unknown` e não `any`: os guardas acima já provaram que aqui é objeto, e
+  // toda chamada externa termina em `as <DTO>` — o tipo cru nunca escapa daqui.
+  const source = value as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const key of Object.keys(source)) {
+    const val = source[key];
     const snake = camelToSnake(key);
     if (key in ENUM_BY_FIELD && typeof val === 'number') {
       // Índice fora do enum conhecido = versão da API à frente do cliente;

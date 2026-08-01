@@ -1,7 +1,7 @@
 /**
  * Helpers de cookie. `parseCookies` roda no server (a partir do
- * header Cookie); `getCookie`/`setCookie`/`deleteCookie` no browser
- * (islands). Estado de preferência (tema/sidebar) vive aqui.
+ * header Cookie); `setCookie`/`deleteCookie` no browser (islands). Estado de
+ * preferência (tema/sidebar) vive aqui.
  *
  * @packageDocumentation
  */
@@ -21,16 +21,6 @@ export function parseCookies(header: string | undefined | null): Record<string, 
     if (k) out[k] = decodeURIComponent(v);
   }
   return out;
-}
-
-/**
- * Lê um cookie do documento.
- *
- * @param name Nome do cookie.
- */
-export function getCookie(name: string): string | undefined {
-  if (typeof document === 'undefined') return undefined;
-  return parseCookies(document.cookie)[name];
 }
 
 /**

@@ -3,8 +3,7 @@
  *
  * Todo `id` sai de `sequence`, então dois `build()` nunca colidem; o resto vem
  * do faker — o que expõe teste que depende, sem querer, de um valor específico
- * do seed. Ver `@viewmodel/core/testing/factory-support` para `paged` e
- * `seedFaker`.
+ * do seed. Ver `@viewmodel/core/testing/factory-support` para `paged`.
  *
  * @packageDocumentation
  */
