@@ -1,10 +1,15 @@
 # ============================================================
-#  Release: dispara quando a versão do package.json MUDA na main.
+#  Release: a versão do package.json é a fonte da verdade.
 #
-#  O gatilho é a mudança de versão, e não uma tag empurrada à mão, porque a
-#  versão no package.json é a fonte da verdade — publicar passa a ser um efeito
-#  de um commit revisado, não um passo manual que alguém pode esquecer ou fazer
-#  fora de ordem.
+#  Publicar é efeito de um commit revisado, não de uma tag empurrada à mão —
+#  ninguém esquece de subir a versão nem publica fora de ordem.
+#
+#  A condição é "a tag v<version> ainda não existe", e NÃO "o package.json mudou
+#  neste push". As duas concordam no caminho normal, mas só a primeira continua
+#  certa quando uma run é re-executada, quando vários commits chegam juntos ou
+#  quando o histórico é reescrito. Foi exatamente isso que falhou antes: com
+#  `paths: package.json` e comparação contra HEAD~1, um force-push de histórico
+#  reescrito não publicou a 1.0.0.
 #
 #  Publica dois artefatos do MESMO build:
 #   • portmaster-dist-vX.Y.Z.zip — o `dist` pronto para rodar com `tjs`, mais o
@@ -13,13 +18,17 @@
 #     via Dockerfile.dist. Buildar a aplicação uma vez só é o que garante que
 #     imagem e zip contêm exatamente o mesmo código.
 # ============================================================
-name: Release — zip e imagem GHCR ao mudar a versão
+name: Release — zip e imagem GHCR quando a versão é nova
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'package.json'
+
+# Dois pushes chegando juntos não podem ambos concluir que a tag falta e correr
+# para criá-la. Sem `cancel-in-progress`: cancelar uma publicação pela metade
+# deixaria release sem imagem.
+concurrency:
+  group: release-${{ github.ref }}
 
 permissions:
   contents: write # criar a release e anexar o zip
@@ -27,48 +36,47 @@ permissions:
 
 jobs:
   check-version:
-    name: A versão subiu?
+    name: A versão é nova?
     runs-on: ubuntu-latest
     outputs:
       publish: ${{ steps.check.outputs.publish }}
       version: ${{ steps.check.outputs.version }}
     steps:
+      # Checkout raso: nada aqui lê histórico — a pergunta sobre a tag é feita ao
+      # remoto, não a este clone.
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2 # o commit anterior, para comparar
 
-      # Três condições, e o build de 45 minutos só começa se as três passarem: a
-      # versão mudou, ela SUBIU (`sort -V`, então um downgrade não republica) e
-      # ainda não existe release com esse número. Sem a última, a colisão só
-      # apareceria no `gh release create`, com o build inteiro já pago.
+      # `git ls-remote` em vez da lista local de tags, para a resposta ser o que
+      # está de fato publicado e não o que este checkout por acaso baixou. O
+      # build de 45 minutos só começa depois desta resposta.
       - id: check
-        name: Comparar com o commit anterior
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: A tag desta versão já existe?
         run: |
-          current="$(jq -r .version package.json)"
-          previous="$(git show HEAD~1:package.json 2>/dev/null | jq -r '.version // "0.0.0"' 2>/dev/null)"
-          previous="${previous:-0.0.0}"
-          echo "version=$current" >> "$GITHUB_OUTPUT"
+          version="$(jq -r .version package.json)"
+          [ -n "$version" ] && [ "$version" != null ] || {
+            echo "::error::O package.json não declara version."; exit 1;
+          }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
-          if [ "$current" = "$previous" ]; then
+          if git ls-remote --exit-code --tags origin "refs/tags/v${version}" >/dev/null 2>&1; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
-            echo "Versão inalterada ($current) — nada a publicar."
+            echo "v${version} já está publicada — nada a fazer. Suba a versão no package.json."
             exit 0
           fi
 
-          if [ "$(printf '%s\n%s\n' "$current" "$previous" | sort -V | tail -1)" != "$current" ]; then
-            echo "::error::A versão desceu: $previous → $current. Nada publicado."
-            exit 1
-          fi
-
-          if gh release view "v${current}" >/dev/null 2>&1; then
-            echo "::error::A release v${current} já existe — suba a versão no package.json."
+          # Guarda contra downgrade: a versão nova tem de ser a maior de todas as
+          # já publicadas. `sort -V` para 1.10.0 vencer 1.9.0, que uma comparação
+          # de texto erraria.
+          highest="$(git ls-remote --tags origin 'refs/tags/v*' \
+            | sed -n 's#.*refs/tags/v\([0-9][^^]*\)$#\1#p' | sort -V | tail -1)"
+          if [ -n "$highest" ] && \
+             [ "$(printf '%s\n%s\n' "$version" "$highest" | sort -V | tail -1)" != "$version" ]; then
+            echo "::error::A versão desceu: v${highest} já está publicada e o package.json pede ${version}."
             exit 1
           fi
 
           echo "publish=true" >> "$GITHUB_OUTPUT"
-          echo "Versão: $previous → $current"
+          echo "v${version} ainda não tem tag — esta run publica."
 
   release:
     name: Publicar zip e imagem
@@ -160,6 +168,8 @@ jobs:
           zip -r "portmaster-dist-v${VERSION}.zip" dist
           sha256sum "portmaster-dist-v${VERSION}.zip" > "portmaster-dist-v${VERSION}.zip.sha256"
 
+      # `--target` fixa a tag no commit que ESTE build compilou; sem ele o `gh`
+      # a criaria no topo do branch, que pode já ter andado.
       - name: Criar a release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -167,6 +177,7 @@ jobs:
           gh release create "v${VERSION}" \
             "portmaster-dist-v${VERSION}.zip" \
             "portmaster-dist-v${VERSION}.zip.sha256" \
+            --target "${GITHUB_SHA}" \
             --title "v${VERSION}" \
             --generate-notes
 

@@ -167,8 +167,9 @@ o CI usa para não compilar a aplicação duas vezes. Ver
 
 ## Release
 
-O gatilho é a **mudança da versão no `package.json`** na `main`, não uma tag
-manual. O workflow revalida tudo e publica dois artefatos do mesmo build:
+A fonte da verdade é a **versão no `package.json`**, não uma tag manual. Todo
+push na `main` pergunta se a tag `v<version>` já existe; se não existe, esta é
+a release. O workflow revalida tudo e publica dois artefatos do mesmo build:
 
 - `portmaster-dist-vX.Y.Z.zip` — o `dist` pronto para rodar, mais o `.sha256`;
 - `ghcr.io/allan-rcos/portmaster:X.Y.Z` e `:latest`.

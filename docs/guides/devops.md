@@ -74,9 +74,16 @@ privado, será preciso um PAT no lugar do `GITHUB_TOKEN`.
 
 ## Release
 
-`.github/workflows/release.yml` dispara quando **a versão do `package.json`
-muda** na `main` — não numa tag empurrada à mão. A versão passa a ser a fonte da
-verdade, e publicar vira efeito de um commit revisado.
+`.github/workflows/release.yml` roda em todo push na `main` e publica quando **a
+tag `v<version>` do `package.json` ainda não existe** — não numa tag empurrada à
+mão. A versão é a fonte da verdade, e publicar vira efeito de um commit revisado.
+
+A condição é a ausência da tag, e não "o `package.json` mudou neste push". As
+duas concordam no caminho normal, mas só a primeira continua certa quando uma
+run é re-executada, quando vários commits chegam juntos ou quando o histórico é
+reescrito — foi um force-push de histórico reescrito que fez a 1.0.0 não sair na
+primeira tentativa. A pergunta é feita ao remoto (`git ls-remote`), então a
+resposta é o que está publicado, não o que o checkout baixou.
 
 Publica dois artefatos do **mesmo** build:
 
