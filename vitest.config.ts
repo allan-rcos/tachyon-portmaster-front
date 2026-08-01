@@ -1,12 +1,20 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
+
+// Mesma injeção do vite.config.ts: sem ela, `__APP_VERSION__` não existe sob o
+// Vitest e qualquer teste que alcance `readSystemInfo` quebra.
+const { version } = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8')
+) as { version: string };
 
 // Config isolada de testes (sem o plugin do Vike, que é só para SSR/build de
 // produção). Não há plugin de framework de interface: com Lit não há transform
 // a aplicar — o que antes exigia `vite-plugin-solid` aqui hoje é só TypeScript.
 // jsdom + jest-dom.
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(version) },
   // `paraglideVitePlugin` gera `dist/paraglide/` também nos testes, então os
   // resolvers de rota (que chamam `m.*`) funcionam sob o Vitest.
   plugins: [

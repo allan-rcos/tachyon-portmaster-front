@@ -1,10 +1,20 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import vike from 'vike/plugin';
 import { txiki } from 'vike-txiki-adapter/vite';
 import { defineConfig } from 'vite';
 
+// A versão do `package.json` é a mesma que dispara a release, então é ela que a
+// tela de diagnóstico mostra — repetir o número num literal do código garante
+// que um dos dois fica defasado. Injetada como constante para não arrastar o
+// `package.json` inteiro (dependências e scripts) para dentro do bundle.
+const { version } = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8')
+) as { version: string };
+
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(version) },
   // Não há plugin de framework de interface aqui, e isso é o ponto: `html``` do
   // Lit é tagged template, então o `tsc`/esbuild do Vite já dá conta. O
   // `vike-solid/vite` (que embrulhava o `vite-plugin-solid`) saiu junto com o

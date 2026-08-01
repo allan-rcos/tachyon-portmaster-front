@@ -96,7 +96,7 @@ function readMemoryUsageMb(): number {
 export function readSystemInfo(): SystemInfo {
   return {
     name: 'Tachyon PortMaster',
-    version: '0.1.0',
+    version: __APP_VERSION__,
     environment: import.meta.env.PROD ? 'production' : 'development',
     runtime: detectRuntime(),
     memory_usage_mb: readMemoryUsageMb(),

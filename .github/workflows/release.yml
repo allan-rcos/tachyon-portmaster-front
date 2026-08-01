@@ -27,34 +27,53 @@ permissions:
 
 jobs:
   check-version:
-    name: A versão mudou?
+    name: A versão subiu?
     runs-on: ubuntu-latest
     outputs:
-      changed: ${{ steps.check.outputs.changed }}
+      publish: ${{ steps.check.outputs.publish }}
       version: ${{ steps.check.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2 # o commit anterior, para comparar
 
+      # Três condições, e o build de 45 minutos só começa se as três passarem: a
+      # versão mudou, ela SUBIU (`sort -V`, então um downgrade não republica) e
+      # ainda não existe release com esse número. Sem a última, a colisão só
+      # apareceria no `gh release create`, com o build inteiro já pago.
       - id: check
         name: Comparar com o commit anterior
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           current="$(jq -r .version package.json)"
-          previous="$(git show HEAD~1:package.json 2>/dev/null | jq -r .version || echo 'none')"
+          previous="$(git show HEAD~1:package.json 2>/dev/null | jq -r '.version // "0.0.0"' 2>/dev/null)"
+          previous="${previous:-0.0.0}"
           echo "version=$current" >> "$GITHUB_OUTPUT"
-          if [ "$current" != "$previous" ]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Versão: $previous → $current"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
+
+          if [ "$current" = "$previous" ]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
             echo "Versão inalterada ($current) — nada a publicar."
+            exit 0
           fi
+
+          if [ "$(printf '%s\n%s\n' "$current" "$previous" | sort -V | tail -1)" != "$current" ]; then
+            echo "::error::A versão desceu: $previous → $current. Nada publicado."
+            exit 1
+          fi
+
+          if gh release view "v${current}" >/dev/null 2>&1; then
+            echo "::error::A release v${current} já existe — suba a versão no package.json."
+            exit 1
+          fi
+
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+          echo "Versão: $previous → $current"
 
   release:
     name: Publicar zip e imagem
     needs: check-version
-    if: needs.check-version.outputs.changed == 'true'
+    if: needs.check-version.outputs.publish == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45 # o estágio do txiki compila do fonte
     env:

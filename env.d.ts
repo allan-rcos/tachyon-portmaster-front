@@ -12,6 +12,9 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
+/** Versão do `package.json`, injetada no build pelo `define` do Vite/Vitest. */
+declare const __APP_VERSION__: string;
+
 // Rede de segurança para `import styles from './x.module.scss'`.
 //
 // O tipo REAL de cada módulo vem do `x.module.scss.d.ts` que o `gen:css`
