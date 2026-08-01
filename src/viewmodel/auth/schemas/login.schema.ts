@@ -17,11 +17,13 @@ export interface LoginSchemaText {
  */
 export function createLoginSchema(t?: LoginSchemaText) {
   return z.object({
+    // Pipe, e não `z.email().trim()`: naquela forma o check de formato roda
+    // ANTES do trim, e "  ana@x.com  " passaria a ser recusado.
     email: z
       .string()
       .trim()
       .min(1, t?.emailRequired ?? 'Informe o e-mail')
-      .email(t?.emailInvalid ?? 'E-mail inválido'),
+      .pipe(z.email(t?.emailInvalid ?? 'E-mail inválido')),
     password: z.string().min(1, t?.passwordRequired ?? 'Informe a senha'),
   });
 }

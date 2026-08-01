@@ -169,9 +169,11 @@ lint daqui o ignora. A documentação dele é autônoma: o mapeamento contra o
 upstream fica em `docs/upstream.md` lá, para que acompanhar mudança de contrato
 do Vike seja um diff, não arqueologia.
 
-Restrição de runtime que o ESLint daqui também aplica: do `@lit-labs/ssr` só
-valem `lib/render-lit-html.js` e `lib/render-result.js`. A raiz e os outros
-caminhos arrastam built-ins do Node, que o txiki não tem.
+Restrição de runtime que o ESLint daqui também aplica: do `@lit-labs/ssr` são
+proibidos os caminhos que alcançam `lib/dom-shim.js` (→ `node-fetch`) ou outros
+built-ins do Node, ausentes no txiki — `install-global-dom-shim.js`,
+`render-with-global-dom-shim.js`, `module-loader.js` e
+`render-result-readable.js`. A raiz é permitida, e é de onde `render` vem.
 
 ## Aliases
 

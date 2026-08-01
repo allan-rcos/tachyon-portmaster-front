@@ -29,11 +29,12 @@ export function createAccountSchema(t?: AccountSchemaText) {
       .trim()
       .min(2, t?.nameShort ?? 'Nome muito curto')
       .max(120, t?.nameLong ?? 'Nome muito longo'),
+    // Ver a nota em `login.schema.ts`: o pipe mantém o trim antes do formato.
     email: z
       .string()
       .trim()
       .min(1, t?.emailRequired ?? 'Informe o e-mail')
-      .email(t?.emailInvalid ?? 'E-mail inválido'),
+      .pipe(z.email(t?.emailInvalid ?? 'E-mail inválido')),
   });
 }
 

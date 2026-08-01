@@ -49,7 +49,8 @@ export function createUserSchema(mode: UserFormMode, t?: UserSchemaText) {
   const m = msgs(t);
   return z.object({
     name: z.string().trim().min(2, m.nameShort).max(120, m.nameLong),
-    email: z.string().trim().min(1, m.emailRequired).email(m.emailInvalid),
+    // Ver a nota em `login.schema.ts`: o pipe mantém o trim antes do formato.
+    email: z.string().trim().min(1, m.emailRequired).pipe(z.email(m.emailInvalid)),
     initial_password: mode === 'create' ? z.string().min(6, m.passwordMin) : z.string(),
     role_ids: z.array(z.string()).min(1, m.rolesRequired),
   });

@@ -269,14 +269,18 @@ export default tseslint.config(
         'error',
         {
           // Nome EXATO, não glob: o `@lit-labs/ssr` tem caminhos bons e ruins
-          // sob o mesmo prefixo. Liberados: `lib/render-lit-html.js` e
-          // `lib/render-result.js`, que são JS puro. Barrados os quatro abaixo,
-          // que arrastam Node built-ins ausentes no txiki.js.
+          // sob o mesmo prefixo. Ruim é o que alcança `lib/dom-shim.js` (→
+          // `node-fetch`) ou built-ins do Node — os quatro abaixo. A raiz NÃO é
+          // um deles, e é de onde `render` vem: `lib/render-lit-html.js`, que
+          // usávamos, foi deprecado pelo upstream.
           paths: [
-            { name: '@lit-labs/ssr', message: 'A raiz importa lib/dom-shim.js → node-fetch.' },
             {
               name: '@lit-labs/ssr/lib/install-global-dom-shim.js',
               message: 'Importa lib/dom-shim.js → node-fetch.',
+            },
+            {
+              name: '@lit-labs/ssr/lib/render-with-global-dom-shim.js',
+              message: 'Importa install-global-dom-shim.js → dom-shim.js → node-fetch.',
             },
             {
               name: '@lit-labs/ssr/lib/module-loader.js',

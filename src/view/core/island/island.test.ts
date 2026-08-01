@@ -12,7 +12,7 @@
 //       estado local. Se falhar, todo signal de island volta ao inicial a cada
 //       mudança em qualquer lugar da página.
 // ============================================================
-import { render as renderSsr } from '@lit-labs/ssr/lib/render-lit-html.js';
+import { render as renderSsr } from '@lit-labs/ssr';
 import { collectResultSync } from '@lit-labs/ssr/lib/render-result.js';
 import { hydrate } from '@lit-labs/ssr-client';
 import { effect, signal } from 'alien-signals';

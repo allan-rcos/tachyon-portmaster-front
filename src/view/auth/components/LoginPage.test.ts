@@ -11,7 +11,7 @@
 //  (`login-page.vm.test.ts`), sem DOM. Aqui verificamos a ligação: o que o
 //  usuário digita chega ao VM, e o que o VM diz aparece na tela.
 // ============================================================
-import { render as renderSsr } from '@lit-labs/ssr/lib/render-lit-html.js';
+import { render as renderSsr } from '@lit-labs/ssr';
 import { collectResultSync } from '@lit-labs/ssr/lib/render-result.js';
 import { hydrate } from '@lit-labs/ssr-client';
 import userEvent from '@testing-library/user-event';
