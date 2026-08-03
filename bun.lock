@@ -82,7 +82,7 @@
     },
     "packages/vike-txiki-adapter": {
       "name": "vike-txiki-adapter",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "bin": {
         "vike-txiki-adapter": "dist/cli.mjs",
       },
