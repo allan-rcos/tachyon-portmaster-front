@@ -48,6 +48,98 @@ Um arquivo por comando. O `index.ts` existe porque o Dagger precisa de uma class
 
 -----
 
+## 📋 Os métodos
+
+Nove funções. Nenhuma pede bun ou node instalado; `dagger call <nome> --help` lista os argumentos.
+
+| Comando | Devolve | Arquivo | Para quê |
+|---|---|---|---|
+| `ci` | `String` | `ci.ts` | i18n → lint → tipos → testes → build → TypeDoc |
+| `lint` | `String` | `lint.ts` | ESLint sobre a árvore |
+| `typecheck` | `String` | `typecheck.ts` | `tsc --noEmit` |
+| `test` | `String` | `test.ts` | A suíte do vitest |
+| `check-translations` | `String` | `translations.ts` | As traduções cobrem as chaves usadas? |
+| `docs-api` | `String` | `docs.ts` | TypeDoc, configurado por `typedoc.json` |
+| `build` | `Directory` | `build.ts` | O `dist` construído e podado |
+| `dist` | `File` | `dist.ts` | O zip que a release publica |
+| `version` | `String` | `version.ts` | A versão de `package.json` |
+
+**`build` e `dist` pedem `export`** — nenhuma função escreve no repositório (R6):
+
+```bash
+dagger call build export --path ../dist
+dagger call dist --version VERSAO export --path ../portmaster-dist-vVERSAO.zip
+```
+
+### Argumentos
+
+Todas recebem `--source`, com `defaultPath` para a raiz — na prática você não passa nada. As exceções:
+
+| Comando | Argumento | Padrão | |
+|---|---|---|---|
+| `dist` | `--version` | **obrigatório** | Entra no nome do zip |
+| `version` | `--package-json` | `/package.json` | |
+
+> **A ordem do `ci` é deliberada.** As verificações baratas e mais específicas primeiro, para que um erro de lint não custe um build inteiro para aparecer. O build vem depois delas e antes do TypeDoc.
+
+-----
+
+## ➕ Como acrescentar um método
+
+1. **Decida onde.** Compõe outras funções? Um arquivo em `src/`. Constrói ambiente ou implementa a cadeia de build? `modules/toolchain` ou `modules/artifact` — a R2 diz que a raiz não tem `dag.container()`.
+
+2. **Um arquivo, com o nome do comando**, exportando **uma coisa só**:
+
+   ```ts
+   // src/format.ts
+   import { dag, Directory } from "@dagger.io/dagger"
+
+   export { checkFormat }
+
+   /** Confere a formatação com o Prettier, sem reescrever. */
+   async function checkFormat(source: Directory): Promise<string> {
+     return dag
+       .toolchain()
+       .ready(source)
+       .withExec(["bunx", "prettier", "--check", "."])
+       .stdout()
+   }
+   ```
+
+3. **Declare o método na classe**, em `src/index.ts`. É o único lugar que cresce, e é uma linha que delega — o Dagger exige uma classe decorada e TypeScript não divide classe em vários arquivos:
+
+   ```ts
+   import { checkFormat } from "./format"
+
+   /** Confere a formatação com o Prettier. */
+   @func()
+   async checkFormat(
+     @argument({ defaultPath: "/", ignore: IGNORE }) source: Directory,
+   ): Promise<string> {
+     return checkFormat(source)
+   }
+   ```
+
+4. **`dagger develop`** no módulo alterado, depois na raiz.
+
+5. **`dagger functions`** para confirmar que apareceu.
+
+### As armadilhas de quem escreve um método novo
+
+> **Nunca escreva um glob com asterisco-barra dentro de um JSDoc.** A sequência fecha o bloco ali mesmo, o texto seguinte vira código, e o erro é `could not resolve type reference for any` — que não menciona comentário nenhum **e aparece no módulo que depende do quebrado**, não nele. Escreva `packages/<nome>/.git`.
+
+> **Um módulo não pode se chamar `dist`.** O `.gitignore` traz `dist` sem barra inicial, e o Dagger respeita o `.gitignore`: o módulo é carregado **vazio** e roda o esqueleto do `dagger init`, sem erro que explique. É por isso que o de empacotamento se chama `artifact`.
+
+> **Use `IGNORE` de `ignore.ts`, não uma lista nova.** Um `ignore` divergente muda a chave de cache e faz a função reexecutar sozinha, sem erro nenhum.
+
+> **Partindo de `toolchain.ready()`, não de `dev()`.** O `ready` já rodou paraglide, flatc e o `typed-scss-modules`, e o cache faz todas as funções compartilharem uma geração só. Do `dev` você teria de repetir os três passos — e a ordem deles.
+
+### E se a função substitui um script do `package.json`
+
+A regra é reimplementar, não envelopar: chamar `bun run <script>` daqui deixaria a ordem dos passos escrita em dois lugares sem nada obrigando os dois a concordarem. Traga os comandos, um `withExec` por passo, e **remova a cadeia do `package.json`** — foi o que aconteceu com `build`, `typecheck` e `test`. Os aliases de uma palavra para uma ferramenta (`lint`, `format`) ficam: não há ordem a duplicar neles, e os editores os usam.
+
+-----
+
 ## 🌱 O `git init` que parece supérfluo e não é
 
 O `toolchain.dev()` recria um repositório git dentro do container antes de instalar as dependências. Apagar essas duas linhas quebra o build, e o erro não menciona git em lugar nenhum.

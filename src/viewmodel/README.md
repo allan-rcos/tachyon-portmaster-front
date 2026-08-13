@@ -132,7 +132,7 @@ View para se tipar.
 ## Testes
 
 Os `*.vm.test.ts` são a maior parte da suíte, e nenhum precisa de DOM — nem os
-de formulário. `bun run test` exercita validação, submissão e autorização
+de formulário. `dagger call test` exercita validação, submissão e autorização
 chamando funções.
 
 ## JSDoc é obrigatório

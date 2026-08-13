@@ -199,7 +199,7 @@ export const berthListMessages = (locale: Locale): BerthListText => ({
 
 Adicione as chaves nos **três** catálogos e declare-as no
 `berth-list-page.messages.schema.json` irmão — ver
-[o guia de i18n](i18n.md). `bun run i18n:check` reprova chave faltante em
+[o guia de i18n](i18n.md). `dagger call check-translations` reprova chave faltante em
 qualquer locale, e também chave declarada e não usada.
 
 ### `berth-list-page.vm.ts` — os dois papéis da rota
@@ -505,9 +505,9 @@ feature.
 ```bash
 bun run i18n:check   # contrato de tradução nos 3 locales
 bun run lint         # camadas, JSDoc e ordem de import
-bun run typecheck
-bun run test
-bun run build
+dagger call typecheck
+dagger call test
+dagger call build
 ```
 
 ## Checklist do que costuma escapar

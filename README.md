@@ -129,12 +129,12 @@ Clonou sem `--recurse-submodules`? `git submodule update --init --recursive`.
 | Comando                | O que faz                                  |
 | ---------------------- | ------------------------------------------ |
 | `bun run dev`          | Vite + HMR                                 |
-| `bun run build`        | build de produção completo                 |
+| `dagger call build`        | build de produção completo                 |
 | `bun run start`        | roda o build com `tjs`                     |
-| `bun run test`         | suíte de testes                            |
-| `bun run lint`         | camadas, JSDoc e ordem de import           |
-| `bun run typecheck`    | `tsc --noEmit`                             |
-| `bun run i18n:check`   | contrato de tradução nos 3 locales         |
+| `dagger call test`         | suíte de testes                            |
+| `dagger call lint`         | camadas, JSDoc e ordem de import           |
+| `dagger call typecheck`    | `tsc --noEmit`                             |
+| `dagger call check-translations`   | contrato de tradução nos 3 locales         |
 | `bun run i18n:compile` | compila os catálogos para `dist/paraglide` |
 | `bun run docs:api`     | referência TypeDoc em `docs/api`           |
 | `bun run gen:fbs`      | regenera os codecs FlatBuffers             |
