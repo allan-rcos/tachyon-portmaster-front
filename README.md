@@ -28,7 +28,7 @@ O projeto é uma **base de MVVM com regra de dependência aplicada pelo linter**
 ## ✨ Destaques
 
 * **SSR num runtime de 2 MB.** Produção roda no [txiki.js](https://github.com/saghul/txiki.js) (`tjs`) — QuickJS + libuv, padrão WinterTC — e não no Node. O Bun aparece só para instalar pacotes e compilar; ele não serve nada.
-* **A regra de dependência é código.** `pages → view → viewmodel → model`, aplicada por quatro zonas de `no-restricted-imports` no `eslint.config.mjs`. Convenção documentada é convenção violada; esta falha o `bun run lint`.
+* **A regra de dependência é código.** `pages → view → viewmodel → model`, aplicada por quatro zonas de `no-restricted-imports` no `eslint.config.mjs`. Convenção documentada é convenção violada; esta falha o `dagger call lint`.
 * **Sem compilador de interface.** Não existe `.tsx` no projeto: `` html`` `` do Lit é *tagged template*, então a View é TypeScript que se importa e roda. A integração com o Vike é nossa — [`vike-lit`](https://github.com/allan-rcos/vike-lit), espelhando a arquitetura do `vike-solid` oficial.
 * **O ViewModel é testável sem DOM, sem Vike e sem rede.** Ele recebe um `PageRequest`, que é objeto literal — e isso vale inclusive para os nove formulários. São 41 arquivos e 189 testes que não sobem navegador.
 * **Ilhas, não hidratação total.** 18 rotas e 14 ilhas: o servidor entrega HTML e só o que é interativo acorda no cliente.
@@ -181,7 +181,7 @@ bun run dev      # http://localhost:3000
 ### Produção, na sua máquina
 
 ```bash
-bun run build
+dagger call build
 bun run start    # roda dist/txiki/server.mjs no tjs
 ```
 
@@ -200,11 +200,11 @@ Imagem final ~98 MB: Debian slim com o `tjs` e o `dist`, rodando como usuário n
 
 | Comando | O que faz |
 |---|---|
-| `bun run lint` | camadas, JSDoc e ordem de import |
-| `bun run typecheck` | `tsc --noEmit` |
-| `bun run test` | 41 arquivos, 189 testes (Vitest + jsdom) |
-| `bun run i18n:check` | contrato de tradução nos três locales |
-| `bun run build` | build de produção completo |
+| `dagger call lint` | camadas, JSDoc e ordem de import |
+| `dagger call typecheck` | `tsc --noEmit` |
+| `dagger call test` | 41 arquivos, 189 testes (Vitest + jsdom) |
+| `dagger call check-translations` | contrato de tradução nos três locales |
+| `dagger call build` | build de produção completo |
 | `bun run docs:api` | referência TypeDoc em `docs/api` |
 | `bun run gen:fbs` | regenera os codecs FlatBuffers |
 
@@ -252,7 +252,7 @@ Cada camada também tem README junto do código: [model](src/model/README.md) ·
 
 Contribuições são bem-vindas. Antes de abrir um PR:
 
-1. `bun run lint`, `bun run typecheck`, `bun run i18n:check`, `bun run test` e `bun run build` precisam passar.
+1. `dagger call lint`, `dagger call typecheck`, `dagger call check-translations`, `dagger call test` e `dagger call build` precisam passar.
 2. Respeite a direção das dependências. Se o lint reclamar de import, a resposta quase nunca é a exceção — é que a lógica está na camada errada.
 3. Regra nova vive no ViewModel, não na View nem na página.
 4. Texto novo entra nos três locales; o `i18n:check` reprova o que faltar.

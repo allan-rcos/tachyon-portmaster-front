@@ -4,13 +4,13 @@
 
 ```bash
 bun run dev          # Vite + HMR em http://localhost:3000
-bun run build        # adapter → i18n → cliente/servidor → bundle do tjs
+dagger call build        # adapter → i18n → cliente/servidor → bundle do tjs
 bun run start        # roda o build com tjs (precisa do tjs no PATH)
 
 bun run lint         # camadas, JSDoc, ordem de import
-bun run typecheck    # tsc --noEmit
+dagger call typecheck    # tsc --noEmit
 bun run i18n:check   # contrato de tradução
-bun run test
+dagger call test
 bun run docs:api     # referência TypeDoc em docs/api (gitignorada)
 ```
 
@@ -38,7 +38,7 @@ Dois Dockerfiles, com propósitos distintos:
 
 ```bash
 docker build -t portmaster .                        # tudo
-bun run build && docker build -f Dockerfile.dist -t portmaster .   # com dist pronto
+dagger call build export --path dist && docker build -f Dockerfile.dist -t portmaster .   # com dist pronto
 
 docker run --rm -p 3000:3000 portmaster
 ```

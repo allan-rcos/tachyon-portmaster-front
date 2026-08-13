@@ -1,8 +1,8 @@
 # Testes
 
 ```bash
-bun run test         # suíte completa
-bun run test:watch   # durante o desenvolvimento
+dagger call test         # suíte completa
+bunx vitest   # durante o desenvolvimento
 ```
 
 Testes ficam **colados ao código** (`*.test.ts` ao lado do fonte), nunca num
