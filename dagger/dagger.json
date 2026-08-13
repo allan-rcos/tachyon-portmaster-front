@@ -1,0 +1,17 @@
+{
+  "name": "front",
+  "engineVersion": "v0.21.8",
+  "sdk": {
+    "source": "typescript"
+  },
+  "dependencies": [
+    {
+      "name": "artifact",
+      "source": "modules/artifact"
+    },
+    {
+      "name": "toolchain",
+      "source": "modules/toolchain"
+    }
+  ]
+}

@@ -1,8 +1,18 @@
 # ============================================================
 #  Integração contínua: roda em todo push e pull request.
 #
-#  A ordem é deliberada — as verificações baratas e mais específicas primeiro,
+#  O conteúdo deste arquivo encolheu porque as verificações deixaram de morar
+#  aqui. `dagger call ci` roda a mesma sequência — i18n, lint, tipos, testes,
+#  build, TypeDoc — e roda igual na máquina de quem desenvolve, que antes não
+#  tinha como reproduzir nada disto sem um push.
+#
+#  A ordem continua sendo deliberada e continua documentada, só que em
+#  dagger/src/index.ts: as verificações baratas e mais específicas primeiro,
 #  para que um erro de lint não custe um build inteiro para aparecer.
+#
+#  O flatc também saiu daqui. Ele é instalado por dagger/modules/toolchain, onde
+#  a versão é uma constante só — antes eram três cópias do mesmo número, uma
+#  neste arquivo, uma no release.yml e uma no build-local.sh da infraestrutura.
 # ============================================================
 name: CI — lint, tipos, testes e build
 
@@ -18,13 +28,22 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Fixado na versão que os módulos de dagger/ declaram no dagger.json.
+  DAGGER_VERSION: "0.21.8"
+
 jobs:
   verify:
     name: Lint, tipos, testes e build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
+      # O checkout dos submódulos continua sendo trabalho do Actions, e é de
+      # propósito: o Dagger recebe o diretório pronto e nunca clona nada por
+      # conta própria. Toda a ginástica de credencial fica no único lugar onde
+      # ela já funciona.
+      #
       # O `.gitmodules` usa URLs SSH (git@github.com:), que o runner não tem
       # chave para resolver. A regra geral é reescrever para HTTPS e deixar o
       # token do Actions autenticar — o que basta para submodule PÚBLICO.
@@ -64,50 +83,12 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      # Os bindings do FlatBuffers saíram do repositório (são saída de
-      # compilador, não fonte), então o `flatc` passou a ser obrigatório aqui.
-      # Binário oficial do release, para não compilar o projeto inteiro.
-      - name: Instalar flatc
-        env:
-          FLATC_VERSION: '25.12.19'
+      - name: Instalar Dagger
         run: |
-          curl -fsSL -o /tmp/flatc.zip \
-            "https://github.com/google/flatbuffers/releases/download/v${FLATC_VERSION}/Linux.flatc.binary.g++-13.zip"
-          unzip -q /tmp/flatc.zip -d /usr/local/bin
-          chmod +x /usr/local/bin/flatc
-          flatc --version
+          curl -fsSL https://dl.dagger.io/dagger/install.sh \
+            | DAGGER_VERSION="${DAGGER_VERSION}" BIN_DIR=/usr/local/bin sudo -E sh
+          dagger version
 
-      - name: Instalar dependências
-        run: bun install --frozen-lockfile
-
-      # Paraglide e flatc precisam rodar antes de tudo: lint, tipos e testes
-      # importam `@/paraglide/messages` e `@/fbs/*`, ambos saída de compilador
-      # que não existe no repo. (`gen:fbs` também é pré-passo dos scripts, mas
-      # explicitá-lo aqui faz a falha aparecer no passo certo.)
-      - name: Compilar i18n
-        run: bun run i18n:compile
-
-      - name: Gerar bindings FlatBuffers
-        run: bun run gen:fbs
-
-      - name: Contrato de i18n
-        run: bun run i18n:check
-
-      - name: Lint
-        run: bun run lint
-
-      - name: Tipos
-        run: bun run typecheck
-
-      - name: Testes
-        run: bun run test
-
-      - name: Build
-        run: bun run build
-
-      - name: Referência de API (TypeDoc)
-        run: bun run docs:api
+      - name: Verificar
+        working-directory: dagger
+        run: dagger call ci
