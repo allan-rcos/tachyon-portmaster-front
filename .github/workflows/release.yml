@@ -1,61 +1,96 @@
 # ============================================================
-#  Release: dispara quando a versão do package.json MUDA na main.
+#  Release: a versão do package.json é a fonte da verdade.
 #
-#  O gatilho é a mudança de versão, e não uma tag empurrada à mão, porque a
-#  versão no package.json é a fonte da verdade — publicar passa a ser um efeito
-#  de um commit revisado, não um passo manual que alguém pode esquecer ou fazer
-#  fora de ordem.
+#  Publicar é efeito de um commit revisado, não de uma tag empurrada à mão —
+#  ninguém esquece de subir a versão nem publica fora de ordem.
+#
+#  A condição é "a tag v<version> ainda não existe", e NÃO "o package.json mudou
+#  neste push". As duas concordam no caminho normal, mas só a primeira continua
+#  certa quando uma run é re-executada, quando vários commits chegam juntos ou
+#  quando o histórico é reescrito. Foi exatamente isso que falhou antes: com
+#  `paths: package.json` e comparação contra HEAD~1, um force-push de histórico
+#  reescrito não publicou a 1.0.0.
 #
 #  Publica dois artefatos do MESMO build:
-#   • portmaster-dist-vX.Y.Z.zip — o `dist` pronto para rodar com `tjs`;
+#   • portmaster-dist-vX.Y.Z.zip — o `dist` pronto para rodar com `tjs`, mais o
+#     .sha256 correspondente;
 #   • ghcr.io/<owner>/portmaster:X.Y.Z — imagem montada a partir desse zip,
 #     via Dockerfile.dist. Buildar a aplicação uma vez só é o que garante que
 #     imagem e zip contêm exatamente o mesmo código.
+#
+#  A poda do dist (só `client` e `txiki`) migrou para dagger/modules/artifact,
+#  onde acontece ANTES do zip e da imagem — que é o que mantém os dois com
+#  exatamente o mesmo conteúdo.
 # ============================================================
-name: Release
+name: Release — zip e imagem GHCR quando a versão é nova
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'package.json'
+
+# Dois pushes chegando juntos não podem ambos concluir que a tag falta e correr
+# para criá-la. Sem `cancel-in-progress`: cancelar uma publicação pela metade
+# deixaria release sem imagem.
+concurrency:
+  group: release-${{ github.ref }}
 
 permissions:
   contents: write # criar a release e anexar o zip
   packages: write # publicar a imagem no GHCR
 
+env:
+  DAGGER_VERSION: "0.21.8"
+
 jobs:
   check-version:
-    name: A versão mudou?
+    name: A versão é nova?
     runs-on: ubuntu-latest
     outputs:
-      changed: ${{ steps.check.outputs.changed }}
+      publish: ${{ steps.check.outputs.publish }}
       version: ${{ steps.check.outputs.version }}
     steps:
+      # Checkout raso: nada aqui lê histórico — a pergunta sobre a tag é feita ao
+      # remoto, não a este clone. Sem submodules: só se lê o package.json.
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2 # o commit anterior, para comparar
 
+      # `git ls-remote` em vez da lista local de tags, para a resposta ser o que
+      # está de fato publicado e não o que este checkout por acaso baixou. O
+      # build de 45 minutos só começa depois desta resposta.
       - id: check
-        name: Comparar com o commit anterior
+        name: A tag desta versão já existe?
         run: |
-          current="$(jq -r .version package.json)"
-          previous="$(git show HEAD~1:package.json 2>/dev/null | jq -r .version || echo 'none')"
-          echo "version=$current" >> "$GITHUB_OUTPUT"
-          if [ "$current" != "$previous" ]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Versão: $previous → $current"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "Versão inalterada ($current) — nada a publicar."
+          version="$(jq -r .version package.json)"
+          [ -n "$version" ] && [ "$version" != null ] || {
+            echo "::error::O package.json não declara version."; exit 1;
+          }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/v${version}" >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "v${version} já está publicada — nada a fazer. Suba a versão no package.json."
+            exit 0
           fi
+
+          # Guarda contra downgrade: a versão nova tem de ser a maior de todas as
+          # já publicadas. `sort -V` para 1.10.0 vencer 1.9.0, que uma comparação
+          # de texto erraria.
+          highest="$(git ls-remote --tags origin 'refs/tags/v*' \
+            | sed -n 's#.*refs/tags/v\([0-9][^^]*\)$#\1#p' | sort -V | tail -1)"
+          if [ -n "$highest" ] && \
+             [ "$(printf '%s\n%s\n' "$version" "$highest" | sort -V | tail -1)" != "$version" ]; then
+            echo "::error::A versão desceu: v${highest} já está publicada e o package.json pede ${version}."
+            exit 1
+          fi
+
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+          echo "v${version} ainda não tem tag — esta run publica."
 
   release:
     name: Publicar zip e imagem
     needs: check-version
-    if: needs.check-version.outputs.changed == 'true'
+    if: needs.check-version.outputs.publish == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 45 # o estágio do txiki compila do fonte
+    timeout-minutes: 60 # o estágio do txiki compila do fonte
     env:
       VERSION: ${{ needs.check-version.outputs.version }}
 
@@ -89,48 +124,43 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      # Os bindings do FlatBuffers saíram do repositório: sem `flatc` aqui, o
-      # `gen:fbs` embutido nos scripts abaixo falha. Ver ci.yml.
-      - name: Instalar flatc
-        env:
-          FLATC_VERSION: '25.12.19'
+      - name: Instalar Dagger
         run: |
-          curl -fsSL -o /tmp/flatc.zip \
-            "https://github.com/google/flatbuffers/releases/download/v${FLATC_VERSION}/Linux.flatc.binary.g++-13.zip"
-          unzip -q /tmp/flatc.zip -d /usr/local/bin
-          chmod +x /usr/local/bin/flatc
-          flatc --version
-
-      - name: Instalar dependências
-        run: bun install --frozen-lockfile
+          curl -fsSL https://dl.dagger.io/dagger/install.sh \
+            | DAGGER_VERSION="${DAGGER_VERSION}" BIN_DIR=/usr/local/bin sudo -E sh
+          dagger version
 
       # Rede de segurança: uma versão nunca deve ser publicada sem a suíte
-      # verde, mesmo que o commit de bump tenha vindo por um caminho que pulou o CI.
+      # verde, mesmo que o commit de bump tenha vindo por um caminho que pulou
+      # o CI. É o mesmo `dagger call ci` do ci.yml, sem repetir os passos.
       - name: Verificar antes de publicar
+        working-directory: dagger
+        run: dagger call ci
+
+      # Um build só, do qual saem o zip e a imagem. O `dist` exportado é o mesmo
+      # que o zip empacota, e é o contexto que o Dockerfile.dist consome.
+      - name: Build e empacotamento
+        working-directory: dagger
         run: |
-          bun run i18n:compile
-          bun run gen:fbs
-          bun run i18n:check
-          bun run lint
-          bun run typecheck
-          bun run test
+          dagger call build export --path ../dist
+          dagger call dist --version "${VERSION}" \
+            export --path "../portmaster-dist-v${VERSION}.zip"
 
-      - name: Build
-        run: bun run build
+      # O .sha256 vai junto porque a infra que consome o zip precisa conferir o
+      # download; sem ele, o hash tem de ser fixado à mão a cada subida.
+      - name: Checksum
+        run: sha256sum "portmaster-dist-v${VERSION}.zip" > "portmaster-dist-v${VERSION}.zip.sha256"
 
-      - name: Empacotar o dist
-        run: zip -r "portmaster-dist-v${VERSION}.zip" dist
-
+      # `--target` fixa a tag no commit que ESTE build compilou; sem ele o `gh`
+      # a criaria no topo do branch, que pode já ter andado.
       - name: Criar a release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "v${VERSION}" \
             "portmaster-dist-v${VERSION}.zip" \
+            "portmaster-dist-v${VERSION}.zip.sha256" \
+            --target "${GITHUB_SHA}" \
             --title "v${VERSION}" \
             --generate-notes
 
