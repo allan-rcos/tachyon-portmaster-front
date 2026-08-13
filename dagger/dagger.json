@@ -1,5 +1,5 @@
 {
-  "name": "front",
+  "name": "front-lit",
   "engineVersion": "v0.21.8",
   "sdk": {
     "source": "typescript"

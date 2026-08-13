@@ -43,10 +43,10 @@ import { dist } from "./dist"
 import { ci } from "./ci"
 import { version } from "./version"
 
-export { Front }
+export { FrontLit }
 
 @object()
-class Front {
+class FrontLit {
   /** Lint com ESLint. */
   @func()
   async lint(
