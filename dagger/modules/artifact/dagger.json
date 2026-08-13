@@ -1,0 +1,13 @@
+{
+  "name": "artifact",
+  "engineVersion": "v0.21.8",
+  "sdk": {
+    "source": "typescript"
+  },
+  "dependencies": [
+    {
+      "name": "toolchain",
+      "source": "../toolchain"
+    }
+  ]
+}
