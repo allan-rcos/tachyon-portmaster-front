@@ -12,6 +12,7 @@ export interface ShellNavText {
   painel: string;
   conteineres: string;
   produtos: string;
+  manifestos: string;
   usuarios: string;
   perfis: string;
   conta: string;

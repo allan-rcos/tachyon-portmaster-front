@@ -16,7 +16,7 @@ import { accountProfileFactory, roleRefFactory } from '@viewmodel/account/testin
 import { ForbiddenError, UnauthorizedError } from '@viewmodel/core/page/page-errors';
 import type { PageRequest } from '@viewmodel/core/page/page-request';
 import { loadAccount } from '@viewmodel/core/session/session';
-import { paged } from '@viewmodel/core/testing/factory-support';
+import { paged, pageRequest } from '@viewmodel/core/testing/factory-support';
 import { listProducts } from '@viewmodel/products/queries/list-products.query';
 import { productFactory } from '@viewmodel/products/testing/product.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -39,11 +39,11 @@ function accountWith(...permissions: Permission[]) {
   });
 }
 
-const request: PageRequest = {
+const request: PageRequest = pageRequest({
   headers: { cookie: 'auth_token=abc' },
   url: '/painel/produtos',
   routeParams: {},
-};
+});
 
 beforeEach(() => {
   mockedList.mockResolvedValue(paged(productFactory.buildList(3)));
@@ -98,13 +98,18 @@ describe('createProductListPageInput', () => {
     expect(params?.get('search')).toBe('diesel');
   });
 
-  it('resolve o texto no locale do cookie do request', async () => {
+  it('resolve o texto no locale da requisição', async () => {
     const pt = await createProductListPageInput(request);
-    const en = await createProductListPageInput({
-      ...request,
-      headers: { cookie: 'auth_token=abc; flow-locale=en' },
-    });
+    const en = await createProductListPageInput(pageRequest({ headers: request.headers, url: request.url, locale: 'en' }));
     expect(pt.t.title).not.toBe(en.t.title);
+  });
+
+  it('prefixa os destinos com o locale, menos no pt-BR', async () => {
+    const pt = await createProductListPageInput(request);
+    const en = await createProductListPageInput(pageRequest({ headers: request.headers, url: request.url, locale: 'en' }));
+    expect(pt.newHref).toBe('/painel/produtos/nova');
+    expect(en.newHref).toBe('/en/painel/produtos/nova');
+    expect(en.items[0]?.editHref.startsWith('/en/painel/produtos/')).toBe(true);
   });
 });
 

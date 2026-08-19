@@ -7,13 +7,16 @@
  *
  * @packageDocumentation
  */
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
 import { computed, signal } from 'alien-signals';
 import { z } from 'zod';
 
+import {
+  createContainerListPageInput,
+  type ContainerListPageInput,
+} from './container-list-page.vm';
 import { containerNewMessages, type ContainerNewText } from './i18n/container-create-page.messages';
 import { createContainer } from './mutations/create-container.mutation';
 import { createContainerSchema } from './schemas/container.schema';
@@ -32,6 +35,14 @@ export interface ContainerCreatePageInput {
   t: ContainerNewText;
   /** Volta para a listagem — a View não monta rota. */
   listHref: string;
+  /**
+   * A listagem que fica ATRÁS do modal.
+   *
+   * A rota do formulário é a listagem com o modal aberto — mantivemos o
+   * endereço (deep-link, SSR e o guard de permissão que vive aqui) e mudamos
+   * só a apresentação. Ver `@viewmodel/products/product-create-page.vm`.
+   */
+  background: ContainerListPageInput;
 }
 
 /**
@@ -45,13 +56,15 @@ export async function createContainerCreatePageInput(
   request: PageRequest,
 ): Promise<ContainerCreatePageInput> {
   const account = await authorize(request, CONTAINER_CREATE_PERMISSIONS);
-  const t = containerNewMessages(resolveLocale(request.headers));
+  const t = request.t(containerNewMessages);
 
+  const background = await createContainerListPageInput(request);
   return {
     meta: { title: t.new, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
-    listHref: '/painel/conteineres',
+    listHref: request.href('/painel/conteineres'),
+    background,
   };
 }
 

@@ -1,8 +1,6 @@
 @use '@ds/responsive' as rp;
 @use '@ds/ui' as ui;
 
-// As células ficam nas áreas nomeadas que o `RowList` declara para o mobile;
-// no desktop elas apenas seguem a ordem das colunas.
 .id {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
@@ -15,7 +13,6 @@
 }
 
 .name {
-  grid-area: name;
   font-size: var(--text-sm);
   font-weight: var(--fw-medium);
   color: inherit;
@@ -26,24 +23,33 @@
   }
 
   @include rp.mobile {
+    grid-area: name;
     font-size: var(--text-base);
   }
 }
 
 .density {
-  grid-area: meta;
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
+
+  @include rp.mobile {
+    grid-area: meta;
+  }
 }
 
 .risk {
-  grid-area: risk;
+  @include rp.mobile {
+    grid-area: risk;
+  }
 }
 
 .action {
-  grid-area: action;
   text-align: right;
+
+  @include rp.mobile {
+    grid-area: action;
+  }
 }
 
 .edit {

@@ -13,13 +13,13 @@
 import { ContainerStatus } from '@model/common';
 import type { CargoManifestItem, TelemetryLogItem } from '@model/containers/dto';
 import {
-  CONTAINER_STATUS_LABEL,
+  containerStatusLabels,
   CONTAINER_STATUS_TONE,
-  TELEMETRY_EVENT_LABEL,
+  telemetryEventLabels,
   TELEMETRY_EVENT_TONE,
   type Tone,
 } from '@viewmodel/core/i18n/labels';
-import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
+import { localizedHref, type Locale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import {
   PageNotFoundError,
@@ -149,7 +149,10 @@ function toManifestRow(item: CargoManifestItem, locale: Locale): ManifestRowData
 function toTelemetryRow(log: TelemetryLogItem, locale: Locale): TelemetryRowData {
   return {
     id: log.id,
-    event: { label: TELEMETRY_EVENT_LABEL[log.event], tone: TELEMETRY_EVENT_TONE[log.event] },
+    event: {
+      label: telemetryEventLabels(locale)[log.event],
+      tone: TELEMETRY_EVENT_TONE[log.event],
+    },
     description: log.description,
     timestamp: log.timestamp,
     formattedTimestamp: formatDateTime(log.timestamp, locale),
@@ -168,7 +171,7 @@ export async function createContainerDetailPageInput(
   request: PageRequest,
 ): Promise<ContainerDetailPageInput> {
   const account = await authorize(request, CONTAINER_DETAIL_PERMISSIONS);
-  const locale = resolveLocale(request.headers);
+  const locale = request.t();
   const t = containerDetailMessages(locale);
   const id = routeParam(request, 'id');
 
@@ -186,7 +189,7 @@ export async function createContainerDetailPageInput(
 
   return {
     meta: { title: `${t.title} — ${c.code}`, description: t.summary },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     facts: {
       id: c.id,
@@ -194,18 +197,18 @@ export async function createContainerDetailPageInput(
       canSeal: c.status === ContainerStatus.Empty || c.status === ContainerStatus.Loading,
       canDispatch: c.status === ContainerStatus.Sealed,
       statusBadge: {
-        label: CONTAINER_STATUS_LABEL[c.status],
+        label: containerStatusLabels(locale)[c.status],
         tone: CONTAINER_STATUS_TONE[c.status],
       },
       weight: formatWeight(c.current_weight, locale),
       capacity: formatWeight(c.max_capacity, locale),
       occupancy: formatPercent(occupancy, locale),
-      editHref: `/painel/conteineres/${c.id}/editar`,
+      editHref: localizedHref(`/painel/conteineres/${c.id}/editar`, locale),
     },
     manifest: summary.manifest.map((item) => toManifestRow(item, locale)),
     logs: summary.recent_logs.map((log) => toTelemetryRow(log, locale)),
     products: products.data.map((p) => ({ id: p.id, name: p.name })),
-    listHref: '/painel/conteineres',
+    listHref: request.href('/painel/conteineres'),
   };
 }
 

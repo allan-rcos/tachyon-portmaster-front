@@ -1,0 +1,130 @@
+@use '@ds/glass' as glass;
+@use '@ds/responsive' as rp;
+@use '@ds/ui' as ui;
+
+.scrim {
+  @include glass.overlay-veil;
+  @include rp.scrim-to-bottom;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  animation: fade 0.2s ease;
+}
+
+// 472px e 88vh vêm medidos do protótipo.
+.dialog {
+  @include glass.glass-l3;
+  @include rp.dialog-to-bottom-sheet;
+  z-index: var(--z-dialog);
+  width: 100%;
+  max-width: 29.5rem;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 30px 28px;
+  animation: pop 0.32s var(--ease-spring);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--glass-border-soft);
+  flex: 0 0 auto;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  flex: 0 0 auto;
+}
+
+.teal {
+  @include glass.glass-tint(rgba(45, 212, 191, 0.14), rgba(45, 212, 191, 0.28));
+  color: var(--teal-300);
+}
+.sage {
+  @include glass.glass-tint(rgba(163, 191, 145, 0.14), rgba(163, 191, 145, 0.28));
+  color: var(--sage-400);
+}
+.gold {
+  @include glass.glass-tint(rgba(245, 197, 66, 0.14), rgba(245, 197, 66, 0.28));
+  color: var(--gold-400);
+}
+.orange {
+  @include glass.glass-tint(rgba(240, 148, 74, 0.14), rgba(240, 148, 74, 0.28));
+  color: var(--orange-400);
+}
+
+.eyebrow {
+  margin: 0 0 3px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--fw-medium);
+  line-height: 1.1;
+}
+
+.close {
+  @include ui.icon-button;
+  @include ui.icon-button-sm;
+  @include rp.touch-target;
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+
+  &:hover {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  @include rp.mobile {
+    overflow-y: visible;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+}

@@ -76,6 +76,7 @@ describe('createAccountPageVM — troca de senha', () => {
     const vm = createAccountPageVM(input);
     vm.setPassword('current_password', 'antiga123');
     vm.setPassword('new_password', 'nova12345');
+    vm.setPassword('confirm_password', 'nova12345');
 
     await expect(vm.changePassword()).resolves.toBe(true);
     expect(mockedPassword).toHaveBeenCalledWith({
@@ -84,6 +85,7 @@ describe('createAccountPageVM — troca de senha', () => {
     });
     expect(vm.passwordValue('current_password')).toBe('');
     expect(vm.passwordValue('new_password')).toBe('');
+    expect(vm.passwordValue('confirm_password')).toBe('');
     expect(vm.passwordChanged()).toBe(true);
   });
 
@@ -102,6 +104,7 @@ describe('createAccountPageVM — troca de senha', () => {
     const vm = createAccountPageVM(input);
     vm.setPassword('current_password', 'errada');
     vm.setPassword('new_password', 'nova12345');
+    vm.setPassword('confirm_password', 'nova12345');
 
     await expect(vm.changePassword()).resolves.toBe(false);
     expect(vm.passwordFailed()).toBe(true);
@@ -112,6 +115,7 @@ describe('createAccountPageVM — troca de senha', () => {
     const vm = createAccountPageVM(input);
     vm.setPassword('current_password', 'antiga123');
     vm.setPassword('new_password', 'nova12345');
+    vm.setPassword('confirm_password', 'nova12345');
     await vm.changePassword();
     expect(vm.passwordChanged()).toBe(true);
 

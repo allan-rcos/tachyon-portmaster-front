@@ -12,19 +12,20 @@
     }
   ],
   "required": [
-    "account_title",
-    "account_subtitle",
-    "account_profile",
-    "account_roles",
-    "account_name",
-    "account_email",
-    "account_security",
-    "account_current_password",
-    "account_new_password",
     "account_change_password",
+    "account_confirm_password",
+    "account_current_password",
+    "account_email",
+    "account_eyebrow",
+    "account_name",
+    "account_new_password",
     "account_password_changed",
     "account_permissions_count",
-    "account_eyebrow"
+    "account_profile",
+    "account_roles",
+    "account_security",
+    "account_subtitle",
+    "account_title"
   ],
   "patternProperties": {
     "^account_": {

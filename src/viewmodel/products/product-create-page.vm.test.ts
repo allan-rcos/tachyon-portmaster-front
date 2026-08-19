@@ -6,9 +6,10 @@
 //  estado no ViewModel, validação e submissão são chamadas de função — e o que
 //  a island faz (desenhar e encaminhar) tem teste próprio na tela.
 // ============================================================
-import { RISK_CLASS_OPTIONS } from '@viewmodel/core/i18n/labels';
+import { riskClassOptions } from '@viewmodel/core/i18n/labels';
 import { productNewMessages } from '@viewmodel/products/i18n/product-create-page.messages';
 import { createProduct } from '@viewmodel/products/mutations/create-product.mutation';
+import { productListPageInput } from '@viewmodel/products/testing/product.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createProductCreateVM, type ProductCreatePageInput } from './product-create-page.vm';
@@ -23,7 +24,8 @@ const input: ProductCreatePageInput = {
   shell: { name: 'Ana', role: 'Administrador', initials: 'AF', href: '/painel/conta' },
   t,
   listHref: '/painel/produtos',
-  riskOptions: RISK_CLASS_OPTIONS,
+  riskOptions: riskClassOptions('pt-BR'),
+  background: productListPageInput(),
 };
 
 beforeEach(() => {

@@ -14,7 +14,6 @@
  */
 import { getProjectInfo } from '@model/system';
 import { resolveClient } from '@viewmodel/core/client/api-client';
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 
 import { systemInfoMessages, type SystemInfoText } from './i18n/system-info-page.messages';
@@ -148,7 +147,7 @@ async function readBackendPanel(
 export async function createSystemInfoPageInput(
   request: PageRequest,
 ): Promise<SystemInfoPageInput> {
-  const t = systemInfoMessages(resolveLocale(request.headers));
+  const t = request.t(systemInfoMessages);
   const info = readSystemInfo();
 
   return {

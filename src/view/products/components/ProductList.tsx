@@ -41,6 +41,12 @@ export function ProductList(props: ProductListProps): JSX.Element {
         eyebrow={props.vm.t.eyebrow}
         title={props.vm.t.title}
         subtitle={props.vm.t.subtitle}
+        search={{
+          name: 'search',
+          value: props.vm.search,
+          label: props.vm.t.search,
+          placeholder: `${props.vm.t.search} ${props.vm.t.name.toLowerCase()}`,
+        }}
         action={
           <Show when={props.vm.canCreate}>
             <a class={styles.newBtn} href={props.vm.newHref}>
@@ -58,13 +64,7 @@ export function ProductList(props: ProductListProps): JSX.Element {
         <RowList
           columns="54px 1fr 150px 230px 52px"
           mobile={{ columns: '1fr auto', areas: "'name action' 'risk risk' 'meta meta'" }}
-          headers={[
-            props.vm.t.id,
-            props.vm.t.name,
-            props.vm.t.density,
-            props.vm.t.riskClass,
-            '',
-          ]}
+          headers={[props.vm.t.id, props.vm.t.name, props.vm.t.density, props.vm.t.riskClass, '']}
           items={items()}
         >
           {(item) => <ProductRow item={item} editLabel={props.vm.t.edit} />}

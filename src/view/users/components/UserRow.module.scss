@@ -2,7 +2,6 @@
 @use '@ds/ui' as ui;
 
 .name {
-  grid-area: user;
   font-size: var(--text-sm);
   font-weight: var(--fw-medium);
   color: inherit;
@@ -13,28 +12,38 @@
   }
 
   @include rp.mobile {
+    grid-area: user;
     font-size: var(--text-base);
   }
 }
 
 .email {
-  grid-area: email;
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
   overflow-wrap: anywhere;
+
+  @include rp.mobile {
+    grid-area: email;
+  }
 }
 
 .roles {
-  grid-area: roles;
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+
+  @include rp.mobile {
+    grid-area: roles;
+  }
 }
 
 .action {
-  grid-area: action;
   text-align: right;
+
+  @include rp.mobile {
+    grid-area: action;
+  }
 }
 
 .edit {

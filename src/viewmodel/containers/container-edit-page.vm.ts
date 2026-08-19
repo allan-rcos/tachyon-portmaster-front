@@ -8,7 +8,6 @@
  *
  * @packageDocumentation
  */
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import {
   PageNotFoundError,
@@ -20,6 +19,10 @@ import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
 import { computed, signal } from 'alien-signals';
 import { z } from 'zod';
 
+import {
+  createContainerListPageInput,
+  type ContainerListPageInput,
+} from './container-list-page.vm';
 import { containerEditMessages, type ContainerEditText } from './i18n/container-edit-page.messages';
 import { updateContainer } from './mutations/update-container.mutation';
 import { getContainer } from './queries/get-container.query';
@@ -53,6 +56,14 @@ export interface ContainerEditPageInput {
   values: ContainerFormValues;
   /** Volta para a listagem — a View não monta rota. */
   listHref: string;
+  /**
+   * A listagem que fica ATRÁS do modal.
+   *
+   * A rota do formulário é a listagem com o modal aberto — mantivemos o
+   * endereço (deep-link, SSR e o guard de permissão que vive aqui) e mudamos
+   * só a apresentação. Ver `@viewmodel/products/product-create-page.vm`.
+   */
+  background: ContainerListPageInput;
 }
 
 /**
@@ -67,21 +78,23 @@ export async function createContainerEditPageInput(
   request: PageRequest,
 ): Promise<ContainerEditPageInput> {
   const account = await authorize(request, CONTAINER_EDIT_PERMISSIONS);
-  const t = containerEditMessages(resolveLocale(request.headers));
+  const t = request.t(containerEditMessages);
   const id = routeParam(request, 'id');
 
   const container = await getContainer(id, request.headers).catch(() => {
     throw new PageNotFoundError(`Contêiner não encontrado: ${id}`);
   });
 
+  const background = await createContainerListPageInput(request);
   return {
     meta: { title: `${t.edit} — ${container.code}`, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     id,
     code: container.code,
     values: { code: container.code, max_capacity: container.max_capacity },
-    listHref: '/painel/conteineres',
+    listHref: request.href('/painel/conteineres'),
+    background,
   };
 }
 

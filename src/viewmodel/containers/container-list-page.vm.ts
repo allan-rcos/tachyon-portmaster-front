@@ -18,11 +18,11 @@ import {
   type AsyncBoundaryText,
 } from '@viewmodel/core/i18n/async-boundary.messages';
 import {
-  CONTAINER_STATUS_LABEL,
+  containerStatusLabels,
   CONTAINER_STATUS_TONE,
   type Tone,
 } from '@viewmodel/core/i18n/labels';
-import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
+import { localizedHref, type Locale } from '@viewmodel/core/i18n/locale';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
@@ -133,13 +133,16 @@ function toRow(c: Container, locale: Locale): ContainerRowData {
   return {
     id: c.id,
     code: c.code,
-    status: { label: CONTAINER_STATUS_LABEL[c.status], tone: CONTAINER_STATUS_TONE[c.status] },
+    status: {
+      label: containerStatusLabels(locale)[c.status],
+      tone: CONTAINER_STATUS_TONE[c.status],
+    },
     weight: formatWeight(c.current_weight, locale),
     capacity: formatWeight(c.max_capacity, locale),
     occupancyValue: Math.min(value, 100),
     occupancy: formatPercent(value, locale),
-    detailHref: `/painel/conteineres/${c.id}`,
-    editHref: `/painel/conteineres/${c.id}/editar`,
+    detailHref: localizedHref(`/painel/conteineres/${c.id}`, locale),
+    editHref: localizedHref(`/painel/conteineres/${c.id}/editar`, locale),
   };
 }
 
@@ -148,13 +151,15 @@ function toRow(c: Container, locale: Locale): ContainerRowData {
  *
  * @param status Valor do filtro; vazio significa "todos".
  * @param search Termo de busca a preservar.
+ * @param locale Locale da requisição — trocar de aba não troca de idioma.
  */
-function statusHref(status: string, search: string): string {
+function statusHref(status: string, search: string, locale: Locale): string {
   const params = new URLSearchParams();
   if (search) params.set('search', search);
   if (status) params.set('status', status);
   const query = params.toString();
-  return query ? `/painel/conteineres?${query}` : '/painel/conteineres';
+  const path = query ? `/painel/conteineres?${query}` : '/painel/conteineres';
+  return localizedHref(path, locale);
 }
 
 /**
@@ -168,7 +173,7 @@ export async function createContainerListPageInput(
   request: PageRequest,
 ): Promise<ContainerListPageInput> {
   const account = await authorize(request, CONTAINER_LIST_PERMISSIONS);
-  const locale = resolveLocale(request.headers);
+  const locale = request.t();
   const t = containersListMessages(locale);
   const params = searchParams(request);
   const filters: ContainerListFilters = {
@@ -179,7 +184,7 @@ export async function createContainerListPageInput(
 
   return {
     meta: { title: t.title, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     boundary: asyncBoundaryMessages(locale),
     items: page.data.map((c) => toRow(c, locale)),
@@ -189,16 +194,16 @@ export async function createContainerListPageInput(
       { value: '', label: t.allStatuses },
       ...Object.values(ContainerStatus).map((s) => ({
         value: s,
-        label: CONTAINER_STATUS_LABEL[s],
+        label: containerStatusLabels(locale)[s],
       })),
     ].map(({ value, label }) => ({
       value,
       label,
       selected: filters.status === value,
-      href: statusHref(value, filters.search),
+      href: statusHref(value, filters.search, request.t()),
     })),
     canCreate: can(account, CONTAINER_CREATE_PERMISSIONS),
-    newHref: '/painel/conteineres/nova',
+    newHref: request.href('/painel/conteineres/nova'),
     locale,
   };
 }

@@ -35,3 +35,16 @@ export const setup = (c: ApiClient, body: SetupRequest): Promise<LoginResponse> 
     encode: encSetup,
     decode: decLoginResponse,
   });
+
+/**
+ * POST /v1/auth/logout — invalida a sessão no backend.
+ *
+ * Não requer corpo e não devolve nada: a resposta traz `Set-Cookie` expirado
+ * (Max-Age=0) para `auth_token` e `refresh_token`. É o ÚNICO jeito de encerrar
+ * a sessão — os dois cookies são HttpOnly, então nenhum `document.cookie` do
+ * cliente os alcança.
+ *
+ * @param c Cliente HTTP configurado.
+ */
+export const logout = (c: ApiClient): Promise<null> =>
+  wire(c, { method: 'POST', path: '/v1/auth/logout' });

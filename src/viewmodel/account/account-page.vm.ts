@@ -12,7 +12,6 @@
  *
  * @packageDocumentation
  */
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
@@ -65,12 +64,12 @@ export interface AccountPageInput {
  */
 export async function createAccountPageInput(request: PageRequest): Promise<AccountPageInput> {
   const account = await authorize(request);
-  const { permissionsCount, ...t } = accountMessages(resolveLocale(request.headers));
+  const { permissionsCount, ...t } = request.t(accountMessages);
   const profile = await getAccount(request.headers);
 
   return {
     meta: { title: t.title, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     identity: { name: profile.name, email: profile.email },
     roles: profile.roles.map((role) => ({
@@ -82,7 +81,11 @@ export async function createAccountPageInput(request: PageRequest): Promise<Acco
 }
 
 const ALL_PROFILE_FIELDS: readonly ProfileField[] = ['name', 'email'];
-const ALL_PASSWORD_FIELDS: readonly PasswordField[] = ['current_password', 'new_password'];
+const ALL_PASSWORD_FIELDS: readonly PasswordField[] = [
+  'current_password',
+  'new_password',
+  'confirm_password',
+];
 
 /**
  * Superfície da conta.
@@ -115,7 +118,7 @@ export function createAccountPageVM(input: AccountPageInput): AccountPageVM {
   });
 
   const passwordSchema = createPasswordChangeSchema(input.t);
-  const password = signal({ current_password: '', new_password: '' });
+  const password = signal({ current_password: '', new_password: '', confirm_password: '' });
   const passwordTouched = signal<ReadonlySet<PasswordField>>(new Set());
   const changingPassword = signal(false);
   const passwordFailed = signal(false);
@@ -181,9 +184,12 @@ export function createAccountPageVM(input: AccountPageInput): AccountPageVM {
       changingPassword(true);
       passwordFailed(false);
       try {
-        await changeAccountPassword(result.data);
+        await changeAccountPassword({
+          current_password: result.data.current_password,
+          new_password: result.data.new_password,
+        });
         // Limpar os campos é o que a island fazia com `form.reset()`.
-        password({ current_password: '', new_password: '' });
+        password({ current_password: '', new_password: '', confirm_password: '' });
         passwordTouched(new Set());
         passwordChanged(true);
         return true;

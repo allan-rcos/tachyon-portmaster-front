@@ -7,6 +7,8 @@
   gap: var(--space-5);
   padding: var(--space-6) var(--space-4);
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
   border-radius: var(--radius-lg);
 }
 
@@ -19,6 +21,10 @@
 
 .nav {
   flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  // A rolagem para no fim da lista em vez de continuar no conteúdo ao lado.
+  overscroll-behavior: contain;
 }
 
 .list {

@@ -17,7 +17,7 @@
  *
  * @packageDocumentation
  */
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import { localizedHref, type Locale } from '@viewmodel/core/i18n/locale';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 import { computed, signal } from 'alien-signals';
 import { z } from 'zod';
@@ -58,11 +58,14 @@ export interface LoginPageData {
  * Só aceita caminho absoluto interno — um `//evil.com` ou `https://…` viraria
  * redirect aberto.
  *
- * @param url URL da requisição.
+ * @param url    URL da requisição.
+ * @param locale Locale da requisição, para o destino padrão.
  */
-function resolveRedirect(url: string): string {
+function resolveRedirect(url: string, locale: Locale): string {
   const target = new URL(url, 'http://localhost').searchParams.get('redirect');
-  if (!target || !target.startsWith('/') || target.startsWith('//')) return '/painel';
+  if (!target || !target.startsWith('/') || target.startsWith('//')) {
+    return localizedHref('/painel', locale);
+  }
   return target;
 }
 
@@ -72,11 +75,11 @@ function resolveRedirect(url: string): string {
  * @param request Requisição de página, adaptada do roteador.
  */
 export async function loadLoginPage(request: PageRequest): Promise<LoginPageData> {
-  const t = loginMessages(resolveLocale(request.headers));
+  const t = request.t(loginMessages);
   return {
     t,
     meta: { title: t.title, description: t.subtitle },
-    redirectTo: resolveRedirect(request.url),
+    redirectTo: resolveRedirect(request.url, request.t()),
   };
 }
 

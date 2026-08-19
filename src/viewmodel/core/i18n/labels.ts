@@ -1,5 +1,13 @@
 /**
- * Rótulos pt-BR e "tom" (cor de badge) dos enums do domínio.
+ * Rótulos e "tom" (cor de badge) dos enums do domínio.
+ *
+ * Os rótulos eram tabelas pt-BR fixas, o que passou despercebido enquanto o
+ * idioma vinha de um cookie que ninguém escrevia — na prática o app era só
+ * português. Com o idioma no endereço, `/en/painel/conteineres` mostrava
+ * "Carregando" e "Classe 3 — Líquidos inflamáveis" no meio de uma tela em
+ * inglês. Viraram FUNÇÕES do locale, como `commonText`.
+ *
+ * Os TONS continuam constantes: cor de badge não é texto, não traduz.
  *
  * @packageDocumentation
  */
@@ -9,15 +17,26 @@ import {
   type TelemetryEvent,
   type Permission,
 } from '@model/common';
+import type { Locale } from '@viewmodel/core/i18n/locale';
 import type { OptionGroup, SelectOption } from '@viewmodel/core/page/options';
+
+import { labelsText } from './labels.messages';
 
 export type Tone = 'gold' | 'sage' | 'teal' | 'orange' | 'danger' | 'neutral';
 
-export const CONTAINER_STATUS_LABEL: Record<ContainerStatus, string> = {
-  Empty: 'Vazio',
-  Loading: 'Carregando',
-  Sealed: 'Lacrado',
-  InTransit: 'Em trânsito',
+/**
+ * Rótulo de cada status de contêiner, no locale dado.
+ *
+ * @param locale Locale já resolvido pelo contexto.
+ */
+export const containerStatusLabels = (locale: Locale): Record<ContainerStatus, string> => {
+  const L = labelsText(locale);
+  return {
+    Empty: L.status_empty,
+    Loading: L.status_loading,
+    Sealed: L.status_sealed,
+    InTransit: L.status_in_transit,
+  };
 };
 
 export const CONTAINER_STATUS_TONE: Record<ContainerStatus, Tone> = {
@@ -27,17 +46,25 @@ export const CONTAINER_STATUS_TONE: Record<ContainerStatus, Tone> = {
   InTransit: 'teal',
 };
 
-export const RISK_CLASS_LABEL: Record<RiskClass, string> = {
-  Class1Explosives: 'Classe 1 — Explosivos',
-  Class2Gases: 'Classe 2 — Gases',
-  Class3FlammableLiquids: 'Classe 3 — Líquidos inflamáveis',
-  Class4FlammableSolids: 'Classe 4 — Sólidos inflamáveis',
-  Class5OxidizingSubstances: 'Classe 5 — Oxidantes',
-  Class6ToxicSubstances: 'Classe 6 — Tóxicos',
-  Class7RadioactiveMaterials: 'Classe 7 — Radioativos',
-  Class8CorrosiveSubstances: 'Classe 8 — Corrosivos',
-  Class9Miscellaneous: 'Classe 9 — Diversos',
-  None: 'Sem risco',
+/**
+ * Rótulo de cada classe de risco IMDG, no locale dado.
+ *
+ * @param locale Locale já resolvido pelo contexto.
+ */
+export const riskClassLabels = (locale: Locale): Record<RiskClass, string> => {
+  const L = labelsText(locale);
+  return {
+    Class1Explosives: L.risk_class1,
+    Class2Gases: L.risk_class2,
+    Class3FlammableLiquids: L.risk_class3,
+    Class4FlammableSolids: L.risk_class4,
+    Class5OxidizingSubstances: L.risk_class5,
+    Class6ToxicSubstances: L.risk_class6,
+    Class7RadioactiveMaterials: L.risk_class7,
+    Class8CorrosiveSubstances: L.risk_class8,
+    Class9Miscellaneous: L.risk_class9,
+    None: L.risk_none,
+  };
 };
 
 export const RISK_CLASS_TONE: Record<RiskClass, Tone> = {
@@ -53,9 +80,17 @@ export const RISK_CLASS_TONE: Record<RiskClass, Tone> = {
   None: 'sage',
 };
 
-export const TELEMETRY_EVENT_LABEL: Record<TelemetryEvent, string> = {
-  load: 'Carga',
-  unload: 'Descarga',
+/**
+ * Rótulo de cada evento de telemetria, no locale dado.
+ *
+ * @param locale Locale já resolvido pelo contexto.
+ */
+export const telemetryEventLabels = (locale: Locale): Record<TelemetryEvent, string> => {
+  const L = labelsText(locale);
+  return {
+    load: L.event_load,
+    unload: L.event_unload,
+  };
 };
 
 export const TELEMETRY_EVENT_TONE: Record<TelemetryEvent, Tone> = {
@@ -64,51 +99,63 @@ export const TELEMETRY_EVENT_TONE: Record<TelemetryEvent, Tone> = {
 };
 
 /**
- * Rótulo pt-BR de cada slug de permissão conhecido.
+ * Rótulo de cada slug de permissão conhecido, no locale dado.
  *
  * `Record<string, ...>` e não `Record<Permission, ...>`: o catálogo é do
  * servidor, então esta tabela é PRESENTACIONAL e parcial por natureza — traduz o
  * que conhece e não pretende ser a lista do que existe. Um slug novo aparece na
  * matriz assim que o backend o registra, com o fallback de
  * {@link permissionLabel}; ninguém precisa mexer aqui para a tela não quebrar.
+ *
+ * @param locale Locale já resolvido pelo contexto.
  */
-export const PERMISSION_LABEL: Record<string, string> = {
-  'product:read': 'Ver produtos',
-  'product:create': 'Criar produtos',
-  'product:update': 'Editar produtos',
-  'product:delete': 'Excluir produtos',
-  'container:read': 'Ver contêineres',
-  'container:create': 'Criar contêineres',
-  'container:update': 'Editar contêineres',
-  'container:delete': 'Excluir contêineres',
-  'container:seal': 'Lacrar contêineres',
-  'container:dispatch': 'Despachar contêineres',
-  'container:summary': 'Ver resumo de contêineres',
-  'manifest:load': 'Carregar manifesto',
-  'manifest:unload': 'Descarregar manifesto',
-  'user:get': 'Ver usuário',
-  'user:list': 'Listar usuários',
-  'user:create': 'Criar usuários',
-  'user:update': 'Editar usuários',
-  'user:delete': 'Excluir usuários',
-  'user:change-password': 'Alterar senha de usuários',
-  'user:update-roles': 'Atribuir perfis',
-  'role:list': 'Listar perfis',
-  'role:create': 'Criar perfis',
-  'role:update-permissions': 'Editar permissões',
-  'permission:list': 'Listar permissões',
-  'metrics:read': 'Ver métricas',
+const permissionLabels = (locale: Locale): Record<string, string> => {
+  const L = labelsText(locale);
+  return {
+    'product:read': L.perm_product_read,
+    'product:create': L.perm_product_create,
+    'product:update': L.perm_product_update,
+    'product:delete': L.perm_product_delete,
+    'container:read': L.perm_container_read,
+    'container:create': L.perm_container_create,
+    'container:update': L.perm_container_update,
+    'container:delete': L.perm_container_delete,
+    'container:seal': L.perm_container_seal,
+    'container:dispatch': L.perm_container_dispatch,
+    'container:summary': L.perm_container_summary,
+    'manifest:load': L.perm_manifest_load,
+    'manifest:unload': L.perm_manifest_unload,
+    'user:get': L.perm_user_get,
+    'user:list': L.perm_user_list,
+    'user:create': L.perm_user_create,
+    'user:update': L.perm_user_update,
+    'user:delete': L.perm_user_delete,
+    'user:change-password': L.perm_user_change_password,
+    'user:update-roles': L.perm_user_update_roles,
+    'role:list': L.perm_role_list,
+    'role:create': L.perm_role_create,
+    'role:update-permissions': L.perm_role_update_permissions,
+    'permission:list': L.perm_permission_list,
+    'metrics:read': L.perm_metrics_read,
+  };
 };
 
-/** Rótulo pt-BR do recurso à esquerda do `:`, para agrupar a matriz. */
-const PERMISSION_RESOURCE_LABEL: Record<string, string> = {
-  product: 'Produtos',
-  container: 'Contêineres',
-  manifest: 'Manifesto',
-  user: 'Usuários',
-  role: 'Perfis',
-  permission: 'Permissões',
-  metrics: 'Métricas',
+/**
+ * Rótulo do recurso à esquerda do `:`, para agrupar a matriz.
+ *
+ * @param locale Locale já resolvido pelo contexto.
+ */
+const permissionResourceLabels = (locale: Locale): Record<string, string> => {
+  const L = labelsText(locale);
+  return {
+    product: L.res_product,
+    container: L.res_container,
+    manifest: L.res_manifest,
+    user: L.res_user,
+    role: L.res_role,
+    permission: L.res_permission,
+    metrics: L.res_metrics,
+  };
 };
 
 /**
@@ -118,19 +165,24 @@ const PERMISSION_RESOURCE_LABEL: Record<string, string> = {
  * caixa aparecer sem texto — ou nem aparecer — só porque o backend registrou uma
  * permissão que este arquivo ainda não traduz.
  *
- * @param slug Slug vindo do catálogo.
+ * @param slug   Slug vindo do catálogo.
+ * @param locale Locale já resolvido pelo contexto.
  */
-export const permissionLabel = (slug: Permission): string => PERMISSION_LABEL[slug] ?? slug;
+export const permissionLabel = (slug: Permission, locale: Locale): string =>
+  permissionLabels(locale)[slug] ?? slug;
 
 /**
  * Opções do seletor de classe de risco, na ordem do enum.
  *
  * A View recebe pares `{ value, label }` em vez do enum: quem garante que o
  * valor escolhido é uma `RiskClass` é o schema do formulário, na submissão.
+ *
+ * @param locale Locale já resolvido pelo contexto.
  */
-export const RISK_CLASS_OPTIONS: readonly SelectOption[] = Object.values(RiskClass).map(
-  (value) => ({ value, label: RISK_CLASS_LABEL[value] }),
-);
+export const riskClassOptions = (locale: Locale): readonly SelectOption[] => {
+  const labels = riskClassLabels(locale);
+  return Object.values(RiskClass).map((value) => ({ value, label: labels[value] }));
+};
 
 /**
  * A matriz de permissões como dado de apresentação, pronta para o `PageInput`.
@@ -150,21 +202,27 @@ export const RISK_CLASS_OPTIONS: readonly SelectOption[] = Object.values(RiskCla
  * valores opacos; quem cobra que sejam slugs válidos é o backend, na submissão.
  *
  * @param catalog Slugs registrados, na ordem em que o backend os devolveu.
+ * @param locale  Locale já resolvido pelo contexto.
  */
-export function permissionOptionGroups(catalog: readonly Permission[]): readonly OptionGroup[] {
+export function permissionOptionGroups(
+  catalog: readonly Permission[],
+  locale: Locale,
+): readonly OptionGroup[] {
+  const resources = permissionResourceLabels(locale);
+  const labels = permissionLabels(locale);
   const byResource = new Map<string, SelectOption[]>();
-  for (const resource of Object.keys(PERMISSION_RESOURCE_LABEL)) byResource.set(resource, []);
+  for (const resource of Object.keys(resources)) byResource.set(resource, []);
 
   for (const slug of catalog) {
     const resource = slug.split(':')[0] ?? slug;
     const options = byResource.get(resource) ?? byResource.set(resource, []).get(resource)!;
-    options.push({ value: slug, label: permissionLabel(slug) });
+    options.push({ value: slug, label: labels[slug] ?? slug });
   }
 
   return [...byResource.entries()]
     .filter(([, options]) => options.length > 0)
     .map(([resource, options]) => ({
-      label: PERMISSION_RESOURCE_LABEL[resource] ?? resource,
+      label: resources[resource] ?? resource,
       options,
     }));
 }

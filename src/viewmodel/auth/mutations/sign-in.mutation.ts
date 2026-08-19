@@ -1,21 +1,27 @@
 /**
- * Autenticação. A mutation não devolve o token cru para a View: ela já o
- * persiste no cookie de sessão, porque "onde a credencial é guardada" é
- * decisão do ViewModel, não da interface. A View só reage ao sucesso.
+ * Autenticação. Quem guarda a credencial é o backend, não esta camada: o
+ * `POST /v1/auth/login` responde com `Set-Cookie` de `auth_token` e
+ * `refresh_token`, ambos HttpOnly. A View só reage ao sucesso.
  *
  * @packageDocumentation
  */
 import { login } from '@model/auth';
 import type { LoginFormData } from '@viewmodel/auth/schemas/login.schema';
 import { browserClient } from '@viewmodel/core/client/api-client';
-import { setCookie } from '@viewmodel/core/utils/cookies';
 
 /**
- * Autentica o usuário e grava o cookie `auth_token` da sessão.
+ * Autentica o usuário.
+ *
+ * Não grava cookie nenhum. Havia aqui um `setCookie('auth_token', res.token)`
+ * a partir do `token` do corpo — que o contrato mantém só por
+ * compatibilidade — e ele não podia funcionar: o navegador ignora uma escrita
+ * via `document.cookie` sobre um nome que já existe como HttpOnly, então o
+ * melhor caso era um no-op e o pior era uma cópia não-HttpOnly do JWT
+ * sombreando a sessão real. O `credentials: 'include'` do `browserClient` é o
+ * que faz o cookie do backend ser aceito e reenviado.
  *
  * @param input Credenciais já validadas pelo schema de login.
  */
 export async function signIn(input: LoginFormData): Promise<void> {
-  const res = await login(browserClient, input);
-  setCookie('auth_token', res.token);
+  await login(browserClient, input);
 }

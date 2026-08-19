@@ -6,6 +6,7 @@
 // ============================================================
 import { userNewMessages } from '@viewmodel/users/i18n/user-create-page.messages';
 import { createUser } from '@viewmodel/users/mutations/create-user.mutation';
+import { userListPageInput } from '@viewmodel/users/testing/user.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createUserCreateVM, type UserCreatePageInput } from './user-create-page.vm';
@@ -24,6 +25,7 @@ const input: UserCreatePageInput = {
     { id: 'rol_op', name: 'Operador' },
   ],
   listHref: '/painel/usuarios',
+  background: userListPageInput(),
 };
 
 beforeEach(() => {

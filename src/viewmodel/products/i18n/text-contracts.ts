@@ -29,6 +29,8 @@ export interface ProductListText {
   actions: string;
   edit: string;
   empty: string;
+  /** Rótulo do campo de busca — vem do `commonText`. */
+  search: string;
   /** Rótulo do botão que traz a próxima página do cursor. */
   loadMore: string;
 }
@@ -45,4 +47,6 @@ export interface ProductFormText extends ProductSchemaText {
   cancel: string;
   delete: string;
   deleteConfirm: string;
+  /** Rótulo acessível do "fechar" do modal — vem do `commonText`. */
+  close: string;
 }

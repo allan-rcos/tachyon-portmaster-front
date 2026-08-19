@@ -11,14 +11,19 @@ import styles from './Navbar.module.scss';
  * O seletor de tema saiu junto com o tema claro — o produto é escuro, não há o
  * que alternar.
  */
-export function Navbar(): JSX.Element {
+export interface NavbarProps {
+  /** Destino da marca, já montado pelo `shellNav`. */
+  homeHref: string;
+}
+
+export function Navbar(props: NavbarProps): JSX.Element {
   return (
     <header class={styles.header}>
       <div class={styles.left}>
         <ClientOnly fallback={<span />}>
           <SidebarDrawer />
         </ClientOnly>
-        <a class={styles.brandMobile} href="/painel" aria-label="PortMaster — início">
+        <a class={styles.brandMobile} href={props.homeHref} aria-label="PortMaster — início">
           <Brand compact />
         </a>
       </div>

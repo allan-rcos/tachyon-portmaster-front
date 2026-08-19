@@ -1,29 +1,40 @@
+import { ContainerList } from '@view/containers/components/ContainerList';
 import { ContainerForm } from '@view/containers/islands/ContainerForm.island';
-import { Breadcrumbs } from '@view/core/components/Breadcrumbs';
-import { PageHeader } from '@view/core/components/PageHeader';
+import { RouteModal } from '@view/core/islands/RouteModal.island';
 import type { ContainerEditVM } from '@viewmodel/containers/container-edit-page.vm';
+import type { ContainerListVM } from '@viewmodel/containers/container-list-page.vm';
 import type { JSX } from 'solid-js';
 
 /** Props da tela de edição de contêiner. */
 export interface ContainerEditScreenProps {
-  /** ViewModel da rota, construído no `+Page`. */
+  /** ViewModel do formulário. */
   vm: ContainerEditVM;
+  /** ViewModel da listagem que fica atrás do modal. */
+  list: ContainerListVM;
 }
 
 /**
- * Tela de edição de contêiner (capacidade máxima). Stateless: o contêiner já
- * veio resolvido pelo `+data`.
+ * Edição de contêiner (capacidade máxima) — modal sobre o pátio.
  *
- * @param props.vm ViewModel da rota.
+ * O título é o código do contêiner, que é como o pátio o identifica.
+ *
+ * @param props.vm   ViewModel do formulário.
+ * @param props.list ViewModel da listagem de fundo.
  */
 export function ContainerEditScreen(props: ContainerEditScreenProps): JSX.Element {
   return (
-    <section>
-      <Breadcrumbs
-        items={[{ label: props.vm.t.title, href: props.vm.listHref }, { label: props.vm.code }]}
-      />
-      <PageHeader title={`${props.vm.t.edit} — ${props.vm.code}`} />
-      <ContainerForm vm={props.vm} />
-    </section>
+    <>
+      <ContainerList vm={props.list} />
+      <RouteModal
+        eyebrow={props.list.t.eyebrow}
+        title={props.vm.code}
+        icon="container"
+        tint="teal"
+        closeHref={props.vm.listHref}
+        closeLabel={props.vm.t.close}
+      >
+        <ContainerForm vm={props.vm} />
+      </RouteModal>
+    </>
   );
 }

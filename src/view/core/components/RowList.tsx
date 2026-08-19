@@ -45,13 +45,7 @@ export function RowList<T>(props: RowListProps<T>): JSX.Element {
           <For each={props.headers}>{(label) => <span>{label}</span>}</For>
         </div>
       </Show>
-      <For each={props.items}>
-        {(item) => (
-          <div class={styles.row}>
-            {props.children(item)}
-          </div>
-        )}
-      </For>
+      <For each={props.items}>{(item) => <div class={styles.row}>{props.children(item)}</div>}</For>
     </div>
   );
 }

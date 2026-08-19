@@ -35,6 +35,8 @@ export interface UserFormText extends UserSchemaText {
   create: string;
   save: string;
   cancel: string;
+  /** Rótulo acessível do "fechar" do modal — vem do `commonText`. */
+  close: string;
 }
 
 /** Chaves de texto das ações administrativas (reset de senha e exclusão). */

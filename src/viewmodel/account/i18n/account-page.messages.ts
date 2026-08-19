@@ -23,6 +23,7 @@ export type AccountPageText = CommonText &
     security: string;
     currentPassword: string;
     newPassword: string;
+    confirmPassword: string;
     changePassword: string;
     passwordChanged: string;
     /**
@@ -49,6 +50,7 @@ export const accountMessages = (locale: Locale): AccountPageText => ({
   security: m.account_security({}, { locale }),
   currentPassword: m.account_current_password({}, { locale }),
   newPassword: m.account_new_password({}, { locale }),
+  confirmPassword: m.account_confirm_password({}, { locale }),
   changePassword: m.account_change_password({}, { locale }),
   passwordChanged: m.account_password_changed({}, { locale }),
   permissionsCount: (count: number) => m.account_permissions_count({ count }, { locale }),

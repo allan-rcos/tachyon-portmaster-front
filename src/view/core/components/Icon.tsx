@@ -32,7 +32,10 @@ export type IconName =
   | 'mail'
   | 'menu'
   | 'rotate'
-  | 'flask';
+  | 'flask'
+  | 'clipboard'
+  | 'bell'
+  | 'globe';
 
 const PATHS: Record<IconName, JSX.Element> = {
   painel: (
@@ -186,6 +189,30 @@ const PATHS: Record<IconName, JSX.Element> = {
       <path d="M10 2v7.5L4.3 19.4A1 1 0 0 0 5.2 21h13.6a1 1 0 0 0 .9-1.6L14 9.5V2" />
       <path d="M8.5 2h7" />
       <path d="M7 16h10" />
+    </>
+  ),
+  // `clipboard-list` do protótipo: a prancheta dos manifestos de carga.
+  clipboard: (
+    <>
+      <rect x="8" y="2" width="8" height="4" rx="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="M12 11h4" />
+      <path d="M12 16h4" />
+      <path d="M8 11h.01" />
+      <path d="M8 16h.01" />
+    </>
+  ),
+  bell: (
+    <>
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+    </>
+  ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a15.3 15.3 0 0 0 0 20a15.3 15.3 0 0 0 0-20" />
+      <path d="M2 12h20" />
     </>
   ),
 };

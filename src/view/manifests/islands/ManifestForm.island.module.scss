@@ -1,0 +1,131 @@
+@use '@ds/glass' as glass;
+@use '@ds/responsive' as rp;
+@use '@ds/ui' as ui;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.desc {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+// As abas do protótipo: uma trilha de vidro com a ativa em relevo.
+.tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-md);
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border-soft);
+  align-self: flex-start;
+
+  @include rp.mobile {
+    align-self: stretch;
+  }
+}
+
+.tab {
+  @include ui.button-base;
+  @include ui.button-sm;
+  @include rp.touch-target;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  @include rp.mobile {
+    flex: 1 1 0;
+  }
+}
+
+.active {
+  background: var(--glass-fill-strong);
+  border-color: var(--glass-border);
+  color: var(--color-text-primary);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.input {
+  @include ui.input;
+  width: 100%;
+}
+
+.invalid {
+  border-color: var(--red-400);
+}
+
+.empty {
+  margin: calc(var(--space-3) * -1) 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+// O previsor de peso — vidro fraco, número em mono, como no protótipo.
+.preview {
+  @include glass.glass-inset;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 14px 16px;
+}
+
+.previewLabel {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.previewValue {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  color: var(--gold-300);
+}
+
+.error {
+  margin: 0;
+  color: var(--red-400);
+  font-size: var(--text-sm);
+}
+
+.done {
+  margin: 0;
+  color: var(--sage-400);
+  font-size: var(--text-sm);
+}
+
+.submit {
+  @include ui.button-primary;
+  @include rp.touch-target;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  @include rp.mobile {
+    align-self: stretch;
+    justify-content: center;
+  }
+}
+
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

@@ -11,6 +11,7 @@
 //  `createXPageInput` direto, sem levantar Vike nenhum, porque o que ele produz
 //  é um erro de domínio e não uma resposta HTTP.
 // ============================================================
+import { localeFromUrl, localizedHref } from '@viewmodel/core/i18n/locale';
 import { ForbiddenError, UnauthorizedError } from '@viewmodel/core/page/page-errors';
 import { PageNotFoundError, toPageRequest } from '@viewmodel/core/page/page-request';
 import type { PageRequest } from '@viewmodel/core/page/page-request';
@@ -33,7 +34,9 @@ export async function toPageInput<T>(
     return await load(toPageRequest(pageContext));
   } catch (error) {
     if (error instanceof UnauthorizedError) {
-      throw redirect(`/entrar?redirect=${encodeURIComponent(pageContext.urlPathname)}`);
+      const locale = localeFromUrl(pageContext.urlOriginal);
+      const back = encodeURIComponent(pageContext.urlOriginal);
+      throw redirect(`${localizedHref('/entrar', locale)}?redirect=${back}`);
     }
     if (error instanceof ForbiddenError) throw render(403);
     if (error instanceof PageNotFoundError) throw render(404);

@@ -7,6 +7,7 @@ import { userEditMessages } from '@viewmodel/users/i18n/user-edit-page.messages'
 import { deleteUser } from '@viewmodel/users/mutations/delete-user.mutation';
 import { resetUserPassword } from '@viewmodel/users/mutations/reset-user-password.mutation';
 import { updateUser } from '@viewmodel/users/mutations/update-user.mutation';
+import { userListPageInput } from '@viewmodel/users/testing/user.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createUserEditVM, type UserEditPageInput } from './user-edit-page.vm';
@@ -32,6 +33,7 @@ const input: UserEditPageInput = {
     { id: 'rol_op', name: 'Operador' },
   ],
   listHref: '/painel/usuarios',
+  background: userListPageInput(),
 };
 
 beforeEach(() => {

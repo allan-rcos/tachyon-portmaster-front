@@ -1,5 +1,8 @@
 import { RolePermissionsScreen } from '@view/roles/screens/RolePermissionsScreen';
-import { createRolePermissionsVM, type RolePermissionsPageInput } from '@viewmodel/roles/role-permissions-page.vm';
+import {
+  createRolePermissionsVM,
+  type RolePermissionsPageInput,
+} from '@viewmodel/roles/role-permissions-page.vm';
 import type { JSX } from 'solid-js';
 import { useData } from 'vike-solid/useData';
 

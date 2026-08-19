@@ -8,7 +8,6 @@
  * @packageDocumentation
  */
 import { permissionOptionGroups } from '@viewmodel/core/i18n/labels';
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { OptionGroup } from '@viewmodel/core/page/options';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
@@ -19,6 +18,7 @@ import { z } from 'zod';
 import { roleNewMessages, type RoleNewText } from './i18n/role-create-page.messages';
 import { createRole } from './mutations/create-role.mutation';
 import { listPermissions } from './queries/list-permissions.query';
+import { createRoleListPageInput, type RoleListPageInput } from './role-list-page.vm';
 import { createRoleSchema } from './schemas/role.schema';
 import type { RoleFormVM } from './vm-contracts';
 
@@ -42,6 +42,14 @@ export interface RoleCreatePageInput {
   listHref: string;
   /** A matriz de permissões, com os rótulos já resolvidos. */
   permissionGroups: readonly OptionGroup[];
+  /**
+   * A listagem que fica ATRÁS do modal.
+   *
+   * A rota do formulário é a listagem com o modal aberto — mantivemos o
+   * endereço (deep-link, SSR e o guard de permissão que vive aqui) e mudamos
+   * só a apresentação. Ver `@viewmodel/products/product-create-page.vm`.
+   */
+  background: RoleListPageInput;
 }
 
 /**
@@ -58,15 +66,17 @@ export async function createRoleCreatePageInput(
   request: PageRequest,
 ): Promise<RoleCreatePageInput> {
   const account = await authorize(request, ROLE_CREATE_PERMISSIONS);
-  const t = roleNewMessages(resolveLocale(request.headers));
+  const t = request.t(roleNewMessages);
   const catalog = await listPermissions(request.headers);
 
+  const background = await createRoleListPageInput(request);
   return {
     meta: { title: t.new, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
-    listHref: '/painel/perfis',
-    permissionGroups: permissionOptionGroups(catalog),
+    listHref: request.href('/painel/perfis'),
+    background,
+    permissionGroups: permissionOptionGroups(catalog, request.t()),
   };
 }
 

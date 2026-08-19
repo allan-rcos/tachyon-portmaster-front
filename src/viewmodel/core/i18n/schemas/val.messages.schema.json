@@ -4,27 +4,31 @@
   "title": "Fragmento i18n: mensagens de validação (valText)",
   "type": "object",
   "required": [
-    "val_name_short",
-    "val_name_long",
-    "val_email_required",
-    "val_email_invalid",
-    "val_password_required",
-    "val_password_min",
-    "val_current_password_required",
-    "val_roles_required",
-    "val_permissions_required",
-    "val_code_short",
-    "val_code_long",
-    "val_code_format",
-    "val_capacity_positive",
     "val_capacity_format",
-    "val_density_positive",
+    "val_capacity_positive",
+    "val_code_format",
+    "val_code_long",
+    "val_code_short",
+    "val_current_password_required",
     "val_density_format",
-    "val_quantity_positive",
+    "val_density_positive",
+    "val_email_invalid",
+    "val_email_required",
+    "val_name_long",
+    "val_name_short",
+    "val_password_min",
+    "val_password_mismatch",
+    "val_password_required",
+    "val_permissions_required",
+    "val_product_required",
     "val_quantity_format",
-    "val_product_required"
+    "val_quantity_positive",
+    "val_roles_required"
   ],
   "patternProperties": {
-    "^val_": { "type": "string", "minLength": 1 }
+    "^val_": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

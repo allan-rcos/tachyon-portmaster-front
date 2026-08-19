@@ -21,7 +21,8 @@
     "common_previous",
     "common_next",
     "common_load_more",
-    "common_id"
+    "common_id",
+    "common_close"
   ],
   "patternProperties": {
     "^common_": {

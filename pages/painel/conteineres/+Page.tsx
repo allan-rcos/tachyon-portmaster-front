@@ -1,5 +1,8 @@
 import { ContainerListScreen } from '@view/containers/screens/ContainerListScreen';
-import { createContainerListVM, type ContainerListPageInput } from '@viewmodel/containers/container-list-page.vm';
+import {
+  createContainerListVM,
+  type ContainerListPageInput,
+} from '@viewmodel/containers/container-list-page.vm';
 import type { JSX } from 'solid-js';
 import { useData } from 'vike-solid/useData';
 

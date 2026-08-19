@@ -12,7 +12,7 @@ import {
   asyncBoundaryMessages,
   type AsyncBoundaryText,
 } from '@viewmodel/core/i18n/async-boundary.messages';
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import { localizedHref, type Locale } from '@viewmodel/core/i18n/locale';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
@@ -65,6 +65,8 @@ export interface UserListPageInput {
   nextPage?: number;
   /** Permissão de criação, já avaliada. */
   canCreate: boolean;
+  /** Locale resolvido, para formatar as páginas seguintes igual à primeira. */
+  locale: Locale;
   /** Destino do botão "novo usuário". */
   newHref: string;
 }
@@ -72,15 +74,16 @@ export interface UserListPageInput {
 /**
  * Converte o DTO do Model na linha que a tela desenha.
  *
- * @param u Usuário vindo do Model.
+ * @param u      Usuário vindo do Model.
+ * @param locale Locale da requisição, para prefixar o destino de edição.
  */
-function toRow(u: UserAdmin): UserRowData {
+function toRow(u: UserAdmin, locale: Locale): UserRowData {
   return {
     id: u.id,
     name: u.name,
     email: u.email,
     roles: u.roles.map((r) => r.name),
-    editHref: `/painel/usuarios/${u.id}/editar`,
+    editHref: localizedHref(`/painel/usuarios/${u.id}/editar`, locale),
   };
 }
 
@@ -93,19 +96,20 @@ function toRow(u: UserAdmin): UserRowData {
  */
 export async function createUserListPageInput(request: PageRequest): Promise<UserListPageInput> {
   const account = await authorize(request, USER_LIST_PERMISSIONS);
-  const locale = resolveLocale(request.headers);
+  const locale = request.t();
   const t = usersListMessages(locale);
   const page = await listUsers(request.headers);
 
   return {
     meta: { title: t.title, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     boundary: asyncBoundaryMessages(locale),
-    items: page.data.map(toRow),
+    items: page.data.map((u) => toRow(u, locale)),
     nextPage: page.data.length < USERS_PAGE_SIZE ? undefined : 2,
     canCreate: can(account, USER_CREATE_PERMISSIONS),
-    newHref: '/painel/usuarios/nova',
+    locale,
+    newHref: request.href('/painel/usuarios/nova'),
   };
 }
 
@@ -153,7 +157,7 @@ export function createUserListVM(input: UserListPageInput): UserListVM {
       // Sem headers: a paginação só acontece no navegador, onde o cookie viaja
       // sozinho. O servidor entrega apenas a primeira página.
       const page = await listUsers(undefined, next);
-      items([...items(), ...page.data.map(toRow)]);
+      items([...items(), ...page.data.map((u) => toRow(u, input.locale))]);
       nextPage(page.data.length < USERS_PAGE_SIZE ? undefined : next + 1);
     } catch {
       failed(true);

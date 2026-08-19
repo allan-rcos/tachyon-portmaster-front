@@ -26,6 +26,7 @@ export default defineConfig({
       // Fonte única do design system — ver vite.config.ts. Trocar aqui e no
       // vite.config muda a origem dos estilos (ex.: Bulma) sem tocar módulos.
       '@ds': fileURLToPath(new URL('./packages/tachyon-design/scss', import.meta.url)),
+      '@ds-assets': fileURLToPath(new URL('./packages/tachyon-design/assets', import.meta.url)),
       // Aliases por camada — ver tsconfig.json / vite.config.ts.
       '@model': fileURLToPath(new URL('./src/model', import.meta.url)),
       '@viewmodel': fileURLToPath(new URL('./src/viewmodel', import.meta.url)),

@@ -1,6 +1,6 @@
 /**
- * Sessão server-side: carrega o AccountProfile (via cookie → GET /account)
- * UMA vez por request e memoiza, para que o guard (auth + permissões) e os
+ * Sessão: carrega o AccountProfile (via cookie → GET /account) UMA vez por
+ * requisição e memoiza, para que o guard (auth + permissões) e os
  * carregadores de página que precisem do perfil compartilhem o mesmo fetch.
  *
  * A memoização é chaveada pelo objeto de `headers`, não pelo PageContext do
@@ -12,25 +12,30 @@
  */
 import { getAccount, type AccountProfile } from '@model/account';
 import type { Permission } from '@model/common';
-import { serverClient } from '@viewmodel/core/client/api-client';
+import { resolveClient } from '@viewmodel/core/client/api-client';
 import type { PageRequest } from '@viewmodel/core/page/page-request';
 
 const cache = new WeakMap<object, Promise<AccountProfile>>();
 
 /**
- * Lê o cookie da requisição (SSR) ou do documento (navegação no cliente).
- *
- * @param request Requisição de página.
- */
-export function readCookie(request: PageRequest): string | undefined {
-  const headers = request.headers as Record<string, string> | null | undefined;
-  const fromHeader = headers?.cookie ?? headers?.Cookie;
-  if (fromHeader) return fromHeader;
-  return typeof document !== 'undefined' ? document.cookie : undefined;
-}
-
-/**
  * Carrega o perfil da sessão, memoizado por requisição.
+ *
+ * O cliente vem de `resolveClient`, e não fixo em `serverClient`: este
+ * carregador roda nos DOIS lados — o `+data` das rotas é declarado com
+ * `env: { server: true, client: true }` em `pages/+config.js`. No navegador o
+ * `serverClient` estava errado por dois motivos independentes:
+ *
+ *   • apontava para o loopback do Rust (`API_SERVER_URL`), cross-origin a
+ *     partir do navegador e fora do proxy que serve `/api`;
+ *   • mandava a credencial num header `Cookie` montado à mão, e `Cookie` é
+ *     forbidden header name — o navegador o descarta em silêncio. A origem
+ *     ainda era `document.cookie`, que por definição nunca enxerga o
+ *     `auth_token`: ele é HttpOnly.
+ *
+ * O efeito era 401 em toda navegação client-side, que o `toPageInput` traduz
+ * em redirect para `/entrar`. Com `resolveClient` o navegador cai no
+ * `browserClient` (`/api` + `credentials: 'include'`) e o cookie HttpOnly
+ * viaja sozinho, que é como o backend espera recebê-lo.
  *
  * @param request Requisição de página.
  * @throws Se o cookie for inválido ou ausente (401). Quem chama decide o que
@@ -42,7 +47,7 @@ export function loadAccount(request: PageRequest): Promise<AccountProfile> {
   const cached = key && cache.get(key);
   if (cached) return cached;
 
-  const pending = getAccount(serverClient({ cookie: readCookie(request) }));
+  const pending = getAccount(resolveClient(request.headers));
   if (key) cache.set(key, pending);
   return pending;
 }

@@ -1,15 +1,15 @@
 import { ClientOnly } from '@view/core/components/ClientOnly';
 import { Navbar } from '@view/core/components/Navbar';
-import { Sidebar, type ShellNavText } from '@view/core/components/Sidebar';
+import { Sidebar } from '@view/core/components/Sidebar';
 import { LogoutButton } from '@view/core/islands/LogoutButton.island';
-import type { ShellIdentity } from '@viewmodel/core/page/shell';
+import type { ShellIdentity, ShellNav } from '@viewmodel/core/page/shell';
 import type { JSX } from 'solid-js';
 
 import styles from './AppShell.module.scss';
 
 export interface AppShellProps {
-  currentPath: string;
-  nav: ShellNavText;
+  /** Navegação já montada pelo `shellNav`. */
+  nav: ShellNav;
   /** Quem está logado — vem do `PageInput` da rota, via `pageContext.data`. */
   identity?: ShellIdentity;
   children: JSX.Element;
@@ -21,17 +21,16 @@ export function AppShell(props: AppShellProps): JSX.Element {
   return (
     <div class={styles.shell}>
       <Sidebar
-        currentPath={props.currentPath}
         nav={props.nav}
         identity={props.identity}
         footer={
-          <ClientOnly fallback={<a href="/entrar">{props.nav.logout}</a>}>
-            <LogoutButton label={props.nav.logout} />
+          <ClientOnly fallback={<a href={props.nav.logoutHref}>{props.nav.logout}</a>}>
+            <LogoutButton label={props.nav.logout} href={props.nav.logoutHref} />
           </ClientOnly>
         }
       />
       <div class={styles.main}>
-        <Navbar />
+        <Navbar homeHref={props.nav.homeHref} />
         <main class={styles.content}>{props.children}</main>
       </div>
     </div>

@@ -8,6 +8,7 @@
 // ============================================================
 import { containerEditMessages } from '@viewmodel/containers/i18n/container-edit-page.messages';
 import { updateContainer } from '@viewmodel/containers/mutations/update-container.mutation';
+import { containerListPageInput } from '@viewmodel/containers/testing/container.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createContainerEditVM, type ContainerEditPageInput } from './container-edit-page.vm';
@@ -25,6 +26,7 @@ const input: ContainerEditPageInput = {
   code: 'MSKU-4410',
   values: { code: 'MSKU-4410', max_capacity: 28000 },
   listHref: '/painel/conteineres',
+  background: containerListPageInput(),
 };
 
 beforeEach(() => {

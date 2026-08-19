@@ -10,7 +10,7 @@
  * @packageDocumentation
  */
 import { type Tone } from '@viewmodel/core/i18n/labels';
-import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
+import type { Locale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
@@ -87,7 +87,7 @@ export interface DashboardPageInput {
  */
 export async function createDashboardPageInput(request: PageRequest): Promise<DashboardPageInput> {
   const account = await authorize(request, DASHBOARD_PERMISSIONS);
-  const locale: Locale = resolveLocale(request.headers);
+  const locale: Locale = request.t();
   const t = painelMessages(locale);
   const metrics = await getMetrics(request.headers);
   const div = metrics.occupancy_division;
@@ -104,7 +104,7 @@ export async function createDashboardPageInput(request: PageRequest): Promise<Da
 
   return {
     meta: { title: t.title, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     tiles: [
       {

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portmaster.app/i18n/route/manifestos.json",
+  "title": "i18n da rota /painel/manifestos (manifestMessages)",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "https://portmaster.app/i18n/common.json"
+    },
+    {
+      "$ref": "https://portmaster.app/i18n/val.json"
+    }
+  ],
+  "required": [
+    "manifests_container",
+    "manifests_done",
+    "manifests_eyebrow",
+    "manifests_load",
+    "manifests_load_desc",
+    "manifests_move",
+    "manifests_no_containers",
+    "manifests_no_products",
+    "manifests_product",
+    "manifests_quantity",
+    "manifests_quantity_hint",
+    "manifests_rule_empty",
+    "manifests_rule_risk",
+    "manifests_rule_sealed",
+    "manifests_rule_weight",
+    "manifests_rules",
+    "manifests_select_container",
+    "manifests_select_product",
+    "manifests_subtitle",
+    "manifests_title",
+    "manifests_unload",
+    "manifests_unload_desc",
+    "manifests_weight_after"
+  ],
+  "patternProperties": {
+    "^manifests_": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

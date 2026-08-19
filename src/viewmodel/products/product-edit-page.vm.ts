@@ -14,8 +14,7 @@
  *
  * @packageDocumentation
  */
-import { RISK_CLASS_OPTIONS } from '@viewmodel/core/i18n/labels';
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import { riskClassOptions } from '@viewmodel/core/i18n/labels';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { SelectOption } from '@viewmodel/core/page/options';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
@@ -28,6 +27,7 @@ import { z } from 'zod';
 import { productEditMessages, type ProductEditText } from './i18n/product-edit-page.messages';
 import { deleteProduct } from './mutations/delete-product.mutation';
 import { updateProduct } from './mutations/update-product.mutation';
+import { createProductListPageInput, type ProductListPageInput } from './product-list-page.vm';
 import { getProduct } from './queries/get-product.query';
 import { createProductSchema } from './schemas/product.schema';
 import type { ProductField, ProductFormVM } from './vm-contracts';
@@ -63,6 +63,8 @@ export interface ProductEditPageInput {
   listHref: string;
   /** Classes de risco do seletor, com rótulo resolvido. */
   riskOptions: readonly SelectOption[];
+  /** A listagem que fica ATRÁS do modal. Ver `./product-create-page.vm`. */
+  background: ProductListPageInput;
 }
 
 /**
@@ -77,7 +79,7 @@ export async function createProductEditPageInput(
   request: PageRequest,
 ): Promise<ProductEditPageInput> {
   const account = await authorize(request, PRODUCT_EDIT_PERMISSIONS);
-  const t = productEditMessages(resolveLocale(request.headers));
+  const t = request.t(productEditMessages);
   const id = routeParam(request, 'id');
 
   // A falha vira "não existe" em vez de vazar o erro de rede: para esta tela,
@@ -85,10 +87,11 @@ export async function createProductEditPageInput(
   const product = await getProduct(id, request.headers).catch(() => {
     throw new PageNotFoundError(`Produto não encontrado: ${id}`);
   });
+  const background = await createProductListPageInput(request);
 
   return {
     meta: { title: `${t.edit} — ${product.name}`, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     id,
     productName: product.name,
@@ -97,8 +100,9 @@ export async function createProductEditPageInput(
       density: product.density,
       risk_class: product.risk_class,
     },
-    listHref: '/painel/produtos',
-    riskOptions: RISK_CLASS_OPTIONS,
+    listHref: request.href('/painel/produtos'),
+    riskOptions: riskClassOptions(request.t()),
+    background,
   };
 }
 

@@ -16,6 +16,8 @@
  */
 import { faker } from '@faker-js/faker';
 import type { Paged } from '@model/common/dto';
+import { localizedHref, type Locale } from '@viewmodel/core/i18n/locale';
+import type { PageRequest } from '@viewmodel/core/page/page-request';
 
 /**
  * Envelopa itens numa resposta paginada do Model.
@@ -38,4 +40,28 @@ export function paged<T>(data: T[], nextCursor?: string): Paged<T> {
  */
 export function seedFaker(seed = 20260725): void {
   faker.seed(seed);
+}
+
+/**
+ * `PageRequest` de teste, com `href`/`t` amarrados ao locale pedido.
+ *
+ * Existe porque o contrato deixou de carregar um `locale` cru: montar o objeto
+ * à mão em cada teste significaria repetir as duas funções, e um teste que as
+ * implementa errado deixa de exercitar o que a rota realmente recebe.
+ *
+ * @param overrides Campos a sobrescrever (url, headers, routeParams, locale).
+ */
+export function pageRequest(
+  overrides: Partial<Omit<PageRequest, 'href' | 't'>> & { locale?: Locale } = {},
+): PageRequest {
+  const { locale = 'pt-BR', ...rest } = overrides;
+  return {
+    headers: undefined,
+    url: '/painel',
+    routeParams: {},
+    href: (path) => localizedHref(path, locale),
+    t: (<T>(catalog?: (l: Locale) => T) =>
+      catalog ? catalog(locale) : locale) as PageRequest['t'],
+    ...rest,
+  };
 }

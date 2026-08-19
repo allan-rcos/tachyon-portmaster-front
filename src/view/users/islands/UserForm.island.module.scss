@@ -1,3 +1,4 @@
+@use '@ds/responsive' as rp;
 @use '@ds/ui' as ui;
 @use '@ds/glass' as glass;
 
@@ -68,4 +69,21 @@
 .loading {
   opacity: 0.6;
   pointer-events: none;
+}
+
+@include rp.mobile {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions > li {
+    width: 100%;
+  }
+
+  .submit,
+  .cancel {
+    width: 100%;
+    justify-content: center;
+  }
 }

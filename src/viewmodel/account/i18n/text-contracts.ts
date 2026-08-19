@@ -31,6 +31,8 @@ export interface PasswordChangeText extends PasswordChangeSchemaText {
   security: string;
   currentPassword: string;
   newPassword: string;
+  /** Rótulo da confirmação da nova senha. */
+  confirmPassword: string;
   submitError: string;
   passwordChanged: string;
   changePassword: string;

@@ -25,7 +25,7 @@ const input: RolePermissionsPageInput = {
   id: 'rol_1',
   roleName: 'Administrador',
   granted: ['product:read'],
-  permissionGroups: permissionOptionGroups(SAMPLE_PERMISSIONS),
+  permissionGroups: permissionOptionGroups(SAMPLE_PERMISSIONS, 'pt-BR'),
   listHref: '/painel/perfis',
 };
 

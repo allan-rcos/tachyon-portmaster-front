@@ -24,7 +24,7 @@ import type {
 export type ProfileField = 'name' | 'email';
 
 /** Campos do formulário de troca de senha. */
-export type PasswordField = 'current_password' | 'new_password';
+export type PasswordField = 'current_password' | 'new_password' | 'confirm_password';
 
 /** Um perfil vinculado ao usuário, pronto para desenhar. */
 export interface AccountRoleData {

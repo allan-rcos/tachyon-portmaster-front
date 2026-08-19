@@ -38,6 +38,9 @@ export default defineConfig({
       // origem (ex.: Bulma), muda só este alias — as importações `@use '@ds/…'`
       // nos módulos continuam iguais.
       '@ds': fileURLToPath(new URL('./packages/tachyon-design/scss', import.meta.url)),
+      // Binários da marca (emblemas, favicon). Espelha o `@ds`: trocar a origem
+      // do design system move os dois de uma vez.
+      '@ds-assets': fileURLToPath(new URL('./packages/tachyon-design/assets', import.meta.url)),
       // Um alias por camada do MVVM — ver tsconfig.json. Mantenha os três
       // arquivos (tsconfig/vite/vitest) em sincronia.
       '@model': fileURLToPath(new URL('./src/model', import.meta.url)),

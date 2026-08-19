@@ -64,7 +64,7 @@ export function SidebarDrawer(): JSX.Element {
   onCleanup(() => {
     /* listeners de document/window */
   });
-  return /* … */;
+  return; /* … */
 }
 ```
 

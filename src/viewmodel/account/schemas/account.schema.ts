@@ -12,6 +12,7 @@ export interface AccountSchemaText {
 export interface PasswordChangeSchemaText {
   currentPasswordRequired: string;
   passwordMin: string;
+  passwordMismatch: string;
 }
 
 /**
@@ -46,10 +47,16 @@ export function createAccountSchema(t?: AccountSchemaText) {
  * @param t Mensagens de erro já resolvidas; omitir cai no pt-BR.
  */
 export function createPasswordChangeSchema(t?: PasswordChangeSchemaText) {
-  return z.object({
-    current_password: z.string().min(1, t?.currentPasswordRequired ?? 'Informe a senha atual'),
-    new_password: z.string().min(6, t?.passwordMin ?? 'Mínimo de 6 caracteres'),
-  });
+  return z
+    .object({
+      current_password: z.string().min(1, t?.currentPasswordRequired ?? 'Informe a senha atual'),
+      new_password: z.string().min(6, t?.passwordMin ?? 'Mínimo de 6 caracteres'),
+      confirm_password: z.string(),
+    })
+    .refine((v) => v.new_password === v.confirm_password, {
+      message: t?.passwordMismatch ?? 'As senhas não conferem',
+      path: ['confirm_password'],
+    });
 }
 
 export const accountSchema = createAccountSchema();

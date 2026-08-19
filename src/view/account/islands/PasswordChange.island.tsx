@@ -30,6 +30,7 @@ export function PasswordChange(props: PasswordChangeProps): JSX.Element {
 
   const current = field('current_password');
   const next = field('new_password');
+  const confirm = field('confirm_password');
   const changing = toAccessor(() => props.vm.changingPassword());
   const failed = toAccessor(() => props.vm.passwordFailed());
   const changed = toAccessor(() => props.vm.passwordChanged());
@@ -53,21 +54,38 @@ export function PasswordChange(props: PasswordChangeProps): JSX.Element {
             classList={{ [styles.invalid]: Boolean(current.error()) }}
             value={current.value()}
             onInput={(e) => props.vm.setPassword('current_password', e.currentTarget.value)}
+            autocomplete="current-password"
             onBlur={() => props.vm.blurPassword('current_password')}
           />
         </FormField>
 
-        <FormField label={props.vm.t.newPassword} for="new-pass" error={next.error()}>
-          <input
-            id="new-pass"
-            type="password"
-            class={styles.input}
-            classList={{ [styles.invalid]: Boolean(next.error()) }}
-            value={next.value()}
-            onInput={(e) => props.vm.setPassword('new_password', e.currentTarget.value)}
-            onBlur={() => props.vm.blurPassword('new_password')}
-          />
-        </FormField>
+        <div class={styles.pair}>
+          <FormField label={props.vm.t.newPassword} for="new-pass" error={next.error()}>
+            <input
+              id="new-pass"
+              type="password"
+              autocomplete="new-password"
+              class={styles.input}
+              classList={{ [styles.invalid]: Boolean(next.error()) }}
+              value={next.value()}
+              onInput={(e) => props.vm.setPassword('new_password', e.currentTarget.value)}
+              onBlur={() => props.vm.blurPassword('new_password')}
+            />
+          </FormField>
+
+          <FormField label={props.vm.t.confirmPassword} for="confirm-pass" error={confirm.error()}>
+            <input
+              id="confirm-pass"
+              type="password"
+              autocomplete="new-password"
+              class={styles.input}
+              classList={{ [styles.invalid]: Boolean(confirm.error()) }}
+              value={confirm.value()}
+              onInput={(e) => props.vm.setPassword('confirm_password', e.currentTarget.value)}
+              onBlur={() => props.vm.blurPassword('confirm_password')}
+            />
+          </FormField>
+        </div>
       </fieldset>
 
       <p class={styles.err} role="alert" hidden={!failed()}>

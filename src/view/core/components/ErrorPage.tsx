@@ -6,6 +6,8 @@ import { Show } from 'solid-js';
 export interface ErrorPageProps {
   forbidden: boolean;
   is404: boolean;
+  /** Destino da saída de emergência, já montado pela rota. */
+  homeHref: string;
 }
 
 /**
@@ -34,7 +36,7 @@ export function ErrorPage(props: ErrorPageProps): JSX.Element {
       <p class={styles.message}>{message()}</p>
       <Show when={!props.forbidden}>
         <p>
-          <a class={styles.link} href="/painel">
+          <a class={styles.link} href={props.homeHref}>
             ← Ir para o painel
           </a>
         </p>

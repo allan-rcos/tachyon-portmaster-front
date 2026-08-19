@@ -36,4 +36,6 @@ export interface RoleFormText extends RoleSchemaText {
   create: string;
   save: string;
   cancel: string;
+  /** Rótulo acessível do "fechar" do modal — vem do `commonText`. */
+  close: string;
 }

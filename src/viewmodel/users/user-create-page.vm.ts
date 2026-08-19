@@ -10,7 +10,6 @@
  *
  * @packageDocumentation
  */
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
@@ -21,6 +20,7 @@ import { z } from 'zod';
 import { userNewMessages, type UserNewText } from './i18n/user-create-page.messages';
 import { createUser } from './mutations/create-user.mutation';
 import { createUserSchema } from './schemas/user.schema';
+import { createUserListPageInput, type UserListPageInput } from './user-list-page.vm';
 import type { RoleOption, UserField, UserFormVM } from './vm-contracts';
 
 /** Permissões que a rota exige. Antes vivia em `+permissions.js`. */
@@ -38,6 +38,14 @@ export interface UserCreatePageInput {
   roles: readonly RoleOption[];
   /** Volta para a listagem — a View não monta rota. */
   listHref: string;
+  /**
+   * A listagem que fica ATRÁS do modal.
+   *
+   * A rota do formulário é a listagem com o modal aberto — mantivemos o
+   * endereço (deep-link, SSR e o guard de permissão que vive aqui) e mudamos
+   * só a apresentação. Ver `@viewmodel/products/product-create-page.vm`.
+   */
+  background: UserListPageInput;
 }
 
 /**
@@ -51,15 +59,17 @@ export async function createUserCreatePageInput(
   request: PageRequest,
 ): Promise<UserCreatePageInput> {
   const account = await authorize(request, USER_CREATE_PERMISSIONS);
-  const t = userNewMessages(resolveLocale(request.headers));
+  const t = request.t(userNewMessages);
   const roles = await listRoles(request.headers);
 
+  const background = await createUserListPageInput(request);
   return {
     meta: { title: t.new, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     roles: roles.data.map((role) => ({ id: role.id, name: role.name })),
-    listHref: '/painel/usuarios',
+    listHref: request.href('/painel/usuarios'),
+    background,
   };
 }
 

@@ -1,0 +1,12 @@
+@use '@ds/responsive' as rp;
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 14px;
+  align-items: start;
+
+  @include rp.tablet-down {
+    grid-template-columns: 1fr;
+  }
+}

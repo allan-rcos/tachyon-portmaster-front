@@ -6,6 +6,7 @@
 // ============================================================
 import { containerNewMessages } from '@viewmodel/containers/i18n/container-create-page.messages';
 import { createContainer } from '@viewmodel/containers/mutations/create-container.mutation';
+import { containerListPageInput } from '@viewmodel/containers/testing/container.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createContainerCreateVM, type ContainerCreatePageInput } from './container-create-page.vm';
@@ -20,6 +21,7 @@ const input: ContainerCreatePageInput = {
   shell: { name: 'Ana', role: 'Administrador', initials: 'AF', href: '/painel/conta' },
   t,
   listHref: '/painel/conteineres',
+  background: containerListPageInput(),
 };
 
 beforeEach(() => {

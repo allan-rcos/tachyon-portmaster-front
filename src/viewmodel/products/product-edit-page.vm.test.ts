@@ -3,11 +3,12 @@
 //  `./product-create-page.vm.test.ts` — aqui o que muda é o formulário nascer
 //  preenchido, salvar pelo id e ter `remove()`.
 // ============================================================
-import { RISK_CLASS_OPTIONS } from '@viewmodel/core/i18n/labels';
+import { riskClassOptions } from '@viewmodel/core/i18n/labels';
 import { productEditMessages } from '@viewmodel/products/i18n/product-edit-page.messages';
 import { createProduct } from '@viewmodel/products/mutations/create-product.mutation';
 import { deleteProduct } from '@viewmodel/products/mutations/delete-product.mutation';
 import { updateProduct } from '@viewmodel/products/mutations/update-product.mutation';
+import { productListPageInput } from '@viewmodel/products/testing/product.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createProductEditVM, type ProductEditPageInput } from './product-edit-page.vm';
@@ -29,7 +30,8 @@ const input: ProductEditPageInput = {
   productName: 'Café',
   values: { name: 'Café', density: 0.67, risk_class: 'None' },
   listHref: '/painel/produtos',
-  riskOptions: RISK_CLASS_OPTIONS,
+  riskOptions: riskClassOptions('pt-BR'),
+  background: productListPageInput(),
 };
 
 beforeEach(() => {

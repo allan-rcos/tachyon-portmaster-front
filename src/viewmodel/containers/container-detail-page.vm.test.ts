@@ -16,7 +16,7 @@ import {
 } from '@viewmodel/containers/testing/container.factory';
 import type { PageRequest } from '@viewmodel/core/page/page-request';
 import { loadAccount } from '@viewmodel/core/session/session';
-import { paged } from '@viewmodel/core/testing/factory-support';
+import { paged, pageRequest } from '@viewmodel/core/testing/factory-support';
 import { listProducts } from '@viewmodel/products/queries/list-products.query';
 import { productFactory } from '@viewmodel/products/testing/product.factory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -54,11 +54,11 @@ const mockedProducts = vi.mocked(listProducts);
 const mockedAccount = vi.mocked(loadAccount);
 const t = containerDetailMessages('pt-BR');
 
-const request: PageRequest = {
+const request: PageRequest = pageRequest({
   headers: { cookie: 'auth_token=abc' },
   url: '/painel/conteineres/ctr_1',
   routeParams: { id: 'ctr_1' },
-};
+});
 
 /** Resolve o `PageInput` com o contêiner no status pedido. */
 async function factsFor(status: ContainerStatus) {

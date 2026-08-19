@@ -11,7 +11,6 @@
  * @packageDocumentation
  */
 import { permissionOptionGroups } from '@viewmodel/core/i18n/labels';
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { OptionGroup } from '@viewmodel/core/page/options';
 import {
@@ -80,7 +79,7 @@ export async function createRolePermissionsPageInput(
   request: PageRequest,
 ): Promise<RolePermissionsPageInput> {
   const account = await authorize(request, ROLE_PERMISSIONS_PERMISSIONS);
-  const t = rolePermissionsMessages(resolveLocale(request.headers));
+  const t = request.t(rolePermissionsMessages);
   const id = routeParam(request, 'id');
 
   // A listagem e o catálogo são independentes: buscar em paralelo tira uma ida
@@ -94,13 +93,13 @@ export async function createRolePermissionsPageInput(
 
   return {
     meta: { title: `${t.syncPermissions} — ${role.name}`, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     id,
     roleName: role.name,
     granted: role.permissions,
-    permissionGroups: permissionOptionGroups(catalog),
-    listHref: '/painel/perfis',
+    permissionGroups: permissionOptionGroups(catalog, request.t()),
+    listHref: request.href('/painel/perfis'),
   };
 }
 

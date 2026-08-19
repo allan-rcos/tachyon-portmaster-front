@@ -21,8 +21,8 @@ import {
   asyncBoundaryMessages,
   type AsyncBoundaryText,
 } from '@viewmodel/core/i18n/async-boundary.messages';
-import { RISK_CLASS_LABEL, RISK_CLASS_TONE, type Tone } from '@viewmodel/core/i18n/labels';
-import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
+import { riskClassLabels, RISK_CLASS_TONE, type Tone } from '@viewmodel/core/i18n/labels';
+import { localizedHref, type Locale } from '@viewmodel/core/i18n/locale';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
@@ -76,6 +76,8 @@ export interface ProductListPageInput {
   nextCursor?: string;
   /** Permissão de criação, já avaliada. */
   canCreate: boolean;
+  /** Termo de busca corrente, para o campo voltar preenchido depois do GET. */
+  search: string;
   /** Destino do botão "novo produto". */
   newHref: string;
   /** Locale resolvido, para formatar as páginas seguintes igual à primeira. */
@@ -93,8 +95,8 @@ function toRow(p: Product, locale: Locale): ProductRowData {
     id: p.id,
     name: p.name,
     density: formatDensity(p.density, locale),
-    risk: { label: RISK_CLASS_LABEL[p.risk_class], tone: RISK_CLASS_TONE[p.risk_class] },
-    editHref: `/painel/produtos/${p.id}/editar`,
+    risk: { label: riskClassLabels(locale)[p.risk_class], tone: RISK_CLASS_TONE[p.risk_class] },
+    editHref: localizedHref(`/painel/produtos/${p.id}/editar`, locale),
   };
 }
 
@@ -112,19 +114,21 @@ export async function createProductListPageInput(
   request: PageRequest,
 ): Promise<ProductListPageInput> {
   const account = await authorize(request, PRODUCT_LIST_PERMISSIONS);
-  const locale = resolveLocale(request.headers);
+  const locale = request.t();
   const t = productsListMessages(locale);
-  const page = await listProducts(request.headers, searchParams(request));
+  const params = searchParams(request);
+  const page = await listProducts(request.headers, params);
 
   return {
     meta: { title: t.title, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     boundary: asyncBoundaryMessages(locale),
     items: page.data.map((p) => toRow(p, locale)),
     nextCursor: page.next_cursor,
     canCreate: can(account, PRODUCT_CREATE_PERMISSIONS),
-    newHref: '/painel/produtos/nova',
+    search: params.get('search') ?? '',
+    newHref: request.href('/painel/produtos/nova'),
     locale,
   };
 }
@@ -139,6 +143,8 @@ export interface ProductListVM {
   items: () => readonly ProductRowData[];
   /** Permissão de criação, já avaliada no servidor. */
   canCreate: boolean;
+  /** Termo de busca corrente, para o campo voltar preenchido depois do GET. */
+  search: string;
   /** Destino do botão "novo produto". */
   newHref: string;
   /** Há mais páginas a carregar. */
@@ -172,7 +178,11 @@ export function createProductListVM(input: ProductListPageInput): ProductListVM 
     try {
       // Sem headers: a paginação só acontece no navegador, onde o cookie viaja
       // sozinho. O servidor entrega apenas a primeira página.
-      const page = await listProducts(undefined, new URLSearchParams({ cursor: next }));
+      // A busca viaja junto do cursor: sem ela, a 2ª página viria do catálogo
+      // INTEIRO e a listagem filtrada passaria a misturar itens fora do filtro.
+      const query = new URLSearchParams({ cursor: next });
+      if (input.search) query.set('search', input.search);
+      const page = await listProducts(undefined, query);
       items([...items(), ...page.data.map((p) => toRow(p, input.locale))]);
       cursor(page.next_cursor);
     } catch {
@@ -188,6 +198,7 @@ export function createProductListVM(input: ProductListPageInput): ProductListVM 
     boundary: input.boundary,
     items,
     canCreate: input.canCreate,
+    search: input.search,
     newHref: input.newHref,
     hasMore: () => cursor() !== undefined,
     isLoadingMore: loadingMore,

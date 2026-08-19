@@ -4,6 +4,7 @@
 //  formulário mora aqui.
 // ============================================================
 import { signIn } from '@viewmodel/auth/mutations/sign-in.mutation';
+import { pageRequest } from '@viewmodel/core/testing/factory-support';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { loginMessages } from './i18n/login-page.messages';
@@ -26,27 +27,23 @@ beforeEach(() => {
 
 describe('loadLoginPage', () => {
   it('resolve o redirect a partir da URL', async () => {
-    const result = await loadLoginPage({
-      url: '/entrar?redirect=%2Fpainel%2Fconteineres',
-      headers: undefined,
-      routeParams: {},
-    });
+    const result = await loadLoginPage(
+      pageRequest({ url: '/entrar?redirect=%2Fpainel%2Fconteineres' }),
+    );
     expect(result.redirectTo).toBe('/painel/conteineres');
   });
 
   it('cai no painel quando não há redirect', async () => {
-    const result = await loadLoginPage({ url: '/entrar', headers: undefined, routeParams: {} });
+    const result = await loadLoginPage(pageRequest({ url: '/entrar' }));
     expect(result.redirectTo).toBe('/painel');
   });
 
   it.each(['//evil.com', 'https://evil.com', 'javascript:alert(1)'])(
     'recusa destino externo (%s) — seria redirect aberto',
     async (target) => {
-      const result = await loadLoginPage({
-        url: `/entrar?redirect=${encodeURIComponent(target)}`,
-        headers: undefined,
-        routeParams: {},
-      });
+      const result = await loadLoginPage(
+        pageRequest({ url: `/entrar?redirect=${encodeURIComponent(target)}` }),
+      );
       expect(result.redirectTo).toBe('/painel');
     },
   );

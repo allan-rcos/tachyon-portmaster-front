@@ -15,13 +15,39 @@
  * @packageDocumentation
  */
 import type { IncomingHeaders } from '@viewmodel/core/client/api-client';
+import { localeFromUrl, localizedHref, type Locale } from '@viewmodel/core/i18n/locale';
 
 /** Dados de uma requisição de página, independentes de framework. */
 export interface PageRequest {
-  /** Cabeçalhos da requisição — fonte do cookie de sessão e do locale. */
+  /** Cabeçalhos da requisição — fonte do cookie de sessão. */
   headers: IncomingHeaders;
-  /** URL original, com query string. */
+  /** URL original, com query string E com o prefixo de locale, se houver. */
   url: string;
+  /**
+   * Monta um caminho interno da aplicação.
+   *
+   * O idioma NÃO é parâmetro: quem chama pede `/painel/produtos` e recebe o
+   * endereço certo para a requisição corrente, sem saber que existe prefixo.
+   * Trocar a estratégia de idioma (prefixo, subdomínio, nenhuma) passa a ser
+   * mudança de UM lugar, e não de todo `createXPageInput`.
+   *
+   * @param path Caminho canônico, começando com `/`.
+   */
+  href: (path: string) => string;
+  /**
+   * Resolve um catálogo de texto no idioma da requisição.
+   *
+   * Mesma ideia do `href`: a rota entrega o catálogo (`productsListMessages`) e
+   * recebe o texto pronto, em vez de carregar um `locale` de mão em mão.
+   *
+   * Sem argumento devolve o locale cru — usado só onde ele precisa ATRAVESSAR
+   * para o cliente (o `PageInput` das listagens leva o locale porque a
+   * paginação formata as próximas páginas no navegador).
+   */
+  t: {
+    <T>(catalog: (locale: Locale) => T): T;
+    (): Locale;
+  };
   /** Parâmetros de rota (ex.: `id`), em base62 opaco. */
   routeParams: Record<string, string>;
   /** Status abortado a montante (ex.: 403 vindo do guard). */
@@ -96,9 +122,13 @@ interface PageContextLike {
  * @param pageContext PageContext do Vike (aceito estruturalmente).
  */
 export function toPageRequest(pageContext: PageContextLike): PageRequest {
+  const locale = localeFromUrl(pageContext.urlOriginal);
   return {
     headers: pageContext.headers as IncomingHeaders,
     url: pageContext.urlOriginal,
+    href: (path) => localizedHref(path, locale),
+    t: (<T>(catalog?: (l: Locale) => T) =>
+      catalog ? catalog(locale) : locale) as PageRequest['t'],
     routeParams: pageContext.routeParams ?? {},
     abortStatusCode: pageContext.abortStatusCode,
     is404: pageContext.is404 ?? false,

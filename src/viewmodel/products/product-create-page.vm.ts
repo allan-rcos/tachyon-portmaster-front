@@ -18,8 +18,7 @@
  *
  * @packageDocumentation
  */
-import { RISK_CLASS_OPTIONS } from '@viewmodel/core/i18n/labels';
-import { resolveLocale } from '@viewmodel/core/i18n/locale';
+import { riskClassOptions } from '@viewmodel/core/i18n/labels';
 import { authorize } from '@viewmodel/core/page/authorize';
 import type { SelectOption } from '@viewmodel/core/page/options';
 import type { PageMeta, PageRequest } from '@viewmodel/core/page/page-request';
@@ -29,6 +28,7 @@ import { z } from 'zod';
 
 import { productNewMessages, type ProductNewText } from './i18n/product-create-page.messages';
 import { createProduct } from './mutations/create-product.mutation';
+import { createProductListPageInput, type ProductListPageInput } from './product-list-page.vm';
 import { createProductSchema } from './schemas/product.schema';
 import type { ProductField, ProductFormVM } from './vm-contracts';
 
@@ -47,6 +47,15 @@ export interface ProductCreatePageInput {
   listHref: string;
   /** Classes de risco do seletor, com rótulo resolvido. */
   riskOptions: readonly SelectOption[];
+  /**
+   * A listagem que fica ATRÁS do modal.
+   *
+   * No protótipo o cadastro é um modal sobre o catálogo, não uma tela cheia.
+   * Mantivemos a ROTA (deep-link, SSR do formulário e o guard de permissão que
+   * vive aqui) e mudamos só a apresentação: esta rota é a listagem com o modal
+   * aberto. Por isso ela precisa carregar a listagem também.
+   */
+  background: ProductListPageInput;
 }
 
 /**
@@ -60,14 +69,16 @@ export async function createProductCreatePageInput(
   request: PageRequest,
 ): Promise<ProductCreatePageInput> {
   const account = await authorize(request, PRODUCT_CREATE_PERMISSIONS);
-  const t = productNewMessages(resolveLocale(request.headers));
+  const t = request.t(productNewMessages);
+  const background = await createProductListPageInput(request);
 
   return {
     meta: { title: t.new, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
-    listHref: '/painel/produtos',
-    riskOptions: RISK_CLASS_OPTIONS,
+    listHref: request.href('/painel/produtos'),
+    riskOptions: riskClassOptions(request.t()),
+    background,
   };
 }
 

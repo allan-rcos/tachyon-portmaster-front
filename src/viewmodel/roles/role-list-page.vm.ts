@@ -13,7 +13,7 @@ import {
   type AsyncBoundaryText,
 } from '@viewmodel/core/i18n/async-boundary.messages';
 import { permissionLabel } from '@viewmodel/core/i18n/labels';
-import { resolveLocale, type Locale } from '@viewmodel/core/i18n/locale';
+import { localizedHref, type Locale } from '@viewmodel/core/i18n/locale';
 import { authorize, can } from '@viewmodel/core/page/authorize';
 import { searchParams, type PageMeta, type PageRequest } from '@viewmodel/core/page/page-request';
 import { shellIdentity, type ShellIdentity } from '@viewmodel/core/page/shell';
@@ -88,8 +88,8 @@ function toRow(r: Role, locale: Locale): RoleRowData {
     name: r.name,
     userCount: formatNumber(r.user_count, locale),
     permissionCount: formatNumber(r.permissions.length, locale),
-    permissions: r.permissions.map(permissionLabel),
-    permissionsHref: `/painel/perfis/${r.id}/permissoes`,
+    permissions: r.permissions.map((slug) => permissionLabel(slug, locale)),
+    permissionsHref: localizedHref(`/painel/perfis/${r.id}/permissoes`, locale),
   };
 }
 
@@ -102,19 +102,19 @@ function toRow(r: Role, locale: Locale): RoleRowData {
  */
 export async function createRoleListPageInput(request: PageRequest): Promise<RoleListPageInput> {
   const account = await authorize(request, ROLE_LIST_PERMISSIONS);
-  const locale = resolveLocale(request.headers);
+  const locale = request.t();
   const t = rolesListMessages(locale);
   const page = await listRoles(request.headers, searchParams(request));
 
   return {
     meta: { title: t.title, description: t.subtitle },
-    shell: shellIdentity(account),
+    shell: shellIdentity(account, request),
     t,
     boundary: asyncBoundaryMessages(locale),
     items: page.data.map((r) => toRow(r, locale)),
     nextCursor: page.next_cursor,
     canCreate: can(account, ROLE_CREATE_PERMISSIONS),
-    newHref: '/painel/perfis/nova',
+    newHref: request.href('/painel/perfis/nova'),
     locale,
   };
 }

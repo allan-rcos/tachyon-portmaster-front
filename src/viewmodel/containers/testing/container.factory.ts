@@ -16,6 +16,9 @@ import type {
   ContainerSummary,
   TelemetryLogItem,
 } from '@model/containers/dto';
+import type { ContainerListPageInput } from '@viewmodel/containers/container-list-page.vm';
+import { containersListMessages } from '@viewmodel/containers/i18n/container-list-page.messages';
+import { asyncBoundaryMessages } from '@viewmodel/core/i18n/async-boundary.messages';
 import { Factory } from 'fishery';
 
 /** Código de contêiner no padrão ISO (4 letras + 4 dígitos). */
@@ -53,3 +56,31 @@ export const containerSummaryFactory = Factory.define<ContainerSummary>(() => ({
   manifest: manifestItemFactory.buildList(2),
   recent_logs: telemetryLogFactory.buildList(3),
 }));
+
+/**
+ * `ContainerListPageInput` mínimo — o FUNDO do modal das rotas de formulário.
+ *
+ * As rotas de cadastro/edição carregam a listagem para desenhá-la atrás do
+ * modal, mas o ViewModel do FORMULÁRIO não lê esse campo: quem o consome é o
+ * `+Page`. Nos testes de VM ele é só o preenchimento que o tipo exige.
+ *
+ * @param overrides Campos a sobrescrever no input padrão.
+ */
+export function containerListPageInput(
+  overrides: Partial<ContainerListPageInput> = {},
+): ContainerListPageInput {
+  const t = containersListMessages('pt-BR');
+  return {
+    meta: { title: t.title, description: t.subtitle },
+    shell: { name: 'Ana', role: 'Administrador', initials: 'AF', href: '/painel/conta' },
+    t,
+    boundary: asyncBoundaryMessages('pt-BR'),
+    items: [],
+    canCreate: true,
+    newHref: '/painel/conteineres/nova',
+    locale: 'pt-BR',
+    filters: { search: '', status: '' },
+    statusOptions: [],
+    ...overrides,
+  };
+}
