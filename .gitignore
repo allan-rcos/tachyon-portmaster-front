@@ -54,3 +54,7 @@ tmp/*
 .DS_Store
 
 .claude
+
+# Ignore *.diff files
+*.diff
+*.patch

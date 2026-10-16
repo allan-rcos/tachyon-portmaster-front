@@ -13,6 +13,12 @@
  *
  * @packageDocumentation
  */
-import faviconUrl from '@ds-assets/logo/favicon.ico?url';
+
+/**
+ * O alias `@ds-assets` causava erro de módulo não encontrado neste import do
+ * favicon; o caminho relativo aponta diretamente para o arquivo no submodule
+ * e permite ao Vite processá-lo como asset por meio do sufixo `?url`.
+ * */
+import faviconUrl from '../packages/tachyon-design/assets/logo/favicon.ico?url';
 
 export default faviconUrl;
